@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,104 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  clerkId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  claims    Claim[]
+  users     User[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String       @id @default(cuid())
+  clerkId        String       @unique
+  email          String       @unique
+  firstName      String?
+  lastName       String?
+  role           Role         @default(INSPECTOR)
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  auditLogs      AuditLog[]
+  claims         Claim[]
+  inspections    Inspection[]
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("users")
+}
+
+model Claim {
+  id              String       @id @default(cuid())
+  claimNumber     String       @unique @default(cuid())
+  clientName      String
+  clientEmail     String?
+  clientPhone     String?
+  itemDescription String
+  damageDetails   String
+  status          ClaimStatus  @default(OPEN)
+  incidentDate    DateTime?
+  claimDate       DateTime     @default(now())
+  organizationId  String
+  createdById     String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  auditLogs       AuditLog[]
+  createdBy       User         @relation(fields: [createdById], references: [id])
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inspections     Inspection[]
+
+  @@map("claims")
+}
+
+model Inspection {
+  id               String     @id @default(cuid())
+  inspectionDate   DateTime   @default(now())
+  inspectorNotes   String?
+  damageAssessment String?
+  photos           String[]
+  claimId          String
+  inspectorId      String
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  auditLogs        AuditLog[]
+  claim            Claim      @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  inspector        User       @relation(fields: [inspectorId], references: [id])
+
+  @@map("inspections")
+}
+
+model AuditLog {
+  id           String      @id @default(cuid())
+  action       String
+  details      String?
+  userId       String
+  claimId      String?
+  inspectionId String?
+  createdAt    DateTime    @default(now())
+  claim        Claim?      @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  inspection   Inspection? @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum Role {
+  INSPECTOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ClaimStatus {
+  OPEN
+  IN_PROGRESS
+  UNDER_REVIEW
+  APPROVED
+  DENIED
+  CLOSED
 }
