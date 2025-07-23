@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { CustomSidebarProvider } from "@/components/custom-sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppHeaderBar } from "@/components/app-header-bar";
 
@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider>
+        <CustomSidebarProvider>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <main className="flex-1 flex flex-col overflow-hidden">
@@ -40,7 +40,7 @@ export default function RootLayout({
               </div>
             </main>
           </div>
-        </SidebarProvider>
+        </CustomSidebarProvider>
       </body>
     </html>
   );

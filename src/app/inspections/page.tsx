@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Search, Calendar, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -50,6 +50,17 @@ export default function InspectionsPage() {
   const [inspections, setInspections] = useState<Inspection[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [page] = useState(1)
+
+  // Debounce search input for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [search])
 
   const fetchInspections = useCallback(async () => {
     try {
@@ -58,11 +69,13 @@ export default function InspectionsPage() {
         limit: "10"
       })
       
+      if (debouncedSearch) params.append("search", debouncedSearch)
+      
       const response = await fetch(`/api/inspections?${params}`)
       const data = await response.json()
       
       if (response.ok) {
-        setInspections(data.inspections)
+        setInspections(data.inspections || [])
       } else {
         console.error("Failed to fetch inspections:", data.error)
       }
@@ -71,44 +84,28 @@ export default function InspectionsPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, page])
-
-  useEffect(() => {
-    fetchInspections()
-  }, [fetchInspections])
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "10"
-      })
-      
-      const response = await fetch(`/api/inspections?${params}`)
-      const data = await response.json()
-      
-      if (response.ok) {
-        setInspections(data.inspections)
-      } else {
-        console.error("Failed to fetch inspections:", data.error)
-      }
-    } catch (error) {
-      console.error("Error fetching inspections:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [debouncedSearch, page])
 
   const getStatusBadge = (status: string) => {
-    const colorClass = statusColors[status as keyof typeof statusColors] || statusColors.OPEN
+    const colorClass = statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"
     return (
-      <Badge className={colorClass}>
+      <Badge variant="secondary" className={colorClass}>
         {status.replace('_', ' ')}
       </Badge>
     )
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
   }
+
+  useEffect(() => {
+    fetchInspections()
+  }, [fetchInspections])
 
   if (loading) {
     return (

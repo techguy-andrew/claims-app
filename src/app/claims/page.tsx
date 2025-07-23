@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -55,7 +55,18 @@ export default function ClaimsPage() {
   const [claims, setClaims] = useState<Claim[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("")
+  const [page] = useState(1)
+
+  // Debounce search input for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [search])
 
   const fetchClaims = useCallback(async () => {
     try {
@@ -64,7 +75,7 @@ export default function ClaimsPage() {
         limit: "10"
       })
       
-      if (search) params.append("search", search)
+      if (debouncedSearch) params.append("search", debouncedSearch)
       if (statusFilter) params.append("status", statusFilter)
       
       const response = await fetch(`/api/claims?${params}`)
@@ -80,47 +91,31 @@ export default function ClaimsPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, statusFilter, page])
+  }, [debouncedSearch, statusFilter, page])
 
-  useEffect(() => {
-    fetchClaims()
-  }, [fetchClaims])
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "10"
-      })
-      
-      if (search) params.append("search", search)
-      if (statusFilter) params.append("status", statusFilter)
-      
-      const response = await fetch(`/api/claims?${params}`)
-      const data = await response.json()
-      
-      if (response.ok) {
-        setClaims(data.claims)
-      } else {
-        console.error("Failed to fetch claims:", data.error)
-      }
-    } catch (error) {
-      console.error("Error fetching claims:", error)
-    } finally {
-      setLoading(false)
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
   }
 
   const getStatusBadge = (status: string) => {
-    const colorClass = statusColors[status as keyof typeof statusColors] || statusColors.OPEN
+    const colorClass = statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"
     return (
-      <Badge className={colorClass}>
+      <Badge variant="secondary" className={colorClass}>
         {status.replace('_', ' ')}
       </Badge>
     )
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
-  }
+  useEffect(() => {
+    const loadClaims = async () => {
+      await fetchClaims()
+    }
+    loadClaims()
+  }, [fetchClaims])
 
   if (loading) {
     return (

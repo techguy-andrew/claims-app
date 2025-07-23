@@ -33,15 +33,15 @@ Roadmap
 2.3.2 Verify connection with Prisma Studio ✅
 
 
-3.0 Phase 3: Core Features
-3.1 Claim Management
-3.1.1 Create API routes for claim CRUD operations
-3.1.2 Build claims dashboard page
-3.1.3 Use shadcn/ui components for claim listing
-3.2 Inspection Management
-3.2.1 Create API routes for inspection CRUD operations
-3.2.2 Build inspection form page
-3.2.3 Use shadcn/ui Form and Input components
+3.0 Phase 3: Core Features ✅ COMPLETED
+3.1 Claim Management ✅
+3.1.1 Create API routes for claim CRUD operations ✅
+3.1.2 Build claims dashboard page ✅
+3.1.3 Use shadcn/ui components for claim listing ✅
+3.2 Inspection Management ✅
+3.2.1 Create API routes for inspection CRUD operations ✅
+3.2.2 Build inspection form page ✅
+3.2.3 Use shadcn/ui Form and Input components ✅
 3.3 Photo Upload
 3.3.1 Install next-cloudinary
 3.3.2 Configure Cloudinary in .env

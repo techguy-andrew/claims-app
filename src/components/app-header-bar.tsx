@@ -1,13 +1,13 @@
 "use client";
 
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { CustomSidebarTrigger, useCustomSidebar } from "@/components/custom-sidebar";
 
 export function AppHeaderBar() {
-  const { isMobile, state } = useSidebar();
+  const { isMobile, state } = useCustomSidebar();
 
   return (
     <div className="flex items-center gap-2 p-2 border-b">
-      {(isMobile || state === "collapsed") && <SidebarTrigger />}
+      {(isMobile || state === "collapsed") && <CustomSidebarTrigger />}
       <h1 className="font-semibold">Claims App</h1>
     </div>
   );

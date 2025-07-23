@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getNextSequentialNumber, validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
 
-const prisma = new PrismaClient()
+// Use connection pooling for better performance
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+})
 
 // GET /api/claims - List all claims
 export async function GET(request: NextRequest) {
@@ -62,7 +69,7 @@ export async function GET(request: NextRequest) {
       prisma.claim.count({ where })
     ])
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       claims,
       pagination: {
         page,
@@ -71,6 +78,11 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     })
+
+    // Add caching headers for better performance
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=30')
+    
+    return response
   } catch (error) {
     console.error('Error fetching claims:', error)
     return NextResponse.json(

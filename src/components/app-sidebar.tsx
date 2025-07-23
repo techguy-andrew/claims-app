@@ -2,20 +2,19 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { ClipboardList, Home, FileText, Camera, Settings, LogOut } from "lucide-react"
+import { ClipboardList, Home, FileText, Camera, Settings, LogOut, X } from "lucide-react"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
-import { X } from "lucide-react"
+  CustomSidebar,
+  CustomSidebarContent,
+  CustomSidebarFooter,
+  CustomSidebarGroup,
+  CustomSidebarGroupContent,
+  CustomSidebarHeader,
+  CustomSidebarMenu,
+  CustomSidebarMenuButton,
+  CustomSidebarMenuItem,
+  useCustomSidebar,
+} from "@/components/custom-sidebar"
 
 const items = [
   {
@@ -42,7 +41,7 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { isMobile, setOpenMobile, toggleSidebar } = useSidebar()
+  const { isMobile, setOpenMobile, toggleSidebar } = useCustomSidebar()
 
   const isActive = (url: string) => {
     if (url === "/") {
@@ -59,51 +58,51 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar>
-      <SidebarHeader>
+    <CustomSidebar>
+      <CustomSidebarHeader>
         <div className="flex items-center justify-between gap-2 px-2 py-1 w-full">
           <div className="flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-primary" />
+            <ClipboardList className="h-6 w-6 text-blue-600" />
             <span className="font-bold text-lg">Claims App</span>
           </div>
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+            className="p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Close sidebar"
             type="button"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
+      </CustomSidebarHeader>
+      <CustomSidebarContent>
+        <CustomSidebarGroup>
+          <CustomSidebarGroupContent>
+            <CustomSidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                <CustomSidebarMenuItem key={item.title}>
+                  <CustomSidebarMenuButton asChild isActive={isActive(item.url)}>
                     <Link href={item.url} onClick={handleLinkClick}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                  </CustomSidebarMenuButton>
+                </CustomSidebarMenuItem>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
+            </CustomSidebarMenu>
+          </CustomSidebarGroupContent>
+        </CustomSidebarGroup>
+      </CustomSidebarContent>
+      <CustomSidebarFooter>
+        <CustomSidebarMenu>
+          <CustomSidebarMenuItem>
+            <CustomSidebarMenuButton>
               <LogOut />
               <span>Sign Out</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+            </CustomSidebarMenuButton>
+          </CustomSidebarMenuItem>
+        </CustomSidebarMenu>
+      </CustomSidebarFooter>
+    </CustomSidebar>
   )
 }

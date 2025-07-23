@@ -39,7 +39,7 @@ async function testAPIValidation() {
       console.log(`Status: ${response.status}`)
       console.log(`Response: ${data.error || 'Success'}`)
     } catch (error) {
-      console.log('Network error (API might not be running):', error.message)
+      console.log('Network error (API might not be running):', (error as Error).message)
     }
 
     // Test 2: Create claim with invalid sequential number (negative)
@@ -62,7 +62,7 @@ async function testAPIValidation() {
       console.log(`Status: ${response.status}`)
       console.log(`Response: ${data.error || 'Success'}`)
     } catch (error) {
-      console.log('Network error (API might not be running):', error.message)
+      console.log('Network error (API might not be running):', (error as Error).message)
     }
 
     // Test 3: Update claim with duplicate sequential number (should fail)
@@ -89,7 +89,7 @@ async function testAPIValidation() {
         console.log(`Status: ${response.status}`)
         console.log(`Response: ${data.error || 'Success'}`)
       } catch (error) {
-        console.log('Network error (API might not be running):', error.message)
+        console.log('Network error (API might not be running):', (error as Error).message)
       }
     } else {
       console.log('Need at least 2 claims for this test')
