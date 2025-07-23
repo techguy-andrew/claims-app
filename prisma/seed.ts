@@ -1,4 +1,4 @@
-import { PrismaClient, ClaimStatus, Role } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { getNextSequentialNumber, initializeCounters } from '../src/lib/sequential-numbers'
 
 const prisma = new PrismaClient()
@@ -167,18 +167,18 @@ async function main() {
 
     // Assign status based on claim age and randomization
     const daysSinceClaim = Math.floor((Date.now() - claimDate.getTime()) / (1000 * 60 * 60 * 24))
-    let status: ClaimStatus
+    let status: 'OPEN' | 'IN_PROGRESS' | 'UNDER_REVIEW' | 'APPROVED' | 'DENIED' | 'CLOSED'
     
     if (daysSinceClaim < 2) {
       status = 'OPEN'
     } else if (daysSinceClaim < 5) {
       status = Math.random() > 0.5 ? 'IN_PROGRESS' : 'OPEN'
     } else if (daysSinceClaim < 10) {
-      status = ['IN_PROGRESS', 'UNDER_REVIEW'][Math.floor(Math.random() * 2)] as ClaimStatus
+      status = ['IN_PROGRESS', 'UNDER_REVIEW'][Math.floor(Math.random() * 2)] as 'IN_PROGRESS' | 'UNDER_REVIEW'
     } else if (daysSinceClaim < 15) {
-      status = ['UNDER_REVIEW', 'APPROVED', 'DENIED'][Math.floor(Math.random() * 3)] as ClaimStatus
+      status = ['UNDER_REVIEW', 'APPROVED', 'DENIED'][Math.floor(Math.random() * 3)] as 'UNDER_REVIEW' | 'APPROVED' | 'DENIED'
     } else {
-      status = ['APPROVED', 'DENIED', 'CLOSED'][Math.floor(Math.random() * 3)] as ClaimStatus
+      status = ['APPROVED', 'DENIED', 'CLOSED'][Math.floor(Math.random() * 3)] as 'APPROVED' | 'DENIED' | 'CLOSED'
     }
 
     const claim = await prisma.claim.create({
@@ -221,7 +221,7 @@ async function main() {
         clientPhone: client.phone,
         itemDescription: `Commercial ${scenario.item}`,
         damageDetails: scenario.damage,
-        status: ['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'APPROVED', 'CLOSED'][Math.floor(Math.random() * 5)] as ClaimStatus,
+        status: ['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'APPROVED', 'CLOSED'][Math.floor(Math.random() * 5)] as 'OPEN' | 'IN_PROGRESS' | 'UNDER_REVIEW' | 'APPROVED' | 'CLOSED',
         incidentDate,
         claimDate,
         organizationId: organization.id,
