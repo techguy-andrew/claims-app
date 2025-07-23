@@ -15,7 +15,12 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
-    const where: Record<string, any> = {}
+    interface InspectionWhere {
+      claimId?: string;
+      inspectorId?: string;
+    }
+
+    const where: InspectionWhere = {}
     
     if (claimId) {
       where.claimId = claimId

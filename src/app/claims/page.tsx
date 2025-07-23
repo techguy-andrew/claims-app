@@ -56,13 +56,35 @@ export default function ClaimsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("")
-  const [page, setPage] = useState(1)
+
+  const fetchClaims = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "10"
+      })
+      
+      if (search) params.append("search", search)
+      if (statusFilter) params.append("status", statusFilter)
+      
+      const response = await fetch(`/api/claims?${params}`)
+      const data = await response.json()
+      
+      if (response.ok) {
+        setClaims(data.claims)
+      } else {
+        console.error("Failed to fetch claims:", data.error)
+      }
+    } catch (error) {
+      console.error("Error fetching claims:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [search, statusFilter, page])
 
   useEffect(() => {
     fetchClaims()
-  }, [search, statusFilter, page])
-
-  const fetchClaims = async () => {
+  }, [fetchClaims])
     try {
       const params = new URLSearchParams({
         page: page.toString(),

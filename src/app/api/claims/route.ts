@@ -15,7 +15,17 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
-    const where: Record<string, any> = {}
+    interface ClaimWhere {
+      status?: string;
+      OR?: Array<{
+        claimNumber?: { contains: string; mode: 'insensitive' };
+        clientName?: { contains: string; mode: 'insensitive' };
+        itemDescription?: { contains: string; mode: 'insensitive' };
+        sequentialNumber?: number;
+      }>;
+    }
+
+    const where: ClaimWhere = {}
     
     if (status) {
       where.status = status

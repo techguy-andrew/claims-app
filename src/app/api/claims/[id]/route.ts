@@ -90,7 +90,18 @@ export async function PUT(
     }
 
     // Handle sequential number update if provided
-    const updateData: any = {
+    type UpdateClaimData = {
+      clientName?: string;
+      clientEmail?: string | null;
+      clientPhone?: string | null;
+      itemDescription?: string;
+      damageDetails?: string | null;
+      status?: string;
+      incidentDate?: Date | null;
+      sequentialNumber?: number;
+    }
+
+    const updateData: UpdateClaimData = {
       clientName,
       clientEmail,
       clientPhone,

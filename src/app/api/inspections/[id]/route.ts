@@ -87,7 +87,15 @@ export async function PUT(
     }
 
     // Handle sequential number update if provided
-    const updateData: any = {
+    type UpdateInspectionData = {
+      inspectionDate?: Date;
+      inspectorNotes?: string | null;
+      damageAssessment?: string | null;
+      photos?: string[];
+      sequentialNumber?: number;
+    }
+
+    const updateData: UpdateInspectionData = {
       inspectionDate: inspectionDate ? new Date(inspectionDate) : undefined,
       inspectorNotes,
       damageAssessment,

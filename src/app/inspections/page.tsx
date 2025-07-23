@@ -50,13 +50,32 @@ export default function InspectionsPage() {
   const [inspections, setInspections] = useState<Inspection[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [page, setPage] = useState(1)
+
+  const fetchInspections = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "10"
+      })
+      
+      const response = await fetch(`/api/inspections?${params}`)
+      const data = await response.json()
+      
+      if (response.ok) {
+        setInspections(data.inspections)
+      } else {
+        console.error("Failed to fetch inspections:", data.error)
+      }
+    } catch (error) {
+      console.error("Error fetching inspections:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [search, page])
 
   useEffect(() => {
     fetchInspections()
-  }, [search, page])
-
-  const fetchInspections = async () => {
+  }, [fetchInspections])
     try {
       const params = new URLSearchParams({
         page: page.toString(),
