@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, ClaimStatus } from '@prisma/client'
 import { getNextSequentialNumber, validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
 
 // Use connection pooling for better performance
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     interface ClaimWhere {
-      status?: string;
+      status?: ClaimStatus;
       OR?: Array<{
         claimNumber?: { contains: string; mode: 'insensitive' };
         clientName?: { contains: string; mode: 'insensitive' };
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const where: ClaimWhere = {}
     
     if (status) {
-      where.status = status
+      where.status = status as ClaimStatus
     }
     
     if (search) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, ClaimStatus } from '@prisma/client'
 import { validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
 
 const prisma = new PrismaClient()
@@ -95,21 +95,21 @@ export async function PUT(
       clientEmail?: string | null;
       clientPhone?: string | null;
       itemDescription?: string;
-      damageDetails?: string | null;
-      status?: string;
+      damageDetails?: string;
+      status?: ClaimStatus;
       incidentDate?: Date | null;
       sequentialNumber?: number;
     }
 
-    const updateData: UpdateClaimData = {
-      clientName,
-      clientEmail,
-      clientPhone,
-      itemDescription,
-      damageDetails,
-      status,
-      incidentDate: incidentDate ? new Date(incidentDate) : null
-    }
+    const updateData: UpdateClaimData = {}
+    
+    if (clientName !== undefined) updateData.clientName = clientName
+    if (clientEmail !== undefined) updateData.clientEmail = clientEmail
+    if (clientPhone !== undefined) updateData.clientPhone = clientPhone
+    if (itemDescription !== undefined) updateData.itemDescription = itemDescription
+    if (damageDetails !== undefined && damageDetails !== null) updateData.damageDetails = damageDetails
+    if (status !== undefined) updateData.status = status as ClaimStatus
+    if (incidentDate !== undefined) updateData.incidentDate = incidentDate ? new Date(incidentDate) : null
 
     if (sequentialNumber !== undefined && sequentialNumber !== existingClaim.sequentialNumber) {
       // Validate the new sequential number
