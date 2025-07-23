@@ -38,9 +38,10 @@ model User {
 }
 
 model Claim {
-  id              String       @id @default(cuid())
-  claimNumber     String       @unique @default(cuid())
-  clientName      String
+  id               String       @id @default(cuid())
+  claimNumber      String       @unique @default(cuid())
+  sequentialNumber Int          @unique
+  clientName       String
   clientEmail     String?
   clientPhone     String?
   itemDescription String
@@ -62,6 +63,7 @@ model Claim {
 
 model Inspection {
   id               String     @id @default(cuid())
+  sequentialNumber Int        @unique
   inspectionDate   DateTime   @default(now())
   inspectorNotes   String?
   damageAssessment String?
@@ -90,6 +92,15 @@ model AuditLog {
   user         User        @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
+}
+
+model NumberCounter {
+  id           String @id @default(cuid())
+  entityType   String @unique
+  currentValue Int    @default(0)
+  updatedAt    DateTime @updatedAt
+
+  @@map("number_counters")
 }
 
 enum Role {
