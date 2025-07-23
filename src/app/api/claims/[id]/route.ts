@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient, ClaimStatus } from '@prisma/client'
+import { ClaimStatus } from '@prisma/client'
 import { validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // GET /api/claims/[id] - Get single claim
 export async function GET(

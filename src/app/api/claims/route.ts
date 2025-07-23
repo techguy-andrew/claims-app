@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient, ClaimStatus } from '@prisma/client'
+import { ClaimStatus } from '@prisma/client'
 import { getNextSequentialNumber, validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
-
-// Use connection pooling for better performance
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL
-    }
-  }
-})
+import { prisma } from '@/lib/prisma'
 
 // GET /api/claims - List all claims
 export async function GET(request: NextRequest) {

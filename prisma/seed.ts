@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { getNextSequentialNumber, initializeCounters } from '../src/lib/sequential-numbers'
-
-const prisma = new PrismaClient()
+import { prisma } from '../src/lib/prisma'
 
 const sampleClients = [
   { name: 'John Smith', email: 'john.smith@email.com', phone: '(555) 123-4567' },

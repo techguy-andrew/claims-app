@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { getNextSequentialNumber, validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // GET /api/inspections - List all inspections
 export async function GET(request: NextRequest) {
