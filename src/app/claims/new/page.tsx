@@ -24,7 +24,7 @@ export default function NewClaimPage() {
     itemDescription: "",
     damageDetails: "",
     incidentDate: "",
-    sequentialNumber: ""
+    claimNumber: ""
   })
 
   const handleInputChange = (field: string, value: string) => {
@@ -43,7 +43,7 @@ export default function NewClaimPage() {
       // In a real app, these would come from authentication context
       const payload = {
         ...formData,
-        sequentialNumber: formData.sequentialNumber ? parseInt(formData.sequentialNumber) : undefined,
+        claimNumber: formData.claimNumber || undefined,
         organizationId: "dummy-org-id",
         createdById: "dummy-user-id"
       }
@@ -182,14 +182,18 @@ export default function NewClaimPage() {
               </div>
               
               <div>
-                <Label htmlFor="sequentialNumber">Sequential Number (Optional)</Label>
+                <Label htmlFor="claimNumber">Claim Number (Optional)</Label>
                 <Input
-                  id="sequentialNumber"
-                  type="number"
-                  value={formData.sequentialNumber}
-                  onChange={(e) => handleInputChange('sequentialNumber', e.target.value)}
-                  placeholder="Leave blank for auto-assignment"
+                  id="claimNumber"
+                  type="text"
+                  value={formData.claimNumber}
+                  onChange={(e) => handleInputChange('claimNumber', e.target.value.toUpperCase())}
+                  placeholder="Leave blank for auto-generation (e.g., ABC1234567)"
+                  maxLength={10}
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  10 characters: letters and numbers only
+                </p>
               </div>
             </div>
           </CardContent>

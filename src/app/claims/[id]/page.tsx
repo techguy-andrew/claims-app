@@ -19,7 +19,6 @@ import {
 interface ClaimData {
   id: string
   claimNumber: string
-  sequentialNumber: number
   clientName: string
   clientEmail: string | null
   clientPhone: string | null
@@ -62,7 +61,7 @@ export default function ClaimDetailsPage({
     damageDetails: "",
     status: "",
     incidentDate: "",
-    sequentialNumber: ""
+    claimNumber: ""
   })
 
   useEffect(() => {
@@ -87,7 +86,7 @@ export default function ClaimDetailsPage({
           damageDetails: data.damageDetails,
           status: data.status,
           incidentDate: data.incidentDate ? data.incidentDate.split('T')[0] : "",
-          sequentialNumber: data.sequentialNumber.toString()
+          claimNumber: data.claimNumber
         })
       } else {
         console.error("Failed to fetch claim:", data.error)
@@ -111,7 +110,7 @@ export default function ClaimDetailsPage({
     try {
       const payload = {
         ...formData,
-        sequentialNumber: formData.sequentialNumber ? parseInt(formData.sequentialNumber) : undefined
+        claimNumber: formData.claimNumber || undefined
       }
       
       const response = await fetch(`/api/claims/${claimId}`, {
@@ -147,7 +146,7 @@ export default function ClaimDetailsPage({
         damageDetails: claim.damageDetails,
         status: claim.status,
         incidentDate: claim.incidentDate ? claim.incidentDate.split('T')[0] : "",
-        sequentialNumber: claim.sequentialNumber.toString()
+        claimNumber: claim.claimNumber
       })
     }
     setEditing(false)
@@ -218,7 +217,7 @@ export default function ClaimDetailsPage({
             ← Back to Claims
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Claim #{claim.sequentialNumber}</h1>
+            <h1 className="text-3xl font-bold">Claim {claim.claimNumber}</h1>
             <p className="text-gray-600 mt-1">
               Created on {formatDate(claim.claimDate)}
             </p>

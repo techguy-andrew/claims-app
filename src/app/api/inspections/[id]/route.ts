@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
+import { validateId } from '@/lib/random-ids'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/inspections/[id] - Get single inspection
@@ -19,8 +19,7 @@ export async function GET(
         claim: {
           select: { 
             id: true,
-            claimNumber: true, 
-            sequentialNumber: true,
+            claimNumber: true,
             clientName: true, 
             itemDescription: true,
             damageDetails: true,
@@ -69,7 +68,7 @@ export async function PUT(
       inspectorNotes,
       damageAssessment,
       photos,
-      sequentialNumber
+      inspectionNumber
     } = body
 
     // Check if inspection exists
@@ -84,13 +83,13 @@ export async function PUT(
       )
     }
 
-    // Handle sequential number update if provided
+    // Handle inspection number update if provided
     type UpdateInspectionData = {
       inspectionDate?: Date;
       inspectorNotes?: string | null;
       damageAssessment?: string | null;
       photos?: string[];
-      sequentialNumber?: number;
+      inspectionNumber?: string;
     }
 
     const updateData: UpdateInspectionData = {
@@ -100,18 +99,16 @@ export async function PUT(
       photos: photos || existingInspection.photos
     }
 
-    if (sequentialNumber !== undefined && sequentialNumber !== existingInspection.sequentialNumber) {
-      // Validate the new sequential number
-      const validation = await validateSequentialNumber('INSPECTION', sequentialNumber, id)
+    if (inspectionNumber !== undefined && inspectionNumber !== existingInspection.inspectionNumber) {
+      // Validate the new inspection number
+      const validation = await validateId('INSPECTION', inspectionNumber.toUpperCase(), id)
       if (!validation.isValid) {
         return NextResponse.json(
           { error: validation.message },
           { status: 400 }
         )
       }
-      updateData.sequentialNumber = sequentialNumber
-      // Reserve this number to prevent conflicts
-      await reserveSequentialNumber('INSPECTION', sequentialNumber)
+      updateData.inspectionNumber = inspectionNumber.toUpperCase()
     }
 
     const inspection = await prisma.inspection.update({
@@ -123,8 +120,7 @@ export async function PUT(
         },
         claim: {
           select: { 
-            claimNumber: true, 
-            sequentialNumber: true,
+            claimNumber: true,
             clientName: true, 
             itemDescription: true 
           }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getNextSequentialNumber, validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
+import { createInspectionNumber, validateId } from '@/lib/random-ids'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/inspections - List all inspections
@@ -33,15 +33,14 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { sequentialNumber: 'desc' },
+        orderBy: { inspectionDate: 'desc' },
         include: {
           inspector: {
             select: { firstName: true, lastName: true, email: true }
           },
           claim: {
             select: { 
-              claimNumber: true, 
-              sequentialNumber: true,
+              claimNumber: true,
               clientName: true, 
               itemDescription: true, 
               status: true 
@@ -82,7 +81,7 @@ export async function POST(request: NextRequest) {
       photos,
       claimId,
       inspectorId,
-      sequentialNumber: providedSequentialNumber
+      inspectionNumber: providedInspectionNumber
     } = body
 
     // Validate required fields
@@ -117,34 +116,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let sequentialNumber: number
+    let inspectionNumber: string
 
-    if (providedSequentialNumber) {
-      // Validate manually provided sequential number
-      const validation = await validateSequentialNumber('INSPECTION', providedSequentialNumber)
-      if (!validation.isValid) {
-        return NextResponse.json(
-          { error: validation.message },
-          { status: 400 }
-        )
-      }
-      sequentialNumber = providedSequentialNumber
-      // Reserve this number to prevent conflicts
-      await reserveSequentialNumber('INSPECTION', sequentialNumber)
-    } else {
-      // Auto-generate sequential number
-      sequentialNumber = await getNextSequentialNumber('INSPECTION')
+    try {
+      // Create inspection number (either provided or auto-generated)
+      inspectionNumber = await createInspectionNumber(providedInspectionNumber)
+    } catch (error) {
+      return NextResponse.json(
+        { error: (error as Error).message },
+        { status: 400 }
+      )
     }
 
     const inspection = await prisma.inspection.create({
       data: {
+        inspectionNumber,
         inspectionDate: inspectionDate ? new Date(inspectionDate) : new Date(),
         inspectorNotes,
         damageAssessment,
         photos: photos || [],
         claimId,
-        inspectorId,
-        sequentialNumber
+        inspectorId
       },
       include: {
         inspector: {
@@ -152,8 +144,7 @@ export async function POST(request: NextRequest) {
         },
         claim: {
           select: { 
-            claimNumber: true, 
-            sequentialNumber: true,
+            claimNumber: true,
             clientName: true, 
             itemDescription: true 
           }

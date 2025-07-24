@@ -23,7 +23,6 @@ import {
 interface Claim {
   id: string
   claimNumber: string
-  sequentialNumber: number
   clientName: string
   itemDescription: string
   status: string
@@ -224,7 +223,7 @@ export default function ClaimsPage() {
                 {claims.map((claim) => (
                   <TableRow key={claim.id}>
                     <TableCell>
-                      <span className="font-medium">#{claim.sequentialNumber}</span>
+                      <span className="font-medium">{claim.claimNumber}</span>
                     </TableCell>
                     <TableCell>{claim.clientName}</TableCell>
                     <TableCell>

@@ -21,7 +21,7 @@ import {
 
 interface Inspection {
   id: string
-  sequentialNumber: number
+  inspectionNumber: string
   inspectionDate: string
   inspectorNotes: string | null
   damageAssessment: string | null
@@ -32,7 +32,6 @@ interface Inspection {
   }
   claim: {
     claimNumber: string
-    sequentialNumber: number
     clientName: string
     itemDescription: string
     status: string
@@ -195,13 +194,13 @@ export default function InspectionsPage() {
                 {inspections.map((inspection) => (
                   <TableRow key={inspection.id}>
                     <TableCell className="font-medium">
-                      #{inspection.sequentialNumber}
+{inspection.inspectionNumber}
                     </TableCell>
                     <TableCell>
                       {formatDate(inspection.inspectionDate)}
                     </TableCell>
                     <TableCell className="font-medium">
-                      #{inspection.claim.sequentialNumber}
+{inspection.claim.claimNumber}
                     </TableCell>
                     <TableCell>{inspection.claim.clientName}</TableCell>
                     <TableCell className="max-w-xs truncate">

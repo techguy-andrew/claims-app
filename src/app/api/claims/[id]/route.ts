@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ClaimStatus } from '@prisma/client'
-import { validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
+import { validateId } from '@/lib/random-ids'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/claims/[id] - Get single claim
@@ -73,7 +73,7 @@ export async function PUT(
       damageDetails,
       status,
       incidentDate,
-      sequentialNumber
+      claimNumber
     } = body
 
     // Check if claim exists
@@ -88,7 +88,7 @@ export async function PUT(
       )
     }
 
-    // Handle sequential number update if provided
+    // Handle claim number update if provided
     type UpdateClaimData = {
       clientName?: string;
       clientEmail?: string | null;
@@ -97,7 +97,7 @@ export async function PUT(
       damageDetails?: string;
       status?: ClaimStatus;
       incidentDate?: Date | null;
-      sequentialNumber?: number;
+      claimNumber?: string;
     }
 
     const updateData: UpdateClaimData = {}
@@ -110,18 +110,16 @@ export async function PUT(
     if (status !== undefined) updateData.status = status as ClaimStatus
     if (incidentDate !== undefined) updateData.incidentDate = incidentDate ? new Date(incidentDate) : null
 
-    if (sequentialNumber !== undefined && sequentialNumber !== existingClaim.sequentialNumber) {
-      // Validate the new sequential number
-      const validation = await validateSequentialNumber('CLAIM', sequentialNumber, id)
+    if (claimNumber !== undefined && claimNumber !== existingClaim.claimNumber) {
+      // Validate the new claim number
+      const validation = await validateId('CLAIM', claimNumber.toUpperCase(), id)
       if (!validation.isValid) {
         return NextResponse.json(
           { error: validation.message },
           { status: 400 }
         )
       }
-      updateData.sequentialNumber = sequentialNumber
-      // Reserve this number to prevent conflicts
-      await reserveSequentialNumber('CLAIM', sequentialNumber)
+      updateData.claimNumber = claimNumber.toUpperCase()
     }
 
     const claim = await prisma.claim.update({

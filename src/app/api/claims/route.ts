@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ClaimStatus } from '@prisma/client'
-import { getNextSequentialNumber, validateSequentialNumber, reserveSequentialNumber } from '@/lib/sequential-numbers'
+import { createClaimNumber, validateId } from '@/lib/random-ids'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/claims - List all claims
@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
         claimNumber?: { contains: string; mode: 'insensitive' };
         clientName?: { contains: string; mode: 'insensitive' };
         itemDescription?: { contains: string; mode: 'insensitive' };
-        sequentialNumber?: number;
       }>;
     }
 
@@ -34,9 +33,7 @@ export async function GET(request: NextRequest) {
       where.OR = [
         { claimNumber: { contains: search, mode: 'insensitive' } },
         { clientName: { contains: search, mode: 'insensitive' } },
-        { itemDescription: { contains: search, mode: 'insensitive' } },
-        // Allow searching by sequential number
-        ...(isNaN(parseInt(search)) ? [] : [{ sequentialNumber: parseInt(search) }])
+        { itemDescription: { contains: search, mode: 'insensitive' } }
       ]
     }
 
@@ -45,7 +42,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { sequentialNumber: 'desc' },
+        orderBy: { claimDate: 'desc' },
         include: {
           createdBy: {
             select: { firstName: true, lastName: true, email: true }
@@ -98,7 +95,7 @@ export async function POST(request: NextRequest) {
       incidentDate,
       organizationId,
       createdById,
-      sequentialNumber: providedSequentialNumber
+      claimNumber: providedClaimNumber
     } = body
 
     // Validate required fields
@@ -109,27 +106,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let sequentialNumber: number
+    let claimNumber: string
 
-    if (providedSequentialNumber) {
-      // Validate manually provided sequential number
-      const validation = await validateSequentialNumber('CLAIM', providedSequentialNumber)
-      if (!validation.isValid) {
-        return NextResponse.json(
-          { error: validation.message },
-          { status: 400 }
-        )
-      }
-      sequentialNumber = providedSequentialNumber
-      // Reserve this number to prevent conflicts
-      await reserveSequentialNumber('CLAIM', sequentialNumber)
-    } else {
-      // Auto-generate sequential number
-      sequentialNumber = await getNextSequentialNumber('CLAIM')
+    try {
+      // Create claim number (either provided or auto-generated)
+      claimNumber = await createClaimNumber(providedClaimNumber)
+    } catch (error) {
+      return NextResponse.json(
+        { error: (error as Error).message },
+        { status: 400 }
+      )
     }
 
     const claim = await prisma.claim.create({
       data: {
+        claimNumber,
         clientName,
         clientEmail,
         clientPhone,
@@ -137,8 +128,7 @@ export async function POST(request: NextRequest) {
         damageDetails,
         incidentDate: incidentDate ? new Date(incidentDate) : null,
         organizationId,
-        createdById,
-        sequentialNumber
+        createdById
       },
       include: {
         createdBy: {
