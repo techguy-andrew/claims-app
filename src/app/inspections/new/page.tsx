@@ -2,12 +2,17 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Save } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { 
+  Button, 
+  Input, 
+  Label, 
+  Textarea, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui"
 import { PhotoUpload } from "@/components/photo-upload"
 
 export default function NewInspectionPage() {
@@ -68,11 +73,10 @@ export default function NewInspectionPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button 
-          variant="outline" 
-          size="icon"
+          variant="secondary" 
           onClick={() => router.back()}
         >
-          <ArrowLeft className="h-4 w-4" />
+          ← Back
         </Button>
         <div>
           <h1 className="text-3xl font-bold">New Inspection</h1>
@@ -130,9 +134,8 @@ export default function NewInspectionPage() {
             </CardHeader>
             <CardContent>
               <PhotoUpload
-                value={formData.photos}
-                onChange={(photos) => handleInputChange("photos", photos)}
-                maxFiles={20}
+                onPhotosChange={(photos) => handleInputChange("photos", photos.map(file => file.name))}
+                maxPhotos={20}
               />
             </CardContent>
           </Card>
@@ -175,14 +178,13 @@ export default function NewInspectionPage() {
         <div className="flex justify-end gap-4 mt-6">
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => router.back()}
           >
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>
-            <Save className="h-4 w-4 mr-2" />
-            {loading ? "Creating..." : "Create Inspection"}
+            💾 {loading ? "Creating..." : "Create Inspection"}
           </Button>
         </div>
       </form>

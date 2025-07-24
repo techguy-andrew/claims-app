@@ -3,13 +3,18 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { CldImage } from "next-cloudinary"
-import { ArrowLeft, Edit, Save, X, Camera, FileText } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { 
+  Button, 
+  Input, 
+  Label, 
+  Textarea, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
+  Badge 
+} from "@/components/ui"
 
 interface InspectionData {
   id: string
@@ -148,8 +153,8 @@ export default function InspectionDetailsPage({
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="secondary">
+            ← Back
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Loading...</h1>
@@ -164,11 +169,10 @@ export default function InspectionDetailsPage({
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button 
-            variant="outline" 
-            size="icon"
+            variant="secondary" 
             onClick={() => router.back()}
           >
-            <ArrowLeft className="h-4 w-4" />
+            ← Back
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Inspection Not Found</h1>
@@ -183,11 +187,10 @@ export default function InspectionDetailsPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button 
-            variant="outline" 
-            size="icon"
+            variant="secondary" 
             onClick={() => router.back()}
           >
-            <ArrowLeft className="h-4 w-4" />
+            ← Back
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Inspection Details</h1>
@@ -200,19 +203,16 @@ export default function InspectionDetailsPage({
         <div className="flex items-center gap-2">
           {editing ? (
             <div className="flex gap-2">
-              <Button onClick={handleCancel} variant="outline">
-                <X className="h-4 w-4 mr-2" />
-                Cancel
+              <Button onClick={handleCancel} variant="secondary">
+                ✕ Cancel
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? "Saving..." : "Save"}
+                💾 {saving ? "Saving..." : "Save"}
               </Button>
             </div>
           ) : (
             <Button onClick={() => setEditing(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
+              ✏️ Edit
             </Button>
           )}
         </div>
@@ -247,11 +247,10 @@ export default function InspectionDetailsPage({
 
             <div className="pt-2">
               <Button 
-                variant="outline" 
+                variant="secondary" 
                 onClick={() => router.push(`/claims/${inspection.claim.id}`)}
               >
-                <FileText className="h-4 w-4 mr-2" />
-                View Full Claim
+                📄 View Full Claim
               </Button>
             </div>
           </CardContent>
@@ -300,9 +299,9 @@ export default function InspectionDetailsPage({
           </CardHeader>
           <CardContent>
             {inspection.photos.length === 0 ? (
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-                <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No photos uploaded</p>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="text-6xl mb-4">📷</div>
+                <p className="text-gray-600">No photos uploaded</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -335,11 +334,11 @@ export default function InspectionDetailsPage({
                 <Label>Inspector Notes</Label>
                 <div className="mt-2">
                   {inspection.inspectorNotes ? (
-                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                    <Badge variant="secondary" className="bg-green-50 text-green-700">
                       Complete
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
+                    <Badge variant="secondary" className="bg-yellow-50 text-yellow-700">
                       Pending
                     </Badge>
                   )}
@@ -350,11 +349,11 @@ export default function InspectionDetailsPage({
                 <Label>Damage Assessment</Label>
                 <div className="mt-2">
                   {inspection.damageAssessment ? (
-                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                    <Badge variant="secondary" className="bg-green-50 text-green-700">
                       Complete
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
+                    <Badge variant="secondary" className="bg-yellow-50 text-yellow-700">
                       Pending
                     </Badge>
                   )}

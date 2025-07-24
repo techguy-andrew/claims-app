@@ -89,7 +89,7 @@ CardHeader.displayName = 'CardHeader';
 const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, children, as: Component = 'h3', ...props }, ref) => (
     <Component
-      ref={ref as any}
+      ref={ref as React.Ref<HTMLElement>}
       className={[styles.headerTitle, className].filter(Boolean).join(' ')}
       {...props}
     >

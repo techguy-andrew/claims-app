@@ -242,7 +242,7 @@ export default function ClaimsPage() {
                       {claim.createdBy.firstName} {claim.createdBy.lastName}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="default" style="outline">
+                      <Badge variant="default" badgeStyle="outline">
                         {claim.inspections.length} inspection{claim.inspections.length !== 1 ? 's' : ''}
                       </Badge>
                     </TableCell>

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext } from 'react';
 
-const CustomSidebarContext = createContext<{}>({});
+const CustomSidebarContext = createContext<object>({});
 
 export const CustomSidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (

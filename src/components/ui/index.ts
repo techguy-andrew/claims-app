@@ -1,8 +1,8 @@
 // Export all UI components
-export { Button, type ButtonProps } from './Button';
-export { Input, type InputProps } from './Input';
-export { Textarea, type TextareaProps } from './Textarea';
-export { Label, Field, type LabelProps, type FieldProps } from './Label';
+export { Button, type ButtonProps } from './button';
+export { Input, type InputProps } from './input';
+export { Textarea, type TextareaProps } from './textarea';
+export { Label, Field, type LabelProps, type FieldProps } from './label';
 export { 
   Card, 
   CardHeader, 
@@ -12,7 +12,7 @@ export {
   CardFooter, 
   CardGrid,
   type CardProps 
-} from './Card';
+} from './card';
 export { 
   Table, 
   TableHeader, 
@@ -23,9 +23,9 @@ export {
   TableCell,
   TableEmpty,
   type TableProps 
-} from './Table';
-export { Select, type SelectProps, type SelectOption } from './Select';
-export { Badge, BadgeGroup, type BadgeProps } from './Badge';
+} from './table';
+export { Select, type SelectProps, type SelectOption } from './select';
+export { Badge, BadgeGroup, type BadgeProps } from './badge';
 export { 
   Modal, 
   ModalHeader, 

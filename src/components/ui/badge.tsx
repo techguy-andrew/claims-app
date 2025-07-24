@@ -1,9 +1,9 @@
 import React from 'react';
 import styles from './Badge.module.css';
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'style'> {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error';
-  style?: 'solid' | 'outline' | 'soft';
+  badgeStyle?: 'solid' | 'outline' | 'soft';
   size?: 'small' | 'default' | 'large';
   interactive?: boolean;
   dot?: boolean;
@@ -21,7 +21,7 @@ export interface BadgeGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ 
     variant = 'default', 
-    style = 'solid',
+    badgeStyle = 'solid',
     size = 'default', 
     interactive = false,
     dot = false,
@@ -36,10 +36,10 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   }, ref) => {
     // Determine the style class
     const getVariantClass = () => {
-      if (style === 'outline') {
+      if (badgeStyle === 'outline') {
         return styles[`${variant}Outline`];
       }
-      if (style === 'soft') {
+      if (badgeStyle === 'soft') {
         return styles[`${variant}Soft`];
       }
       return styles[variant];

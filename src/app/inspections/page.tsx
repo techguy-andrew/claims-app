@@ -2,19 +2,22 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, Calendar, Camera } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
+import { 
+  Button, 
+  Input, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+  Badge 
+} from "@/components/ui"
 
 interface Inspection {
   id: string
@@ -139,8 +142,7 @@ export default function InspectionsPage() {
           </p>
         </div>
         <Button onClick={() => router.push('/inspections/new')}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Inspection
+          + New Inspection
         </Button>
       </div>
 
@@ -151,12 +153,10 @@ export default function InspectionsPage() {
         </CardHeader>
         <CardContent>
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by claim number, client name, or item..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
             />
           </div>
         </CardContent>
@@ -198,10 +198,7 @@ export default function InspectionsPage() {
                       #{inspection.sequentialNumber}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {formatDate(inspection.inspectionDate)}
-                      </div>
+                      {formatDate(inspection.inspectionDate)}
                     </TableCell>
                     <TableCell className="font-medium">
                       #{inspection.claim.sequentialNumber}
@@ -217,28 +214,25 @@ export default function InspectionsPage() {
                       {inspection.inspector.firstName} {inspection.inspector.lastName}
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Camera className="h-4 w-4 text-muted-foreground" />
-                        <Badge variant="outline">
-                          {inspection.photos.length} photo{inspection.photos.length !== 1 ? 's' : ''}
-                        </Badge>
-                      </div>
+                      <Badge variant="secondary">
+                        📷 {inspection.photos.length} photo{inspection.photos.length !== 1 ? 's' : ''}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       {inspection.damageAssessment ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                        <Badge variant="secondary" className="bg-green-50 text-green-700">
                           Complete
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
+                        <Badge variant="secondary" className="bg-yellow-50 text-yellow-700">
                           Pending
                         </Badge>
                       )}
                     </TableCell>
                     <TableCell>
                       <Button 
-                        variant="outline" 
-                        size="sm"
+                        variant="secondary" 
+                        size="small"
                         onClick={() => router.push(`/inspections/${inspection.id}`)}
                       >
                         View
