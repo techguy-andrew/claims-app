@@ -2,26 +2,23 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
+import { 
+  Button, 
+  Input, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import {
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+  Badge
+} from "@/components/ui"
 
 interface Claim {
   id: string
@@ -39,15 +36,6 @@ interface Claim {
     id: string
     inspectionDate: string
   }>
-}
-
-const statusColors = {
-  OPEN: "bg-blue-100 text-blue-800",
-  IN_PROGRESS: "bg-yellow-100 text-yellow-800", 
-  UNDER_REVIEW: "bg-purple-100 text-purple-800",
-  APPROVED: "bg-green-100 text-green-800",
-  DENIED: "bg-red-100 text-red-800",
-  CLOSED: "bg-gray-100 text-gray-800"
 }
 
 export default function ClaimsPage() {
@@ -102,10 +90,20 @@ export default function ClaimsPage() {
   }
 
   const getStatusBadge = (status: string) => {
-    const colorClass = statusColors[status as keyof typeof statusColors] || "bg-gray-100 text-gray-800"
+    const statusConfig = {
+      OPEN: { variant: 'primary' as const, text: 'Open' },
+      IN_PROGRESS: { variant: 'warning' as const, text: 'In Progress' },
+      UNDER_REVIEW: { variant: 'secondary' as const, text: 'Under Review' },
+      APPROVED: { variant: 'success' as const, text: 'Approved' },
+      DENIED: { variant: 'error' as const, text: 'Denied' },
+      CLOSED: { variant: 'default' as const, text: 'Closed' }
+    }
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.CLOSED
+    
     return (
-      <Badge variant="secondary" className={colorClass}>
-        {status.replace('_', ' ')}
+      <Badge variant={config.variant}>
+        {config.text}
       </Badge>
     )
   }
@@ -119,17 +117,17 @@ export default function ClaimsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Claims</h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-gray-600 mt-2">
               Manage and track all insurance claims
             </p>
           </div>
         </div>
         <Card>
-          <CardContent className="p-6">
+          <CardContent>
             <div className="text-center py-8">
               Loading claims...
             </div>
@@ -140,16 +138,16 @@ export default function ClaimsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Claims</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-gray-600 mt-2">
             Manage and track all insurance claims
           </p>
         </div>
         <Button onClick={() => router.push('/claims/new')}>
-          <Plus className="h-4 w-4 mr-2" />
+          <span style={{ marginRight: '0.5rem' }}>+</span>
           New Claim
         </Button>
       </div>
@@ -160,31 +158,37 @@ export default function ClaimsPage() {
           <CardTitle>Filter Claims</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by claim #, client name, or item..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="OPEN">Open</SelectItem>
-                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
-                <SelectItem value="APPROVED">Approved</SelectItem>
-                <SelectItem value="DENIED">Denied</SelectItem>
-                <SelectItem value="CLOSED">Closed</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              placeholder="Search by claim #, client name, or item..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              leftIcon={
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path 
+                    d="M7.333 12.667A5.333 5.333 0 1 0 7.333 2a5.333 5.333 0 0 0 0 10.667ZM14 14l-2.9-2.9" 
+                    stroke="currentColor" 
+                    strokeWidth="1.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
+            />
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              placeholder="Filter by status"
+              options={[
+                { value: '', label: 'All Statuses' },
+                { value: 'OPEN', label: 'Open' },
+                { value: 'IN_PROGRESS', label: 'In Progress' },
+                { value: 'UNDER_REVIEW', label: 'Under Review' },
+                { value: 'APPROVED', label: 'Approved' },
+                { value: 'DENIED', label: 'Denied' },
+                { value: 'CLOSED', label: 'Closed' }
+              ]}
+            />
           </div>
         </CardContent>
       </Card>
@@ -199,11 +203,11 @@ export default function ClaimsPage() {
         </CardHeader>
         <CardContent>
           {claims.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-gray-500">
               No claims found. Create your first claim to get started.
             </div>
           ) : (
-            <Table>
+            <Table responsive>
               <TableHeader>
                 <TableRow>
                   <TableHead>Claim #</TableHead>
@@ -219,12 +223,14 @@ export default function ClaimsPage() {
               <TableBody>
                 {claims.map((claim) => (
                   <TableRow key={claim.id}>
-                    <TableCell className="font-medium">
-                      #{claim.sequentialNumber}
+                    <TableCell>
+                      <span className="font-medium">#{claim.sequentialNumber}</span>
                     </TableCell>
                     <TableCell>{claim.clientName}</TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {claim.itemDescription}
+                    <TableCell>
+                      <div className="max-w-xs truncate" title={claim.itemDescription}>
+                        {claim.itemDescription}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {getStatusBadge(claim.status)}
@@ -236,14 +242,14 @@ export default function ClaimsPage() {
                       {claim.createdBy.firstName} {claim.createdBy.lastName}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">
+                      <Badge variant="default" style="outline">
                         {claim.inspections.length} inspection{claim.inspections.length !== 1 ? 's' : ''}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Button 
-                        variant="outline" 
-                        size="sm"
+                        variant="secondary" 
+                        size="small"
                         onClick={() => router.push(`/claims/${claim.id}`)}
                       >
                         View

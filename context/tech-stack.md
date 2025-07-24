@@ -7,8 +7,6 @@ Frontend:
 - React
 - Next.js (App Router)
 - TypeScript
-- Tailwind CSS
-- shadcn/ui
 
 
 
@@ -21,8 +19,8 @@ Backend:
 
 
 Styling:
-- Tailwind CSS
-- PostCSS
+- CSS Modules
+- Custom CSS Components
 
 
 
@@ -36,8 +34,8 @@ Database:
 Authentication:
 - Clerk
 
-
-
+File Upload:
+- Cloudinary
 
 Deployment:
 - Vercel

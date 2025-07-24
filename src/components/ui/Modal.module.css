@@ -1,0 +1,238 @@
+/* Modal Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+  animation: modal-overlay-enter 200ms ease-out;
+}
+
+.overlay.closing {
+  animation: modal-overlay-exit 150ms ease-in;
+}
+
+@keyframes modal-overlay-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-overlay-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Modal Content */
+.content {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  animation: modal-content-enter 200ms ease-out;
+}
+
+.content.closing {
+  animation: modal-content-exit 150ms ease-in;
+}
+
+@keyframes modal-content-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modal-content-exit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+}
+
+/* Modal Sizes */
+.small {
+  max-width: 400px;
+}
+
+.large {
+  max-width: 700px;
+}
+
+.extraLarge {
+  max-width: 900px;
+}
+
+.fullScreen {
+  max-width: none;
+  width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
+}
+
+@media (max-width: 768px) {
+  .content {
+    max-width: none;
+    width: calc(100vw - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+  
+  .fullScreen {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* Modal Header */
+.header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.description {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--text-secondary);
+  margin: var(--spacing-xs) 0 0 0;
+}
+
+/* Close Button */
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.closeButton:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.closeButton svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Modal Body */
+.body {
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.body:first-child {
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+}
+
+.body:last-child {
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}
+
+/* Modal Footer */
+.footer {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}
+
+.footer.spaceBetween {
+  justify-content: space-between;
+}
+
+.footer.center {
+  justify-content: center;
+}
+
+/* Prevent body scroll when modal is open */
+.noScroll {
+  overflow: hidden;
+}
+
+/* Loading State */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Modal Backdrop Blur */
+.blurBackdrop {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Scrollable Content */
+.scrollable .body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar */
+.body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.body::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.body::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300);
+  border-radius: 3px;
+}
+
+.body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-400);
+}

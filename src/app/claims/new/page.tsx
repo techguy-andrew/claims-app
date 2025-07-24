@@ -2,12 +2,17 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Save } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { 
+  Button, 
+  Input, 
+  Label, 
+  Textarea, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui"
 
 export default function NewClaimPage() {
   const router = useRouter()
@@ -52,159 +57,158 @@ export default function NewClaimPage() {
       })
 
       if (response.ok) {
-        const claim = await response.json()
-        router.push(`/claims/${claim.id}`)
+        const newClaim = await response.json()
+        router.push(`/claims/${newClaim.id}`)
       } else {
         const error = await response.json()
         console.error("Failed to create claim:", error)
-        // TODO: Show error toast/notification
+        alert("Failed to create claim. Please try again.")
       }
     } catch (error) {
       console.error("Error creating claim:", error)
-      // TODO: Show error toast/notification
+      alert("An error occurred. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-4">
         <Button 
-          variant="outline" 
-          size="icon"
-          onClick={() => router.back()}
+          variant="secondary" 
+          onClick={() => router.push('/claims')}
         >
-          <ArrowLeft className="h-4 w-4" />
+          ← Back to Claims
         </Button>
         <div>
           <h1 className="text-3xl font-bold">New Claim</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-gray-600 mt-1">
             Create a new insurance claim
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Client Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Client Information</CardTitle>
-              <CardDescription>
-                Details about the client filing the claim
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Client Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Client Information</CardTitle>
+            <CardDescription>
+              Enter the client details for this claim
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="clientName">Client Name *</Label>
+              <Input
+                id="clientName"
+                value={formData.clientName}
+                onChange={(e) => handleInputChange('clientName', e.target.value)}
+                placeholder="Enter client full name"
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="clientName">Client Name *</Label>
-                <Input
-                  id="clientName"
-                  value={formData.clientName}
-                  onChange={(e) => handleInputChange("clientName", e.target.value)}
-                  placeholder="Enter client's full name"
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="clientEmail">Email Address</Label>
+                <Label htmlFor="clientEmail">Email</Label>
                 <Input
                   id="clientEmail"
                   type="email"
                   value={formData.clientEmail}
-                  onChange={(e) => handleInputChange("clientEmail", e.target.value)}
+                  onChange={(e) => handleInputChange('clientEmail', e.target.value)}
                   placeholder="client@example.com"
                 />
               </div>
               
               <div>
-                <Label htmlFor="clientPhone">Phone Number</Label>
+                <Label htmlFor="clientPhone">Phone</Label>
                 <Input
                   id="clientPhone"
                   type="tel"
                   value={formData.clientPhone}
-                  onChange={(e) => handleInputChange("clientPhone", e.target.value)}
+                  onChange={(e) => handleInputChange('clientPhone', e.target.value)}
                   placeholder="(555) 123-4567"
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Claim Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Claim Details</CardTitle>
-              <CardDescription>
-                Information about the claim and incident
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="sequentialNumber">
-                  Claim Number
-                  <span className="text-sm text-muted-foreground ml-2">
-                    (Leave blank for auto-generated)
-                  </span>
-                </Label>
-                <Input
-                  id="sequentialNumber"
-                  type="number"
-                  min="1"
-                  value={formData.sequentialNumber}
-                  onChange={(e) => handleInputChange("sequentialNumber", e.target.value)}
-                  placeholder="Auto-generated if blank"
-                />
-              </div>
-
+        {/* Claim Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Claim Details</CardTitle>
+            <CardDescription>
+              Provide details about the incident and damage
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="itemDescription">Item Description *</Label>
+              <Textarea
+                id="itemDescription"
+                value={formData.itemDescription}
+                onChange={(e) => handleInputChange('itemDescription', e.target.value)}
+                placeholder="Describe the item(s) involved in the claim..."
+                rows={3}
+                required
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="damageDetails">Damage Details *</Label>
+              <Textarea
+                id="damageDetails"
+                value={formData.damageDetails}
+                onChange={(e) => handleInputChange('damageDetails', e.target.value)}
+                placeholder="Describe the damage in detail..."
+                rows={4}
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="incidentDate">Incident Date</Label>
                 <Input
                   id="incidentDate"
                   type="date"
                   value={formData.incidentDate}
-                  onChange={(e) => handleInputChange("incidentDate", e.target.value)}
+                  onChange={(e) => handleInputChange('incidentDate', e.target.value)}
                 />
               </div>
-
+              
               <div>
-                <Label htmlFor="itemDescription">Item Description *</Label>
+                <Label htmlFor="sequentialNumber">Sequential Number (Optional)</Label>
                 <Input
-                  id="itemDescription"
-                  value={formData.itemDescription}
-                  onChange={(e) => handleInputChange("itemDescription", e.target.value)}
-                  placeholder="Describe the item that was damaged"
-                  required
+                  id="sequentialNumber"
+                  type="number"
+                  value={formData.sequentialNumber}
+                  onChange={(e) => handleInputChange('sequentialNumber', e.target.value)}
+                  placeholder="Leave blank for auto-assignment"
                 />
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              <div>
-                <Label htmlFor="damageDetails">Damage Details *</Label>
-                <Textarea
-                  id="damageDetails"
-                  value={formData.damageDetails}
-                  onChange={(e) => handleInputChange("damageDetails", e.target.value)}
-                  placeholder="Provide detailed description of the damage..."
-                  rows={4}
-                  required
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4 mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-4">
+          <Button 
+            type="button" 
+            variant="secondary" 
+            onClick={() => router.push('/claims')}
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={loading}>
-            <Save className="h-4 w-4 mr-2" />
-            {loading ? "Creating..." : "Create Claim"}
+          <Button 
+            type="submit" 
+            loading={loading}
+          >
+            💾 Create Claim
           </Button>
         </div>
       </form>

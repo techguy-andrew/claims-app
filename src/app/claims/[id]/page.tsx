@@ -2,20 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Edit, Save, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
+import { 
+  Button, 
+  Input, 
+  Label, 
+  Textarea, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+  Badge 
+} from "@/components/ui"
 
 interface ClaimData {
   id: string
@@ -42,15 +41,6 @@ interface ClaimData {
       lastName: string | null
     }
   }>
-}
-
-const statusColors = {
-  OPEN: "bg-blue-100 text-blue-800",
-  IN_PROGRESS: "bg-yellow-100 text-yellow-800", 
-  UNDER_REVIEW: "bg-purple-100 text-purple-800",
-  APPROVED: "bg-green-100 text-green-800",
-  DENIED: "bg-red-100 text-red-800",
-  CLOSED: "bg-gray-100 text-gray-800"
 }
 
 export default function ClaimDetailsPage({
@@ -163,96 +153,98 @@ export default function ClaimDetailsPage({
     setEditing(false)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString()
-  }
-
   const getStatusBadge = (status: string) => {
-    const colorClass = statusColors[status as keyof typeof statusColors] || statusColors.OPEN
+    const statusConfig = {
+      OPEN: { variant: 'primary' as const, text: 'Open' },
+      IN_PROGRESS: { variant: 'warning' as const, text: 'In Progress' },
+      UNDER_REVIEW: { variant: 'secondary' as const, text: 'Under Review' },
+      APPROVED: { variant: 'success' as const, text: 'Approved' },
+      DENIED: { variant: 'error' as const, text: 'Denied' },
+      CLOSED: { variant: 'default' as const, text: 'Closed' }
+    }
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.CLOSED
+    
     return (
-      <Badge className={colorClass}>
-        {status.replace('_', ' ')}
+      <Badge variant={config.variant}>
+        {config.text}
       </Badge>
     )
   }
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Loading...</h1>
-          </div>
-        </div>
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent>
+            <div className="text-center py-8">Loading claim details...</div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   if (!claim) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Claim Not Found</h1>
-          </div>
-        </div>
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent>
+            <div className="text-center py-8 text-red-600">
+              Claim not found or failed to load.
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => router.back()}
+            variant="secondary" 
+            onClick={() => router.push('/claims')}
           >
-            <ArrowLeft className="h-4 w-4" />
+            ← Back to Claims
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Claim #{claim.sequentialNumber}</h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-gray-600 mt-1">
               Created on {formatDate(claim.claimDate)}
             </p>
           </div>
         </div>
-        
         <div className="flex items-center gap-2">
           {getStatusBadge(claim.status)}
-          {editing ? (
+          {!editing ? (
+            <Button onClick={() => setEditing(true)}>
+              ✏️ Edit
+            </Button>
+          ) : (
             <div className="flex gap-2">
-              <Button onClick={handleCancel} variant="outline">
-                <X className="h-4 w-4 mr-2" />
-                Cancel
+              <Button onClick={handleSave} loading={saving}>
+                💾 Save
               </Button>
-              <Button onClick={handleSave} disabled={saving}>
-                <Save className="h-4 w-4 mr-2" />
-                {saving ? "Saving..." : "Save"}
+              <Button variant="secondary" onClick={handleCancel}>
+                ✕ Cancel
               </Button>
             </div>
-          ) : (
-            <Button onClick={() => setEditing(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
           )}
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Client Information */}
+      {/* Claim Details */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Client Information</CardTitle>
@@ -263,10 +255,10 @@ export default function ClaimDetailsPage({
               {editing ? (
                 <Input
                   value={formData.clientName}
-                  onChange={(e) => handleInputChange("clientName", e.target.value)}
+                  onChange={(e) => handleInputChange('clientName', e.target.value)}
                 />
               ) : (
-                <div className="font-medium">{claim.clientName}</div>
+                <p className="text-gray-900 font-medium">{claim.clientName}</p>
               )}
             </div>
             
@@ -276,10 +268,10 @@ export default function ClaimDetailsPage({
                 <Input
                   type="email"
                   value={formData.clientEmail}
-                  onChange={(e) => handleInputChange("clientEmail", e.target.value)}
+                  onChange={(e) => handleInputChange('clientEmail', e.target.value)}
                 />
               ) : (
-                <div className="font-medium">{claim.clientEmail || "Not provided"}</div>
+                <p className="text-gray-600">{claim.clientEmail || 'Not provided'}</p>
               )}
             </div>
             
@@ -287,139 +279,143 @@ export default function ClaimDetailsPage({
               <Label>Phone</Label>
               {editing ? (
                 <Input
+                  type="tel"
                   value={formData.clientPhone}
-                  onChange={(e) => handleInputChange("clientPhone", e.target.value)}
+                  onChange={(e) => handleInputChange('clientPhone', e.target.value)}
                 />
               ) : (
-                <div className="font-medium">{claim.clientPhone || "Not provided"}</div>
+                <p className="text-gray-600">{claim.clientPhone || 'Not provided'}</p>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Claim Details */}
         <Card>
           <CardHeader>
-            <CardTitle>Claim Details</CardTitle>
+            <CardTitle>Claim Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Claim Number</Label>
-              {editing ? (
-                <Input
-                  type="number"
-                  min="1"
-                  value={formData.sequentialNumber}
-                  onChange={(e) => handleInputChange("sequentialNumber", e.target.value)}
-                />
-              ) : (
-                <div className="font-medium">#{claim.sequentialNumber}</div>
-              )}
-            </div>
-
-            <div>
               <Label>Status</Label>
               {editing ? (
-                <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="OPEN">Open</SelectItem>
-                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                    <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
-                    <SelectItem value="APPROVED">Approved</SelectItem>
-                    <SelectItem value="DENIED">Denied</SelectItem>
-                    <SelectItem value="CLOSED">Closed</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Select
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  options={[
+                    { value: 'OPEN', label: 'Open' },
+                    { value: 'IN_PROGRESS', label: 'In Progress' },
+                    { value: 'UNDER_REVIEW', label: 'Under Review' },
+                    { value: 'APPROVED', label: 'Approved' },
+                    { value: 'DENIED', label: 'Denied' },
+                    { value: 'CLOSED', label: 'Closed' }
+                  ]}
+                />
               ) : (
-                <div>{getStatusBadge(claim.status)}</div>
+                getStatusBadge(claim.status)
               )}
             </div>
-
+            
             <div>
               <Label>Incident Date</Label>
               {editing ? (
                 <Input
                   type="date"
                   value={formData.incidentDate}
-                  onChange={(e) => handleInputChange("incidentDate", e.target.value)}
+                  onChange={(e) => handleInputChange('incidentDate', e.target.value)}
                 />
               ) : (
-                <div className="font-medium">
-                  {claim.incidentDate ? formatDate(claim.incidentDate) : "Not specified"}
-                </div>
+                <p className="text-gray-600">
+                  {claim.incidentDate ? formatDate(claim.incidentDate) : 'Not specified'}
+                </p>
               )}
             </div>
-
+            
             <div>
-              <Label>Item Description</Label>
-              {editing ? (
-                <Input
-                  value={formData.itemDescription}
-                  onChange={(e) => handleInputChange("itemDescription", e.target.value)}
-                />
-              ) : (
-                <div className="font-medium">{claim.itemDescription}</div>
-              )}
+              <Label>Created By</Label>
+              <p className="text-gray-600">
+                {claim.createdBy.firstName} {claim.createdBy.lastName} ({claim.createdBy.email})
+              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Damage Details */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Damage Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {editing ? (
-              <Textarea
-                value={formData.damageDetails}
-                onChange={(e) => handleInputChange("damageDetails", e.target.value)}
-                rows={4}
-              />
-            ) : (
-              <div className="whitespace-pre-wrap">{claim.damageDetails}</div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Inspections */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Inspections</CardTitle>
-            <CardDescription>
-              {claim.inspections.length} inspection{claim.inspections.length !== 1 ? 's' : ''} recorded
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {claim.inspections.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No inspections yet. Create an inspection to get started.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {claim.inspections.map((inspection) => (
-                  <div key={inspection.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <div className="font-medium">
-                        Inspection on {formatDate(inspection.inspectionDate)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Inspector: {inspection.inspector.firstName} {inspection.inspector.lastName}
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Item and Damage Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Item & Damage Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label>Item Description</Label>
+            {editing ? (
+              <Textarea
+                value={formData.itemDescription}
+                onChange={(e) => handleInputChange('itemDescription', e.target.value)}
+                rows={3}
+              />
+            ) : (
+              <p className="text-gray-900 bg-gray-50 p-3 rounded border">
+                {claim.itemDescription}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <Label>Damage Details</Label>
+            {editing ? (
+              <Textarea
+                value={formData.damageDetails}
+                onChange={(e) => handleInputChange('damageDetails', e.target.value)}
+                rows={4}
+              />
+            ) : (
+              <p className="text-gray-900 bg-gray-50 p-3 rounded border">
+                {claim.damageDetails}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Inspections */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Inspections</CardTitle>
+          <CardDescription>
+            {claim.inspections.length} inspection{claim.inspections.length !== 1 ? 's' : ''} scheduled
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {claim.inspections.length === 0 ? (
+            <div className="text-center py-6 text-gray-500">
+              No inspections scheduled yet.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {claim.inspections.map((inspection) => (
+                <div key={inspection.id} className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <p className="font-medium">
+                      Inspector: {inspection.inspector.firstName} {inspection.inspector.lastName}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Date: {formatDate(inspection.inspectionDate)}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="secondary" 
+                    size="small"
+                    onClick={() => router.push(`/inspections/${inspection.id}`)}
+                  >
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

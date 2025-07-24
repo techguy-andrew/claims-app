@@ -1,108 +1,55 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import Link from "next/link"
-import { ClipboardList, Home, FileText, Camera, Settings, LogOut, X } from "lucide-react"
-import {
-  CustomSidebar,
-  CustomSidebarContent,
-  CustomSidebarFooter,
-  CustomSidebarGroup,
-  CustomSidebarGroupContent,
-  CustomSidebarHeader,
-  CustomSidebarMenu,
-  CustomSidebarMenuButton,
-  CustomSidebarMenuItem,
-  useCustomSidebar,
-} from "@/components/custom-sidebar"
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-const items = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Claims",
-    url: "/claims",
-    icon: FileText,
-  },
-  {
-    title: "Inspections", 
-    url: "/inspections",
-    icon: Camera,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-]
+export const AppSidebar: React.FC = () => {
+  const pathname = usePathname();
 
-export function AppSidebar() {
-  const pathname = usePathname()
-  const { isMobile, setOpenMobile, toggleSidebar } = useCustomSidebar()
-
-  const isActive = (url: string) => {
-    if (url === "/") {
-      return pathname === "/"
-    }
-    return pathname.startsWith(url)
-  }
-
-  // Handler for link clicks
-  const handleLinkClick = () => {
-    if (isMobile) {
-      setOpenMobile(false)
-    }
-  }
+  const navigation = [
+    { name: 'Dashboard', href: '/', icon: '🏠' },
+    { name: 'Claims', href: '/claims', icon: '📋' },
+    { name: 'Inspections', href: '/inspections', icon: '🔍' },
+  ];
 
   return (
-    <CustomSidebar>
-      <CustomSidebarHeader>
-        <div className="flex items-center justify-between gap-2 px-2 py-1 w-full">
-          <div className="flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-lg">Claims App</span>
-          </div>
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Close sidebar"
-            type="button"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-      </CustomSidebarHeader>
-      <CustomSidebarContent>
-        <CustomSidebarGroup>
-          <CustomSidebarGroupContent>
-            <CustomSidebarMenu>
-              {items.map((item) => (
-                <CustomSidebarMenuItem key={item.title}>
-                  <CustomSidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <Link href={item.url} onClick={handleLinkClick}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </CustomSidebarMenuButton>
-                </CustomSidebarMenuItem>
-              ))}
-            </CustomSidebarMenu>
-          </CustomSidebarGroupContent>
-        </CustomSidebarGroup>
-      </CustomSidebarContent>
-      <CustomSidebarFooter>
-        <CustomSidebarMenu>
-          <CustomSidebarMenuItem>
-            <CustomSidebarMenuButton>
-              <LogOut />
-              <span>Sign Out</span>
-            </CustomSidebarMenuButton>
-          </CustomSidebarMenuItem>
-        </CustomSidebarMenu>
-      </CustomSidebarFooter>
-    </CustomSidebar>
-  )
-}
+    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
+      {/* Logo */}
+      <div className="p-6 border-b border-gray-200">
+        <h1 className="text-xl font-bold text-gray-900">Claims App</h1>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            
+            return (
+              <li key={item.name}>
+                <Link
+                  href={item.href}
+                  className={`
+                    flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+                    ${isActive 
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+                      : 'text-gray-700 hover:bg-gray-50'
+                    }
+                  `}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  {item.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200">
+        <p className="text-xs text-gray-500">© 2024 Claims App</p>
+      </div>
+    </div>
+  );
+};

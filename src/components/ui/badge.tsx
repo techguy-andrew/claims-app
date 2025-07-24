@@ -1,46 +1,129 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import React from 'react';
+import styles from './Badge.module.css';
 
-import { cn } from "@/lib/utils"
-
-const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive:
-          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-function Badge({
-  className,
-  variant,
-  asChild = false,
-  ...props
-}: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? Slot : "span"
-
-  return (
-    <Comp
-      data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
-      {...props}
-    />
-  )
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error';
+  style?: 'solid' | 'outline' | 'soft';
+  size?: 'small' | 'default' | 'large';
+  interactive?: boolean;
+  dot?: boolean;
+  pulse?: boolean;
+  number?: boolean;
+  icon?: React.ReactNode;
+  onClose?: () => void;
+  children: React.ReactNode;
 }
 
-export { Badge, badgeVariants }
+export interface BadgeGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ 
+    variant = 'default', 
+    style = 'solid',
+    size = 'default', 
+    interactive = false,
+    dot = false,
+    pulse = false,
+    number = false,
+    icon,
+    onClose,
+    className, 
+    children,
+    onClick,
+    ...props 
+  }, ref) => {
+    // Determine the style class
+    const getVariantClass = () => {
+      if (style === 'outline') {
+        return styles[`${variant}Outline`];
+      }
+      if (style === 'soft') {
+        return styles[`${variant}Soft`];
+      }
+      return styles[variant];
+    };
+
+    // Combine CSS classes
+    const badgeClasses = [
+      styles.badge,
+      getVariantClass(),
+      size !== 'default' && styles[size],
+      interactive && styles.interactive,
+      dot && styles.dot,
+      pulse && styles.pulse,
+      number && styles.number,
+      icon && styles.withIcon,
+      onClose && styles.withClose,
+      className
+    ].filter(Boolean).join(' ');
+
+    const handleClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+      if (interactive && onClick) {
+        onClick(e);
+      }
+    };
+
+    return (
+      <span
+        ref={ref}
+        className={badgeClasses}
+        onClick={handleClick}
+        role={interactive ? 'button' : undefined}
+        tabIndex={interactive ? 0 : undefined}
+        {...props}
+      >
+        {icon && (
+          <span className={styles.icon}>
+            {icon}
+          </span>
+        )}
+        {children}
+        {onClose && (
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Remove"
+          >
+            <svg 
+              viewBox="0 0 12 12" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M9 3L3 9M3 3L9 9" 
+                stroke="currentColor" 
+                strokeWidth="1.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+      </span>
+    );
+  }
+);
+
+Badge.displayName = 'Badge';
+
+const BadgeGroup = React.forwardRef<HTMLDivElement, BadgeGroupProps>(
+  ({ className, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={[styles.group, className].filter(Boolean).join(' ')}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+);
+
+BadgeGroup.displayName = 'BadgeGroup';
+
+export { Badge, BadgeGroup };

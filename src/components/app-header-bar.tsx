@@ -1,14 +1,19 @@
-"use client";
+"use client"
 
-import { CustomSidebarTrigger, useCustomSidebar } from "@/components/custom-sidebar";
+import { Button } from '@/components/ui';
 
-export function AppHeaderBar() {
-  const { isMobile, state } = useCustomSidebar();
-
+export const AppHeaderBar: React.FC = () => {
   return (
-    <div className="flex items-center gap-2 p-2 border-b">
-      {(isMobile || state === "collapsed") && <CustomSidebarTrigger />}
-      <h1 className="font-semibold">Claims App</h1>
-    </div>
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+      <div className="flex items-center gap-4">
+        <h2 className="text-lg font-semibold text-gray-900">Welcome to Claims App</h2>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <Button variant="secondary" size="small">
+          👤 Profile
+        </Button>
+      </div>
+    </header>
   );
-} 
+};

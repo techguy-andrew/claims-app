@@ -1,177 +1,115 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { useDropzone } from "react-dropzone"
-import { CldImage } from "next-cloudinary"
-import { Camera, Upload, X, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import React, { useState } from 'react';
+import { Button, Card, CardContent } from '@/components/ui';
 
 interface PhotoUploadProps {
-  value?: string[]
-  onChange?: (photos: string[]) => void
-  maxFiles?: number
-  disabled?: boolean
+  onPhotosChange?: (photos: File[]) => void;
+  maxPhotos?: number;
+  existingPhotos?: string[];
 }
 
-export function PhotoUpload({ 
-  value = [], 
-  onChange, 
-  maxFiles = 10, 
-  disabled = false 
-}: PhotoUploadProps) {
-  const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
+export const PhotoUpload: React.FC<PhotoUploadProps> = ({ 
+  onPhotosChange, 
+  maxPhotos = 10,
+  existingPhotos = []
+}) => {
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>(existingPhotos);
 
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    })
-
-    if (!response.ok) {
-      throw new Error('Upload failed')
-    }
-
-    const result = await response.json()
-    return result.url
-  }
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (disabled) return
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => file.type.startsWith('image/'));
     
-    setUploading(true)
-    setUploadProgress(0)
-
-    try {
-      const newPhotos: string[] = []
-      
-      for (let i = 0; i < acceptedFiles.length; i++) {
-        const file = acceptedFiles[i]
-        const url = await uploadToCloudinary(file)
-        newPhotos.push(url)
-        setUploadProgress(((i + 1) / acceptedFiles.length) * 100)
-      }
-
-      const updatedPhotos = [...value, ...newPhotos].slice(0, maxFiles)
-      onChange?.(updatedPhotos)
-    } catch (error) {
-      console.error('Upload error:', error)
-      // TODO: Show error toast
-    } finally {
-      setUploading(false)
-      setUploadProgress(0)
+    if (photos.length + validFiles.length > maxPhotos) {
+      alert(`Maximum ${maxPhotos} photos allowed`);
+      return;
     }
-  }, [value, onChange, maxFiles, disabled])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
-    },
-    maxFiles: maxFiles - value.length,
-    disabled: disabled || uploading
-  })
+    const newPhotos = [...photos, ...validFiles];
+    setPhotos(newPhotos);
+
+    // Create previews
+    const newPreviews = [...previews];
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        newPreviews.push(e.target?.result as string);
+        setPreviews([...newPreviews]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    onPhotosChange?.(newPhotos);
+  };
 
   const removePhoto = (index: number) => {
-    if (disabled) return
-    const newPhotos = value.filter((_, i) => i !== index)
-    onChange?.(newPhotos)
-  }
+    const newPhotos = photos.filter((_, i) => i !== index);
+    const newPreviews = previews.filter((_, i) => i !== index);
+    
+    setPhotos(newPhotos);
+    setPreviews(newPreviews);
+    onPhotosChange?.(newPhotos);
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Upload Area */}
-      <Card 
-        {...getRootProps()} 
-        className={`
-          border-2 border-dashed cursor-pointer transition-colors
-          ${isDragActive ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-primary/50'}
-        `}
-      >
-        <CardContent className="p-8 text-center">
-          <input {...getInputProps()} />
-          
-          {uploading ? (
-            <div className="space-y-4">
-              <Loader2 className="h-12 w-12 text-primary mx-auto animate-spin" />
-              <div>
-                <p className="text-lg font-medium">Uploading photos...</p>
-                <div className="w-full bg-muted rounded-full h-2 mt-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
+    <Card>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Photos</h3>
+            <span className="text-sm text-gray-500">
+              {photos.length + existingPhotos.length}/{maxPhotos}
+            </span>
+          </div>
+
+          {/* Upload Area */}
+          <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              id="photo-upload"
+            />
+            <label htmlFor="photo-upload" className="cursor-pointer">
+              <div className="space-y-2">
+                <div className="text-4xl">📷</div>
+                <p className="text-sm text-gray-600">
+                  Click to upload photos or drag and drop
+                </p>
+                <p className="text-xs text-gray-400">
+                  PNG, JPG, JPEG up to 10MB each
+                </p>
+              </div>
+            </label>
+          </div>
+
+          {/* Photo Previews */}
+          {previews.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {previews.map((preview, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={preview}
+                    alt={`Photo ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border"
                   />
+                  <Button
+                    variant="destructive"
+                    size="small"
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => removePhoto(index)}
+                  >
+                    ×
+                  </Button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {Math.round(uploadProgress)}% complete
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                {isDragActive ? (
-                  <Upload className="h-12 w-12 text-primary" />
-                ) : (
-                  <Camera className="h-12 w-12 text-muted-foreground" />
-                )}
-              </div>
-              
-              <div>
-                <p className="text-lg font-medium">
-                  {isDragActive ? 'Drop photos here' : 'Upload photos'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Drag and drop or click to select files
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Supports JPG, PNG, WebP • Max {maxFiles} photos • {value.length}/{maxFiles} uploaded
-                </p>
-              </div>
+              ))}
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Photo Grid */}
-      {value.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {value.map((url, index) => (
-            <div key={index} className="relative group">
-              <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                <CldImage
-                  src={url}
-                  alt={`Photo ${index + 1}`}
-                  width={200}
-                  height={200}
-                  deliveryType="fetch"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              
-              {!disabled && (
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => removePhoto(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-              
-              <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                {index + 1}
-              </div>
-            </div>
-          ))}
         </div>
-      )}
-    </div>
-  )
-}
+      </CardContent>
+    </Card>
+  );
+};

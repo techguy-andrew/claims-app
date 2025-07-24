@@ -1,116 +1,247 @@
-"use client"
+import React from 'react';
+import styles from './Table.module.css';
 
-import * as React from "react"
-
-import { cn } from "@/lib/utils"
-
-function Table({ className, ...props }: React.ComponentProps<"table">) {
-  return (
-    <div
-      data-slot="table-container"
-      className="relative w-full overflow-x-auto"
-    >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
-    </div>
-  )
+export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
+  variant?: 'default' | 'striped' | 'bordered';
+  size?: 'compact' | 'default' | 'spacious';
+  responsive?: boolean;
+  loading?: boolean;
+  children: React.ReactNode;
 }
 
-function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-  return (
+export interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  children: React.ReactNode;
+}
+
+export interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  children: React.ReactNode;
+}
+
+export interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  children: React.ReactNode;
+}
+
+export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+  children: React.ReactNode;
+}
+
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  children: React.ReactNode;
+  sortable?: boolean;
+  sortDirection?: 'asc' | 'desc' | null;
+  onSort?: () => void;
+}
+
+export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+  children: React.ReactNode;
+  align?: 'left' | 'center' | 'right';
+  status?: 'default' | 'success' | 'warning' | 'error';
+}
+
+export interface TableEmptyProps {
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ 
+    variant = 'default', 
+    size = 'default', 
+    responsive = false,
+    loading = false,
+    className, 
+    children,
+    ...props 
+  }, ref) => {
+    const tableClasses = [
+      styles.table,
+      variant !== 'default' && styles[variant],
+      size !== 'default' && styles[size],
+      responsive && styles.responsive,
+      className
+    ].filter(Boolean).join(' ');
+
+    const containerClasses = [
+      styles.tableContainer,
+      loading && styles.loading
+    ].filter(Boolean).join(' ');
+
+    return (
+      <div className={containerClasses}>
+        <table
+          ref={ref}
+          className={tableClasses}
+          {...props}
+        >
+          {children}
+        </table>
+      </div>
+    );
+  }
+);
+
+Table.displayName = 'Table';
+
+const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
+  ({ className, children, ...props }, ref) => (
     <thead
-      data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      ref={ref}
+      className={[styles.header, className].filter(Boolean).join(' ')}
       {...props}
-    />
+    >
+      {children}
+    </thead>
   )
-}
+);
 
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
-  return (
+TableHeader.displayName = 'TableHeader';
+
+const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
+  ({ className, children, ...props }, ref) => (
     <tbody
-      data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0", className)}
+      ref={ref}
+      className={[styles.body, className].filter(Boolean).join(' ')}
       {...props}
-    />
+    >
+      {children}
+    </tbody>
   )
-}
+);
 
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
-  return (
+TableBody.displayName = 'TableBody';
+
+const TableFooter = React.forwardRef<HTMLTableSectionElement, TableFooterProps>(
+  ({ className, children, ...props }, ref) => (
     <tfoot
-      data-slot="table-footer"
-      className={cn(
-        "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
-        className
-      )}
+      ref={ref}
+      className={[styles.footer, className].filter(Boolean).join(' ')}
       {...props}
-    />
+    >
+      {children}
+    </tfoot>
   )
-}
+);
 
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
-  return (
-    <tr
-      data-slot="table-row"
-      className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+TableFooter.displayName = 'TableFooter';
 
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
-  return (
-    <th
-      data-slot="table-head"
-      className={cn(
-        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
+  ({ className, children, ...props }, ref) => {
+    const isHeaderRow = React.Children.toArray(children).some(
+      child => React.isValidElement(child) && child.type === TableHead
+    );
+    const isFooterRow = props.className?.includes('footer');
 
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
-  return (
-    <td
-      data-slot="table-cell"
-      className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+    const rowClasses = [
+      isHeaderRow ? styles.headerRow : isFooterRow ? styles.footerRow : styles.bodyRow,
+      className
+    ].filter(Boolean).join(' ');
 
-function TableCaption({
-  className,
-  ...props
-}: React.ComponentProps<"caption">) {
-  return (
-    <caption
-      data-slot="table-caption"
-      className={cn("text-muted-foreground mt-4 text-sm", className)}
-      {...props}
-    />
-  )
-}
+    return (
+      <tr
+        ref={ref}
+        className={rowClasses}
+        {...props}
+      >
+        {children}
+      </tr>
+    );
+  }
+);
 
-export {
-  Table,
-  TableHeader,
-  TableBody,
+TableRow.displayName = 'TableRow';
+
+const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
+  ({ 
+    className, 
+    children, 
+    sortable = false,
+    sortDirection = null,
+    onSort,
+    ...props 
+  }, ref) => {
+    const headClasses = [
+      styles.headerCell,
+      sortable && styles.sortable,
+      className
+    ].filter(Boolean).join(' ');
+
+    const handleSort = () => {
+      if (sortable && onSort) {
+        onSort();
+      }
+    };
+
+    return (
+      <th
+        ref={ref}
+        className={headClasses}
+        onClick={handleSort}
+        {...props}
+      >
+        {children}
+        {sortable && (
+          <span className={[
+            styles.sortIcon,
+            sortDirection && styles.active
+          ].filter(Boolean).join(' ')}>
+            {sortDirection === 'asc' ? '↑' : sortDirection === 'desc' ? '↓' : '↕'}
+          </span>
+        )}
+      </th>
+    );
+  }
+);
+
+TableHead.displayName = 'TableHead';
+
+const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
+  ({ 
+    className, 
+    children, 
+    align = 'left',
+    status = 'default',
+    ...props 
+  }, ref) => {
+    const cellClasses = [
+      styles.bodyCell,
+      styles[`align${align.charAt(0).toUpperCase() + align.slice(1)}`],
+      status !== 'default' && styles.statusCell,
+      status !== 'default' && styles[`status${status.charAt(0).toUpperCase() + status.slice(1)}`],
+      className
+    ].filter(Boolean).join(' ');
+
+    return (
+      <td
+        ref={ref}
+        className={cellClasses}
+        {...props}
+      >
+        {children}
+      </td>
+    );
+  }
+);
+
+TableCell.displayName = 'TableCell';
+
+const TableEmpty: React.FC<TableEmptyProps> = ({ children, icon }) => (
+  <tr>
+    <td colSpan={100} className={styles.empty}>
+      {icon}
+      <div>{children}</div>
+    </td>
+  </tr>
+);
+
+TableEmpty.displayName = 'TableEmpty';
+
+export { 
+  Table, 
+  TableHeader, 
+  TableBody, 
   TableFooter,
-  TableHead,
-  TableRow,
+  TableRow, 
+  TableHead, 
   TableCell,
-  TableCaption,
-}
+  TableEmpty
+};

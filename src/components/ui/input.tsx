@@ -1,21 +1,67 @@
-import * as React from "react"
+import React from 'react';
+import styles from './Input.module.css';
 
-import { cn } from "@/lib/utils"
-
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      )}
-      {...props}
-    />
-  )
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  size?: 'small' | 'default' | 'large';
+  state?: 'default' | 'error' | 'success';
+  fullWidth?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-export { Input }
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ 
+    size = 'default', 
+    state = 'default', 
+    fullWidth = false, 
+    leftIcon, 
+    rightIcon, 
+    className, 
+    ...props 
+  }, ref) => {
+    // Combine CSS classes
+    const inputClasses = [
+      styles.input,
+      size !== 'default' && styles[size],
+      state !== 'default' && styles[state],
+      fullWidth && styles.fullWidth,
+      leftIcon && styles.withIcon,
+      rightIcon && styles.withIconRight,
+      className
+    ].filter(Boolean).join(' ');
+
+    if (leftIcon || rightIcon) {
+      return (
+        <div className={styles.inputContainer}>
+          {leftIcon && (
+            <div className={styles.iconLeft}>
+              {leftIcon}
+            </div>
+          )}
+          <input
+            ref={ref}
+            className={inputClasses}
+            {...props}
+          />
+          {rightIcon && (
+            <div className={styles.iconRight}>
+              {rightIcon}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <input
+        ref={ref}
+        className={inputClasses}
+        {...props}
+      />
+    );
+  }
+);
+
+Input.displayName = 'Input';
+
+export { Input };
