@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CustomSidebarProvider } from "@/components/custom-sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { AppHeaderBar } from "@/components/app-header-bar";
+import { MobileHeader } from "@/components/mobile-header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,14 +31,20 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CustomSidebarProvider>
-          <div className="min-h-screen flex w-full">
-            <AppSidebar />
-            <main className="flex-1 flex flex-col overflow-hidden">
-              <AppHeaderBar />
-              <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <div className="min-h-screen w-full relative bg-gray-50">
+            {/* Main Content Area - Always Full Width, Never Moves */}
+            <main className="min-h-screen flex flex-col w-full bg-white lg:ml-64">
+              {/* Mobile/Tablet Header with Hamburger Menu */}
+              <MobileHeader />
+              
+              {/* Content Area - Always Visible */}
+              <div className="flex-1 min-h-screen bg-white p-4 lg:p-6">
                 {children}
               </div>
             </main>
+            
+            {/* Sidebar - Floats On Top */}
+            <AppSidebar />
           </div>
         </CustomSidebarProvider>
       </body>

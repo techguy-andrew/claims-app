@@ -80,6 +80,8 @@ export default function InspectionsPage() {
         setInspections(data.inspections || [])
       } else {
         console.error("Failed to fetch inspections:", data.error)
+        console.error("Response status:", response.status)
+        console.error("Response data:", data)
       }
     } catch (error) {
       console.error("Error fetching inspections:", error)

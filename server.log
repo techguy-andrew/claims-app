@@ -1,0 +1,14 @@
+
+> claims-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.4.3
+   - Local:        http://localhost:3000
+   - Network:      http://172.20.10.6:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1191ms
+ ✓ Compiled /api/inspections in 497ms (286 modules)
+ GET /api/inspections 200 in 1808ms
+[?25h
