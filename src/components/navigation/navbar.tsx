@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, Home, Search, Bell, User, Settings, LogOut } from 'lucide-react';
+import { Search, Bell, User, Settings, LogOut } from 'lucide-react';
 import { createVariants, cn, type VariantProps } from './utils';
 import styles from './navigation.module.css';
 
@@ -35,6 +35,7 @@ export interface NavbarProps extends VariantProps<typeof navbarVariants> {
   onMenuToggle?: () => void;
   isMenuOpen?: boolean;
   className?: string;
+  showHamburger?: boolean;
 }
 
 export interface NavbarMobileMenuProps {
@@ -152,6 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onMenuToggle,
   isMenuOpen = false,
   className = '',
+  showHamburger = true,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -180,19 +182,21 @@ export const Navbar: React.FC<NavbarProps> = ({
       <nav className={navbarClasses} role="navigation" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 h-full">
           <div className="flex items-center h-full">
-            {/* Mobile Menu Button - Far Left */}
-            <button
-              onClick={handleMenuToggle}
-              className={cn(styles.mobileNav, "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-3")}
-              aria-label={currentMenuState ? 'Close menu' : 'Open menu'}
-              aria-expanded={currentMenuState}
-            >
-              <div className={cn(styles.hamburger, currentMenuState && 'open')}>
-                <div className={styles.hamburgerLine} />
-                <div className={styles.hamburgerLine} />
-                <div className={styles.hamburgerLine} />
-              </div>
-            </button>
+            {/* Hamburger Menu Button - Always visible */}
+            {showHamburger && (
+              <button
+                onClick={handleMenuToggle}
+                className={cn("p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-3")}
+                aria-label={currentMenuState ? 'Close menu' : 'Open menu'}
+                aria-expanded={currentMenuState}
+              >
+                <div className={cn(styles.hamburger, currentMenuState && 'open')}>
+                  <div className={styles.hamburgerLine} />
+                  <div className={styles.hamburgerLine} />
+                  <div className={styles.hamburgerLine} />
+                </div>
+              </button>
+            )}
 
             {/* Logo Section - No Home Icon */}
             <div className="flex items-center flex-1">
@@ -252,7 +256,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <NavbarMobileMenu 
           isOpen={isMobileMenuOpen} 
           onClose={handleMobileMenuClose}
-          theme={theme}
+          theme={theme === 'transparent' ? 'light' : theme}
         />
       )}
     </>

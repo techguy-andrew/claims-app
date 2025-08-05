@@ -1,30 +1,33 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { 
   Button, 
   Input, 
   Label, 
-  Textarea, 
   Card, 
   CardContent, 
   CardDescription, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui"
+import { PhotoUpload } from '@/components/photo-upload'
+import { TopBar } from '@/components/navigation/topbar'
+import { useSidebar } from '@/components/navigation'
 
 export default function NewClaimPage() {
   const router = useRouter()
+  const { toggle } = useSidebar()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    clientName: "",
-    clientEmail: "",
-    clientPhone: "",
-    itemDescription: "",
-    damageDetails: "",
-    incidentDate: "",
-    claimNumber: ""
+    shipperName: "",
+    idNumber: "",
+    adjusterName: "",
+    adjusterEmail: "",
+    adjusterPhone: "",
+    contractingCompany: ""
   })
 
   const handleInputChange = (field: string, value: string) => {
@@ -43,7 +46,6 @@ export default function NewClaimPage() {
       // In a real app, these would come from authentication context
       const payload = {
         ...formData,
-        claimNumber: formData.claimNumber || undefined,
         organizationId: "dummy-org-id",
         createdById: "dummy-user-id"
       }
@@ -73,131 +75,117 @@ export default function NewClaimPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="secondary" 
-          onClick={() => router.push('/claims')}
-        >
-          ← Back to Claims
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">New Claim</h1>
-          <p className="text-gray-600 mt-1">
-            Create a new insurance claim
-          </p>
-        </div>
-      </div>
+    <>
+      <TopBar
+        title="New Claim"
+        subtitle="Create a new insurance claim"
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <Link href="/claims">
+            <Button variant="secondary">
+              ← Back to Claims
+            </Button>
+          </Link>
+        }
+      />
+      <div className="p-6 space-y-6">
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Client Information */}
+        {/* Shipper Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Client Information</CardTitle>
+            <CardTitle>Shipper Information</CardTitle>
             <CardDescription>
-              Enter the client details for this claim
+              Enter the shipper/insured details for this claim
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="clientName">Client Name *</Label>
+              <Label htmlFor="shipperName">Name of Shipper/Insured *</Label>
               <Input
-                id="clientName"
-                value={formData.clientName}
-                onChange={(e) => handleInputChange('clientName', e.target.value)}
-                placeholder="Enter client full name"
+                id="shipperName"
+                value={formData.shipperName}
+                onChange={(e) => handleInputChange('shipperName', e.target.value)}
+                placeholder="Enter shipper/insured name"
                 required
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="clientEmail">Email</Label>
-                <Input
-                  id="clientEmail"
-                  type="email"
-                  value={formData.clientEmail}
-                  onChange={(e) => handleInputChange('clientEmail', e.target.value)}
-                  placeholder="client@example.com"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="clientPhone">Phone</Label>
-                <Input
-                  id="clientPhone"
-                  type="tel"
-                  value={formData.clientPhone}
-                  onChange={(e) => handleInputChange('clientPhone', e.target.value)}
-                  placeholder="(555) 123-4567"
-                />
-              </div>
+            <div>
+              <Label htmlFor="idNumber">ID Number *</Label>
+              <Input
+                id="idNumber"
+                value={formData.idNumber}
+                onChange={(e) => handleInputChange('idNumber', e.target.value)}
+                placeholder="Enter ID number"
+                required
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Claim Details */}
+        {/* Adjuster Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Claim Details</CardTitle>
+            <CardTitle>Adjuster Information</CardTitle>
             <CardDescription>
-              Provide details about the incident and damage
+              Enter the adjuster contact details
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="itemDescription">Item Description *</Label>
-              <Textarea
-                id="itemDescription"
-                value={formData.itemDescription}
-                onChange={(e) => handleInputChange('itemDescription', e.target.value)}
-                placeholder="Describe the item(s) involved in the claim..."
-                rows={3}
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="damageDetails">Damage Details *</Label>
-              <Textarea
-                id="damageDetails"
-                value={formData.damageDetails}
-                onChange={(e) => handleInputChange('damageDetails', e.target.value)}
-                placeholder="Describe the damage in detail..."
-                rows={4}
+              <Label htmlFor="adjusterName">Adjuster Name *</Label>
+              <Input
+                id="adjusterName"
+                value={formData.adjusterName}
+                onChange={(e) => handleInputChange('adjusterName', e.target.value)}
+                placeholder="Enter adjuster name"
                 required
               />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="incidentDate">Incident Date</Label>
+                <Label htmlFor="adjusterEmail">Adjuster Email *</Label>
                 <Input
-                  id="incidentDate"
-                  type="date"
-                  value={formData.incidentDate}
-                  onChange={(e) => handleInputChange('incidentDate', e.target.value)}
+                  id="adjusterEmail"
+                  type="email"
+                  value={formData.adjusterEmail}
+                  onChange={(e) => handleInputChange('adjusterEmail', e.target.value)}
+                  placeholder="adjuster@example.com"
+                  required
                 />
               </div>
               
               <div>
-                <Label htmlFor="claimNumber">Claim Number (Optional)</Label>
+                <Label htmlFor="adjusterPhone">Adjuster Phone Number *</Label>
                 <Input
-                  id="claimNumber"
-                  type="text"
-                  value={formData.claimNumber}
-                  onChange={(e) => handleInputChange('claimNumber', e.target.value.toUpperCase())}
-                  placeholder="Leave blank for auto-generation (e.g., ABC1234567)"
-                  maxLength={10}
+                  id="adjusterPhone"
+                  type="tel"
+                  value={formData.adjusterPhone}
+                  onChange={(e) => handleInputChange('adjusterPhone', e.target.value)}
+                  placeholder="(555) 123-4567"
+                  required
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  10 characters: letters and numbers only
-                </p>
               </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="contractingCompany">Contracting Company *</Label>
+              <Input
+                id="contractingCompany"
+                value={formData.contractingCompany}
+                onChange={(e) => handleInputChange('contractingCompany', e.target.value)}
+                placeholder="Enter contracting company name"
+                required
+              />
             </div>
           </CardContent>
         </Card>
+
+        {/* Files and Attachments */}
+        <PhotoUpload />
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-4">
@@ -216,6 +204,7 @@ export default function NewClaimPage() {
           </Button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   )
 }

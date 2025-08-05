@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
 import { 
   Modal, 
@@ -17,12 +17,13 @@ interface PhotoViewerProps {
   onClose: () => void;
 }
 
-export const PhotoViewer: React.FC<PhotoViewerProps> = ({
+// Performance optimization with memo
+export const PhotoViewer = memo<PhotoViewerProps>(function PhotoViewer({
   photos,
   initialIndex = 0,
   isOpen,
   onClose
-}) => {
+}) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isZoomed, setIsZoomed] = useState(false);
 
@@ -218,4 +219,4 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       </ModalBody>
     </Modal>
   );
-};
+});

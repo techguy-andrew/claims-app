@@ -1,20 +1,22 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
 import { 
   Button, 
   Input, 
-  Label, 
-  Textarea, 
+  Label,
   Card, 
   CardContent, 
-  CardDescription, 
+  CardDescription,
   CardHeader, 
-  CardTitle,
-  Select,
-  Badge 
+  CardTitle
 } from "@/components/ui"
+import { PhotoUpload } from '@/components/photo-upload'
+import { PhotoViewer } from '@/components/photo-viewer'
+import { TopBar } from '@/components/navigation/topbar'
+import { useSidebar } from '@/components/navigation'
 
 interface ClaimData {
   id: string
@@ -24,6 +26,7 @@ interface ClaimData {
   clientPhone: string | null
   itemDescription: string
   damageDetails: string
+  photos: string[]
   status: string
   incidentDate: string | null
   claimDate: string
@@ -32,14 +35,9 @@ interface ClaimData {
     lastName: string | null
     email: string
   }
-  inspections: Array<{
-    id: string
-    inspectionDate: string
-    inspector: {
-      firstName: string | null
-      lastName: string | null
-    }
-  }>
+  organization: {
+    name: string
+  }
 }
 
 export default function ClaimDetailsPage({
@@ -47,21 +45,21 @@ export default function ClaimDetailsPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const router = useRouter()
+  const { toggle } = useSidebar()
   const [claimId, setClaimId] = useState<string>("")
   const [claim, setClaim] = useState<ClaimData | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
   const [formData, setFormData] = useState({
     clientName: "",
     clientEmail: "",
     clientPhone: "",
     itemDescription: "",
     damageDetails: "",
-    status: "",
-    incidentDate: "",
-    claimNumber: ""
+    photos: [] as string[]
   })
 
   useEffect(() => {
@@ -84,9 +82,7 @@ export default function ClaimDetailsPage({
           clientPhone: data.clientPhone || "",
           itemDescription: data.itemDescription,
           damageDetails: data.damageDetails,
-          status: data.status,
-          incidentDate: data.incidentDate ? data.incidentDate.split('T')[0] : "",
-          claimNumber: data.claimNumber
+          photos: data.photos || []
         })
       } else {
         console.error("Failed to fetch claim:", data.error)
@@ -105,20 +101,27 @@ export default function ClaimDetailsPage({
     }))
   }
 
+  const handlePhotosChange = (photos: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      photos
+    }))
+  }
+
+  const openPhotoViewer = (index: number) => {
+    setViewerIndex(index);
+    setViewerOpen(true);
+  }
+
   const handleSave = async () => {
     setSaving(true)
     try {
-      const payload = {
-        ...formData,
-        claimNumber: formData.claimNumber || undefined
-      }
-      
       const response = await fetch(`/api/claims/${claimId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(formData)
       })
 
       if (response.ok) {
@@ -128,9 +131,11 @@ export default function ClaimDetailsPage({
       } else {
         const error = await response.json()
         console.error("Failed to update claim:", error)
+        alert("Failed to save changes. Please try again.")
       }
     } catch (error) {
       console.error("Error updating claim:", error)
+      alert("Failed to save changes. Please try again.")
     } finally {
       setSaving(false)
     }
@@ -144,277 +149,235 @@ export default function ClaimDetailsPage({
         clientPhone: claim.clientPhone || "",
         itemDescription: claim.itemDescription,
         damageDetails: claim.damageDetails,
-        status: claim.status,
-        incidentDate: claim.incidentDate ? claim.incidentDate.split('T')[0] : "",
-        claimNumber: claim.claimNumber
+        photos: claim.photos || []
       })
     }
     setEditing(false)
   }
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      OPEN: { variant: 'primary' as const, text: 'Open' },
-      IN_PROGRESS: { variant: 'warning' as const, text: 'In Progress' },
-      UNDER_REVIEW: { variant: 'secondary' as const, text: 'Under Review' },
-      APPROVED: { variant: 'success' as const, text: 'Approved' },
-      DENIED: { variant: 'error' as const, text: 'Denied' },
-      CLOSED: { variant: 'default' as const, text: 'Closed' }
-    }
-    
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.CLOSED
-    
-    return (
-      <Badge variant={config.variant}>
-        {config.text}
-      </Badge>
-    )
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent>
-            <div className="text-center py-8">Loading claim details...</div>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <TopBar
+          title="Claim Details"
+          subtitle="View and edit claim information"
+          showMenuButton={true}
+          onMenuToggle={toggle}
+        />
+        <div className="p-6">
+          <Card>
+            <CardContent>
+              <div className="text-center py-8">Loading claim details...</div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     )
   }
 
   if (!claim) {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent>
-            <div className="text-center py-8 text-red-600">
-              Claim not found or failed to load.
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <TopBar
+          title="Claim Details"
+          subtitle="View and edit claim information"
+          showMenuButton={true}
+          onMenuToggle={toggle}
+        />
+        <div className="p-6">
+          <Card>
+            <CardContent>
+              <div className="text-center py-8 text-red-600">
+                Claim not found or failed to load.
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="secondary" 
-            onClick={() => router.push('/claims')}
-          >
-            ← Back to Claims
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Claim {claim.claimNumber}</h1>
-            <p className="text-gray-600 mt-1">
-              Created on {formatDate(claim.claimDate)}
-            </p>
+    <>
+      <TopBar
+        title={`Claim ${claim.claimNumber}`}
+        subtitle="View and edit claim information"
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <div className="flex items-center gap-2">
+            <Link href="/claims">
+              <Button variant="secondary">
+                ← Back to Claims
+              </Button>
+            </Link>
+            {!editing ? (
+              <Button onClick={() => setEditing(true)}>
+                ✏️ Edit
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button onClick={handleSave} loading={saving}>
+                  💾 Save
+                </Button>
+                <Button variant="secondary" onClick={handleCancel}>
+                  ✕ Cancel
+                </Button>
+              </div>
+            )}
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {getStatusBadge(claim.status)}
-          {!editing ? (
-            <Button onClick={() => setEditing(true)}>
-              ✏️ Edit
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button onClick={handleSave} loading={saving}>
-                💾 Save
-              </Button>
-              <Button variant="secondary" onClick={handleCancel}>
-                ✕ Cancel
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+        }
+      />
+      <div className="p-6 space-y-6">
 
-      {/* Claim Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Client Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Client Name</Label>
-              {editing ? (
-                <Input
-                  value={formData.clientName}
-                  onChange={(e) => handleInputChange('clientName', e.target.value)}
-                />
-              ) : (
-                <p className="text-gray-900 font-medium">{claim.clientName}</p>
-              )}
-            </div>
-            
-            <div>
-              <Label>Email</Label>
-              {editing ? (
-                <Input
-                  type="email"
-                  value={formData.clientEmail}
-                  onChange={(e) => handleInputChange('clientEmail', e.target.value)}
-                />
-              ) : (
-                <p className="text-gray-600">{claim.clientEmail || 'Not provided'}</p>
-              )}
-            </div>
-            
-            <div>
-              <Label>Phone</Label>
-              {editing ? (
-                <Input
-                  type="tel"
-                  value={formData.clientPhone}
-                  onChange={(e) => handleInputChange('clientPhone', e.target.value)}
-                />
-              ) : (
-                <p className="text-gray-600">{claim.clientPhone || 'Not provided'}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Claim Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Status</Label>
-              {editing ? (
-                <Select
-                  value={formData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
-                  options={[
-                    { value: 'OPEN', label: 'Open' },
-                    { value: 'IN_PROGRESS', label: 'In Progress' },
-                    { value: 'UNDER_REVIEW', label: 'Under Review' },
-                    { value: 'APPROVED', label: 'Approved' },
-                    { value: 'DENIED', label: 'Denied' },
-                    { value: 'CLOSED', label: 'Closed' }
-                  ]}
-                />
-              ) : (
-                getStatusBadge(claim.status)
-              )}
-            </div>
-            
-            <div>
-              <Label>Incident Date</Label>
-              {editing ? (
-                <Input
-                  type="date"
-                  value={formData.incidentDate}
-                  onChange={(e) => handleInputChange('incidentDate', e.target.value)}
-                />
-              ) : (
-                <p className="text-gray-600">
-                  {claim.incidentDate ? formatDate(claim.incidentDate) : 'Not specified'}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label>Created By</Label>
-              <p className="text-gray-600">
-                {claim.createdBy.firstName} {claim.createdBy.lastName} ({claim.createdBy.email})
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Item and Damage Details */}
+      {/* Client Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Item & Damage Details</CardTitle>
+          <CardTitle>Client Information</CardTitle>
+          <CardDescription>
+            Client contact details for this claim
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label>Item Description</Label>
+            <Label htmlFor="clientName">Client Name</Label>
             {editing ? (
-              <Textarea
-                value={formData.itemDescription}
-                onChange={(e) => handleInputChange('itemDescription', e.target.value)}
-                rows={3}
+              <Input
+                id="clientName"
+                value={formData.clientName}
+                onChange={(e) => handleInputChange('clientName', e.target.value)}
+                placeholder="Enter client name"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border">
-                {claim.itemDescription}
-              </p>
+              <p className="text-gray-900 font-medium mt-2">{claim.clientName}</p>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="clientEmail">Client Email</Label>
+              {editing ? (
+                <Input
+                  id="clientEmail"
+                  type="email"
+                  value={formData.clientEmail}
+                  onChange={(e) => handleInputChange('clientEmail', e.target.value)}
+                  placeholder="client@example.com"
+                />
+              ) : (
+                <p className="text-gray-900 font-medium mt-2">{claim.clientEmail || 'Not provided'}</p>
+              )}
+            </div>
+            
+            <div>
+              <Label htmlFor="clientPhone">Client Phone</Label>
+              {editing ? (
+                <Input
+                  id="clientPhone"
+                  type="tel"
+                  value={formData.clientPhone}
+                  onChange={(e) => handleInputChange('clientPhone', e.target.value)}
+                  placeholder="(555) 123-4567"
+                />
+              ) : (
+                <p className="text-gray-900 font-medium mt-2">{claim.clientPhone || 'Not provided'}</p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Claim Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Claim Details</CardTitle>
+          <CardDescription>
+            Item and damage information
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="itemDescription">Item Description</Label>
+            {editing ? (
+              <Input
+                id="itemDescription"
+                value={formData.itemDescription}
+                onChange={(e) => handleInputChange('itemDescription', e.target.value)}
+                placeholder="Describe the item"
+              />
+            ) : (
+              <p className="text-gray-900 font-medium mt-2">{claim.itemDescription}</p>
             )}
           </div>
           
           <div>
-            <Label>Damage Details</Label>
+            <Label htmlFor="damageDetails">Damage Details</Label>
             {editing ? (
-              <Textarea
+              <Input
+                id="damageDetails"
                 value={formData.damageDetails}
                 onChange={(e) => handleInputChange('damageDetails', e.target.value)}
-                rows={4}
+                placeholder="Describe the damage"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded border">
-                {claim.damageDetails}
-              </p>
+              <p className="text-gray-900 font-medium mt-2">{claim.damageDetails}</p>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Inspections */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Inspections</CardTitle>
-          <CardDescription>
-            {claim.inspections.length} inspection{claim.inspections.length !== 1 ? 's' : ''} scheduled
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {claim.inspections.length === 0 ? (
-            <div className="text-center py-6 text-gray-500">
-              No inspections scheduled yet.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {claim.inspections.map((inspection) => (
-                <div key={inspection.id} className="flex items-center justify-between p-3 border rounded">
-                  <div>
-                    <p className="font-medium">
-                      Inspector: {inspection.inspector.firstName} {inspection.inspector.lastName}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Date: {formatDate(inspection.inspectionDate)}
-                    </p>
+      {/* Current Photos Display */}
+      {(claim?.photos && claim.photos.length > 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Photos</CardTitle>
+            <CardDescription>
+              {claim.photos.length} photo{claim.photos.length !== 1 ? 's' : ''} attached to this claim
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {claim.photos.map((photo, index) => (
+                <div key={index} className="relative group cursor-pointer">
+                  <Image
+                    src={photo}
+                    alt={`Claim photo ${index + 1}`}
+                    width={200}
+                    height={200}
+                    className="w-full h-24 object-cover rounded-lg border hover:opacity-80 transition-opacity"
+                    onClick={() => openPhotoViewer(index)}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
                   </div>
-                  <Button 
-                    variant="secondary" 
-                    size="small"
-                    onClick={() => router.push(`/inspections/${inspection.id}`)}
-                  >
-                    View
-                  </Button>
                 </div>
               ))}
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Photo Upload (Edit Mode Only) */}
+      {editing && (
+        <PhotoUpload 
+          onPhotosChange={handlePhotosChange}
+          existingPhotos={formData.photos}
+          maxPhotos={10}
+        />
+      )}
+
+      <PhotoViewer
+        photos={claim?.photos || []}
+        initialIndex={viewerIndex}
+        isOpen={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+      />
+      </div>
+    </>
   )
 }

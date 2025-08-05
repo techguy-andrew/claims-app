@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ClaimStatus } from '@prisma/client'
-import { createClaimNumber, validateId } from '@/lib/random-ids'
+import { createClaimNumber } from '@/lib/random-ids'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/claims - List all claims

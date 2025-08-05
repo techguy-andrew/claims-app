@@ -65,7 +65,7 @@ async function main() {
   for (let i = 0; i < 10; i++) {
     const client = sampleClients[i]
     const itemInfo = sampleItems[i]
-    const sequentialNumber = await getNextSequentialNumber('CLAIM')
+    const claimNumber = `CLM-${String(await getNextSequentialNumber('CLAIM')).padStart(6, '0')}`
     
     // Create dates
     const incidentDate = new Date()
@@ -80,7 +80,7 @@ async function main() {
 
     const claim = await prisma.claim.create({
       data: {
-        sequentialNumber,
+        claimNumber,
         clientName: client.name,
         clientEmail: client.email,
         clientPhone: client.phone,
@@ -95,7 +95,7 @@ async function main() {
     })
 
     claims.push(claim)
-    console.log(`Created Claim #${sequentialNumber}: ${client.name} - ${itemInfo.item}`)
+    console.log(`Created Claim #${claimNumber}: ${client.name} - ${itemInfo.item}`)
   }
 
   // Create 15 sample inspections
@@ -103,7 +103,7 @@ async function main() {
   
   for (let i = 0; i < 15; i++) {
     const claim = claims[Math.floor(Math.random() * claims.length)]
-    const sequentialNumber = await getNextSequentialNumber('INSPECTION')
+    const inspectionNumber = `INS-${String(await getNextSequentialNumber('INSPECTION')).padStart(6, '0')}`
     
     const inspectionDate = new Date(claim.claimDate)
     inspectionDate.setDate(inspectionDate.getDate() + Math.floor(Math.random() * 10) + 1)
@@ -114,7 +114,7 @@ async function main() {
 
     await prisma.inspection.create({
       data: {
-        sequentialNumber,
+        inspectionNumber,
         inspectionDate,
         inspectorNotes: inspectionNotes[Math.floor(Math.random() * inspectionNotes.length)],
         damageAssessment: `Assessment ${i + 1}: ${Math.random() > 0.5 ? 'Repairable' : 'Total loss'}`,
@@ -124,7 +124,7 @@ async function main() {
       }
     })
 
-    console.log(`Created Inspection #${sequentialNumber} for Claim #${claim.sequentialNumber}`)
+    console.log(`Created Inspection #${inspectionNumber} for Claim #${claim.claimNumber}`)
   }
 
   console.log('Sample data creation completed!')

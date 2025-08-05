@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createInspectionNumber, validateId } from '@/lib/random-ids'
+import { createInspectionNumber } from '@/lib/random-ids'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/inspections - List all inspections

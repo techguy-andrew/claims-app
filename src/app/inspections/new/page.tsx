@@ -14,9 +14,12 @@ import {
   CardTitle 
 } from "@/components/ui"
 import { PhotoUpload } from "@/components/photo-upload"
+import { TopBar } from '@/components/navigation/topbar'
+import { useSidebar } from '@/components/navigation'
 
 export default function NewInspectionPage() {
   const router = useRouter()
+  const { toggle } = useSidebar()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     claimId: "",
@@ -70,21 +73,22 @@ export default function NewInspectionPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="secondary" 
-          onClick={() => router.back()}
-        >
-          ← Back
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">New Inspection</h1>
-          <p className="text-muted-foreground mt-2">
-            Create a new property inspection
-          </p>
-        </div>
-      </div>
+    <>
+      <TopBar
+        title="New Inspection"
+        subtitle="Create a new property inspection"
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <Button 
+            variant="secondary" 
+            onClick={() => router.back()}
+          >
+            ← Back
+          </Button>
+        }
+      />
+      <div className="p-6 space-y-6">
 
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-2">
@@ -134,7 +138,7 @@ export default function NewInspectionPage() {
             </CardHeader>
             <CardContent>
               <PhotoUpload
-                onPhotosChange={(photos) => handleInputChange("photos", photos.map(file => file.name))}
+                onPhotosChange={(photos) => handleInputChange("photos", photos)}
                 maxPhotos={20}
               />
             </CardContent>
@@ -188,6 +192,7 @@ export default function NewInspectionPage() {
           </Button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   )
 }

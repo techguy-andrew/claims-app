@@ -129,7 +129,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
     const isHeaderRow = React.Children.toArray(children).some(
       child => React.isValidElement(child) && child.type === TableHead
     );
-    const isFooterRow = props.className?.includes('footer');
+    const isFooterRow = className?.includes('footer');
 
     const rowClasses = [
       isHeaderRow ? styles.headerRow : isFooterRow ? styles.footerRow : styles.bodyRow,

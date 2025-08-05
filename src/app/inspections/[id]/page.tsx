@@ -15,6 +15,8 @@ import {
   CardTitle,
   Badge 
 } from "@/components/ui"
+import { TopBar } from '@/components/navigation/topbar'
+import { useSidebar } from '@/components/navigation'
 
 interface InspectionData {
   id: string
@@ -52,6 +54,7 @@ export default function InspectionDetailsPage({
   params: Promise<{ id: string }>
 }) {
   const router = useRouter()
+  const { toggle } = useSidebar()
   const [inspectionId, setInspectionId] = useState<string>("")
   const [inspection, setInspection] = useState<InspectionData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -151,72 +154,71 @@ export default function InspectionDetailsPage({
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="secondary">
-            ← Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Loading...</h1>
-          </div>
+      <>
+        <TopBar
+          title="Inspection Details"
+          subtitle="View and edit inspection information"
+          showMenuButton={true}
+          onMenuToggle={toggle}
+        />
+        <div className="p-6">
+          <div className="text-center py-8">Loading inspection details...</div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (!inspection) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="secondary" 
-            onClick={() => router.back()}
-          >
-            ← Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Inspection Not Found</h1>
+      <>
+        <TopBar
+          title="Inspection Details"
+          subtitle="View and edit inspection information"
+          showMenuButton={true}
+          onMenuToggle={toggle}
+        />
+        <div className="p-6">
+          <div className="text-center py-8 text-red-600">
+            Inspection not found or failed to load.
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="secondary" 
-            onClick={() => router.back()}
-          >
-            ← Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Inspection Details</h1>
-            <p className="text-muted-foreground mt-2">
-              Inspected on {formatDate(inspection.inspectionDate)}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {editing ? (
-            <div className="flex gap-2">
-              <Button onClick={handleCancel} variant="secondary">
-                ✕ Cancel
-              </Button>
-              <Button onClick={handleSave} disabled={saving}>
-                💾 {saving ? "Saving..." : "Save"}
-              </Button>
-            </div>
-          ) : (
-            <Button onClick={() => setEditing(true)}>
-              ✏️ Edit
+    <>
+      <TopBar
+        title="Inspection Details"
+        subtitle={`Inspected on ${formatDate(inspection.inspectionDate)}`}
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="secondary" 
+              onClick={() => router.back()}
+            >
+              ← Back
             </Button>
-          )}
-        </div>
-      </div>
+            {editing ? (
+              <div className="flex gap-2">
+                <Button onClick={handleCancel} variant="secondary">
+                  ✕ Cancel
+                </Button>
+                <Button onClick={handleSave} disabled={saving}>
+                  💾 {saving ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => setEditing(true)}>
+                ✏️ Edit
+              </Button>
+            )}
+          </div>
+        }
+      />
+      <div className="p-6 space-y-6">
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Related Claim */}
@@ -312,9 +314,12 @@ export default function InspectionDetailsPage({
                       alt={`Inspection photo ${index + 1}`}
                       width={300}
                       height={300}
-                      deliveryType="fetch"
                       className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
                       onClick={() => window.open(photo, '_blank')}
+                      onError={(e) => {
+                        console.error('Failed to load image:', photo);
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                   </div>
                 ))}
@@ -405,6 +410,7 @@ export default function InspectionDetailsPage({
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

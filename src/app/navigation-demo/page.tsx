@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { 
   TopBar, 
   TopbarAction, 
-  TopbarFilter, 
   TopBarWithBreadcrumbs,
   TopBarWithSearch,
   TopBarWithFilter,
@@ -13,7 +12,7 @@ import {
   useTheme,
   useNavigation
 } from '@/components/navigation';
-import { Plus, Download, Filter, Settings, Home, FileText } from 'lucide-react';
+import { Plus, Download, Settings, Home, FileText } from 'lucide-react';
 
 export default function NavigationDemoPage() {
   const [searchQuery, setSearchQuery] = useState('');

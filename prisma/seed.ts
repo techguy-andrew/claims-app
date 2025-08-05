@@ -153,7 +153,7 @@ async function main() {
   for (let i = 0; i < sampleClients.length; i++) {
     const client = sampleClients[i]
     const scenario = sampleDamageScenarios[i]
-    const sequentialNumber = await getNextSequentialNumber('CLAIM')
+    const claimNumber = `CLM-${String(await getNextSequentialNumber('CLAIM')).padStart(6, '0')}`
     
     // Create incident date between 1-30 days ago
     const incidentDate = new Date()
@@ -181,7 +181,7 @@ async function main() {
 
     const claim = await prisma.claim.create({
       data: {
-        sequentialNumber,
+        claimNumber,
         clientName: client.name,
         clientEmail: client.email,
         clientPhone: client.phone,
@@ -196,14 +196,14 @@ async function main() {
     })
 
     claims.push(claim)
-    console.log(`Created claim #${sequentialNumber}: ${client.name} - ${scenario.item}`)
+    console.log(`Created claim #${claimNumber}: ${client.name} - ${scenario.item}`)
   }
 
   // Create additional claims for variety
   for (let i = 10; i < 15; i++) {
     const client = sampleClients[i % sampleClients.length]
     const scenario = sampleDamageScenarios[i % sampleDamageScenarios.length]
-    const sequentialNumber = await getNextSequentialNumber('CLAIM')
+    const claimNumber = `CLM-${String(await getNextSequentialNumber('CLAIM')).padStart(6, '0')}`
     
     const incidentDate = new Date()
     incidentDate.setDate(incidentDate.getDate() - Math.floor(Math.random() * 60) - 1)
@@ -213,7 +213,7 @@ async function main() {
 
     const claim = await prisma.claim.create({
       data: {
-        sequentialNumber,
+        claimNumber,
         clientName: `${client.name} (Business)`,
         clientEmail: client.email,
         clientPhone: client.phone,
@@ -228,7 +228,7 @@ async function main() {
     })
 
     claims.push(claim)
-    console.log(`Created claim #${sequentialNumber}: ${client.name} (Business) - Commercial ${scenario.item}`)
+    console.log(`Created claim #${claimNumber}: ${client.name} (Business) - Commercial ${scenario.item}`)
   }
 
   // Create sample inspections
@@ -238,7 +238,7 @@ async function main() {
   for (let i = 0; i < inspectionsToCreate; i++) {
     const claim = claims[Math.floor(Math.random() * claims.length)]
     const inspector = inspectorUsers[Math.floor(Math.random() * inspectorUsers.length)]
-    const sequentialNumber = await getNextSequentialNumber('INSPECTION')
+    const inspectionNumber = `INS-${String(await getNextSequentialNumber('INSPECTION')).padStart(6, '0')}`
     
     // Create inspection date between claim date and now
     const inspectionDate = new Date(claim.claimDate)
@@ -251,7 +251,7 @@ async function main() {
 
     const inspection = await prisma.inspection.create({
       data: {
-        sequentialNumber,
+        inspectionNumber,
         inspectionDate,
         inspectorNotes: inspectionNotes[Math.floor(Math.random() * inspectionNotes.length)],
         damageAssessment: damageAssessments[Math.floor(Math.random() * damageAssessments.length)],
@@ -264,7 +264,7 @@ async function main() {
       }
     })
 
-    console.log(`Created inspection #${sequentialNumber} for claim #${claim.sequentialNumber} by ${inspector.firstName} ${inspector.lastName}`)
+    console.log(`Created inspection #${inspectionNumber} for claim #${claim.claimNumber} by ${inspector.firstName} ${inspector.lastName}`)
   }
 
   // Create some audit log entries
@@ -276,7 +276,7 @@ async function main() {
     await prisma.auditLog.create({
       data: {
         action: 'CLAIM_CREATED',
-        details: `Claim #${claim.sequentialNumber} created for ${claim.clientName}`,
+        details: `Claim #${claim.claimNumber} created for ${claim.clientName}`,
         userId: adminUser.id,
         claimId: claim.id
       }
@@ -286,7 +286,7 @@ async function main() {
       await prisma.auditLog.create({
         data: {
           action: 'CLAIM_STATUS_UPDATED',
-          details: `Claim #${claim.sequentialNumber} status changed to ${claim.status}`,
+          details: `Claim #${claim.claimNumber} status changed to ${claim.status}`,
           userId: adminUser.id,
           claimId: claim.id
         }

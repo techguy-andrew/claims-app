@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, memo, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -12,11 +12,13 @@ import {
   ChevronDown, 
   ChevronRight,
   LogOut,
-  Menu
+  X
 } from 'lucide-react';
 import { createVariants, cn, type VariantProps } from './utils';
 import styles from './navigation.module.css';
+import { useNavigation } from './navigation-provider';
 
+// Types and Interfaces
 const sidebarVariants = {
   layout: {
     overlay: styles.overlay,
@@ -36,6 +38,25 @@ const sidebarVariants = {
 
 const getSidebarClasses = createVariants(sidebarVariants);
 
+export interface NavigationItem {
+  id: string;
+  label: string;
+  href?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  badge?: string | number;
+  children?: NavigationItem[];
+  onClick?: () => void;
+  disabled?: boolean;
+  external?: boolean;
+}
+
+export interface UserInfo {
+  name: string;
+  email?: string;
+  avatar?: string;
+  initials?: string;
+}
+
 export interface SidebarProps extends VariantProps<typeof sidebarVariants> {
   isOpen?: boolean;
   isCollapsed?: boolean;
@@ -47,32 +68,17 @@ export interface SidebarProps extends VariantProps<typeof sidebarVariants> {
   userInfo?: UserInfo;
   className?: string;
   children?: React.ReactNode;
+  'aria-label'?: string;
 }
 
-export interface NavigationItem {
-  id: string;
-  label: string;
-  href?: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  badge?: string | number;
-  children?: NavigationItem[];
-  onClick?: () => void;
-}
-
-export interface UserInfo {
-  name: string;
-  email?: string;
-  avatar?: string;
-  initials?: string;
-}
-
-export interface SidebarItemProps {
+export interface SidebarItemProps extends Omit<React.ComponentProps<'div'>, 'children'> {
   item: NavigationItem;
   isActive?: boolean;
   isCollapsed?: boolean;
   level?: number;
   theme?: 'light' | 'dark';
   onItemClick?: (item: NavigationItem) => void;
+  isItemActive?: (item: NavigationItem) => boolean;
 }
 
 export interface SidebarSectionProps {
@@ -82,45 +88,89 @@ export interface SidebarSectionProps {
   className?: string;
 }
 
+// Custom hooks
+const useClickOutside = (
+  ref: React.RefObject<HTMLElement | null>,
+  handler: () => void,
+  active: boolean = true
+) => {
+  useEffect(() => {
+    if (!active) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        handler();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [ref, handler, active]);
+};
+
+const useKeyboard = (isOpen: boolean, onClose?: () => void) => {
+  useEffect(() => {
+    if (!isOpen || !onClose) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+};
+
 // Sidebar Item Component
-export const SidebarItem: React.FC<SidebarItemProps> = ({ 
+export const SidebarItem = memo<SidebarItemProps>(({ 
   item, 
   isActive = false, 
   isCollapsed = false,
   level = 0,
   theme = 'light',
-  onItemClick
+  onItemClick,
+  isItemActive
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const hasChildren = item.children && item.children.length > 0;
-  const indentLevel = level * 12; // 12px per level
+  const hasChildren = Boolean(item.children?.length);
+  const indentLevel = level * 12;
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
+    if (item.disabled) return;
+    
     if (hasChildren) {
-      setIsExpanded(!isExpanded);
+      setIsExpanded(prev => !prev);
     }
-    if (item.onClick) {
-      item.onClick();
-    }
-    if (onItemClick) {
-      onItemClick(item);
-    }
-  };
+    
+    item.onClick?.();
+    onItemClick?.(item);
+  }, [hasChildren, item, onItemClick]);
 
-  const itemContent = (
+  const itemContent = useMemo(() => (
     <>
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {item.icon && (
-          <item.icon className={cn(
-            "flex-shrink-0",
-            isCollapsed ? "w-5 h-5" : "w-4 h-4"
-          )} />
+          <item.icon 
+            className={cn(
+              "flex-shrink-0",
+              isCollapsed ? "w-5 h-5" : "w-4 h-4",
+              item.disabled && "opacity-50"
+            )} 
+            aria-hidden="true"
+          />
         )}
         {!isCollapsed && (
           <>
-            <span className="truncate">{item.label}</span>
+            <span className={cn(
+              "truncate", 
+              item.disabled && "opacity-50"
+            )}>
+              {item.label}
+            </span>
             {item.badge && (
-              <span className="ml-auto flex-shrink-0 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+              <span className="ml-auto flex-shrink-0 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-200">
                 {item.badge}
               </span>
             )}
@@ -130,60 +180,87 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
       {hasChildren && !isCollapsed && (
         <div className="flex-shrink-0">
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4" aria-hidden="true" />
           ) : (
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
           )}
         </div>
       )}
     </>
-  );
+  ), [item, isCollapsed, isExpanded, hasChildren]);
 
   const itemClasses = cn(
     styles.navItem,
     theme === 'dark' && styles.dark,
     isActive && styles.active,
-    isActive && theme === 'dark' && styles.dark,
-    "relative"
+    isActive && theme === 'dark' && styles.darkActive,
+    item.disabled && "opacity-50 cursor-not-allowed",
+    "relative transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
   );
 
-  const ItemWrapper = item.href ? Link : 'button';
-  const itemProps = item.href 
-    ? { href: item.href } 
-    : { type: 'button' as const, onClick: handleClick };
+  const commonProps = useMemo(() => ({
+    className: itemClasses,
+    style: { paddingLeft: `${12 + indentLevel}px` },
+    title: isCollapsed ? item.label : undefined,
+    'aria-expanded': hasChildren ? isExpanded : undefined,
+    'aria-disabled': item.disabled,
+    onClick: handleClick,
+  }), [itemClasses, indentLevel, isCollapsed, item.label, hasChildren, isExpanded, item.disabled, handleClick]);
+
+  const ItemElement = useMemo(() => {
+    if (item.href && !item.disabled) {
+      return (
+        <Link
+          href={item.href}
+          {...commonProps}
+          aria-current={isActive ? 'page' : undefined}
+          target={item.external ? '_blank' : undefined}
+          rel={item.external ? 'noopener noreferrer' : undefined}
+        >
+          {itemContent}
+        </Link>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        disabled={item.disabled}
+        {...commonProps}
+      >
+        {itemContent}
+      </button>
+    );
+  }, [item, commonProps, itemContent, isActive]);
 
   return (
     <div>
-      <ItemWrapper
-        {...itemProps}
-        className={itemClasses}
-        style={{ paddingLeft: `${12 + indentLevel}px` }}
-        title={isCollapsed ? item.label : undefined}
-        aria-expanded={hasChildren ? isExpanded : undefined}
-      >
-        {itemContent}
-      </ItemWrapper>
+      {ItemElement}
       
-      {/* Children */}
       {hasChildren && isExpanded && !isCollapsed && (
-        <div className="space-y-1">
+        <div className="space-y-1" role="group" aria-label={`${item.label} submenu`}>
           {item.children!.map((child) => (
             <SidebarItem
               key={child.id}
               item={child}
+              isActive={isItemActive ? isItemActive(child) : false}
+              isCollapsed={isCollapsed}
               level={level + 1}
               theme={theme}
               onItemClick={onItemClick}
+              isItemActive={isItemActive}
             />
           ))}
         </div>
       )}
     </div>
   );
-};
+});
+
+SidebarItem.displayName = 'SidebarItem';
 
 // Sidebar Section Component
-export const SidebarSection: React.FC<SidebarSectionProps> = ({ 
+export const SidebarSection = memo<SidebarSectionProps>(({ 
   title, 
   children, 
   isCollapsed = false,
@@ -193,90 +270,148 @@ export const SidebarSection: React.FC<SidebarSectionProps> = ({
     <div className={cn("space-y-1", className)}>
       {title && !isCollapsed && (
         <div className="px-3 py-2">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             {title}
           </h3>
         </div>
       )}
-      {children}
+      <div role="group" aria-label={title}>
+        {children}
+      </div>
     </div>
   );
-};
+});
+
+SidebarSection.displayName = 'SidebarSection';
 
 // User Profile Component
-export const SidebarProfile: React.FC<{
+export const SidebarProfile = memo<{
   userInfo: UserInfo;
   isCollapsed?: boolean;
   theme?: 'light' | 'dark';
   onSignOut?: () => void;
-}> = ({ userInfo, isCollapsed = false, theme = 'light', onSignOut }) => {
+  onProfileClick?: () => void;
+  onSettingsClick?: () => void;
+}>(({ 
+  userInfo, 
+  isCollapsed = false, 
+  onSignOut,
+  onProfileClick,
+  onSettingsClick
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+  const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), []);
+
+  useClickOutside(menuRef, closeMenu, isMenuOpen);
+
+  const handleProfileClick = useCallback(() => {
+    closeMenu();
+    onProfileClick?.();
+  }, [closeMenu, onProfileClick]);
+
+  const handleSettingsClick = useCallback(() => {
+    closeMenu();
+    onSettingsClick?.();
+  }, [closeMenu, onSettingsClick]);
+
+  const handleSignOut = useCallback(() => {
+    closeMenu();
+    onSignOut?.();
+  }, [closeMenu, onSignOut]);
+
+  const userInitials = useMemo(() => {
+    return userInfo.initials || userInfo.name.charAt(0).toUpperCase();
+  }, [userInfo.initials, userInfo.name]);
 
   if (isCollapsed) {
     return (
       <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-        <div className={styles.userAvatar} title={userInfo.name}>
-          {userInfo.initials || userInfo.name.charAt(0).toUpperCase()}
+        <div 
+          className={cn(styles.userAvatar, "cursor-pointer")} 
+          title={userInfo.name}
+          onClick={toggleMenu}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleMenu();
+            }
+          }}
+        >
+          {userInitials}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+    <div className="p-4 border-t border-gray-200 dark:border-gray-700" ref={menuRef}>
       <div className="relative">
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className={cn(styles.userMenu, "w-full")}
+          onClick={toggleMenu}
+          className={cn(
+            styles.userMenu, 
+            "w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-lg"
+          )}
           aria-expanded={isMenuOpen}
+          aria-haspopup="true"
+          aria-label={`User menu for ${userInfo.name}`}
         >
-          <div className={styles.userAvatar}>
-            {userInfo.initials || userInfo.name.charAt(0).toUpperCase()}
+          <div className={styles.userAvatar} aria-hidden="true">
+            {userInitials}
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-medium truncate">{userInfo.name}</p>
+            <p className="text-sm font-medium truncate dark:text-white">
+              {userInfo.name}
+            </p>
             {userInfo.email && (
-              <p className="text-xs text-gray-500 truncate">{userInfo.email}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {userInfo.email}
+              </p>
             )}
           </div>
-          <ChevronDown className={cn(
-            "w-4 h-4 transition-transform",
-            isMenuOpen && "rotate-180"
-          )} />
+          <ChevronDown 
+            className={cn(
+              "w-4 h-4 transition-transform duration-200 text-gray-500 dark:text-gray-400",
+              isMenuOpen && "rotate-180"
+            )}
+            aria-hidden="true"
+          />
         </button>
 
-        {/* User Menu Dropdown */}
         {isMenuOpen && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-50">
+          <div 
+            className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-50"
+            role="menu"
+            aria-orientation="vertical"
+          >
             <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                // Handle profile click
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-left"
+              onClick={handleProfileClick}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset dark:text-white"
+              role="menuitem"
             >
-              <User className="w-4 h-4" />
+              <User className="w-4 h-4" aria-hidden="true" />
               View Profile
             </button>
             <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                // Handle settings click
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-left"
+              onClick={handleSettingsClick}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset dark:text-white"
+              role="menuitem"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4" aria-hidden="true" />
               Settings
             </button>
-            <hr className="my-1 border-gray-200 dark:border-gray-700" />
+            <hr className="my-1 border-gray-200 dark:border-gray-700" role="separator" />
             <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                if (onSignOut) onSignOut();
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-left"
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset"
+              role="menuitem"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4" aria-hidden="true" />
               Sign Out
             </button>
           </div>
@@ -284,55 +419,59 @@ export const SidebarProfile: React.FC<{
       </div>
     </div>
   );
+});
+
+SidebarProfile.displayName = 'SidebarProfile';
+
+// Default navigation data
+const DEFAULT_NAVIGATION: NavigationItem[] = [
+  { id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
+  { id: 'claims', label: 'Claims', href: '/claims', icon: FileText, badge: '3' },
+  { id: 'inspections', label: 'Inspections', href: '/inspections', icon: Search },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+    children: [
+      { id: 'general', label: 'General', href: '/settings/general' },
+      { id: 'users', label: 'Users', href: '/settings/users' },
+      { id: 'billing', label: 'Billing', href: '/settings/billing' },
+    ]
+  },
+];
+
+const DEFAULT_USER_INFO: UserInfo = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  initials: 'JD'
 };
 
 // Main Sidebar Component
-export const Sidebar: React.FC<SidebarProps> = ({ 
+export const Sidebar = memo<SidebarProps>(({ 
   layout = 'overlay',
   size = 'md',
-  theme = 'light',
+  theme,
   isOpen = false,
   isCollapsed = false,
   onClose,
-  onToggle,
   onToggleCollapse,
-  navigation = [],
+  navigation = DEFAULT_NAVIGATION,
   showProfile = true,
-  userInfo,
+  userInfo = DEFAULT_USER_INFO,
   className = '',
-  children
+  children,
+  'aria-label': ariaLabel = 'Main navigation',
+  ...props
 }) => {
+  const { theme: contextTheme, isMobile, isTablet } = useNavigation();
   const pathname = usePathname();
+  
+  const currentTheme = theme || contextTheme || 'light';
 
-  // Default navigation if none provided
-  const defaultNavigation: NavigationItem[] = [
-    { id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
-    { id: 'claims', label: 'Claims', href: '/claims', icon: FileText, badge: '3' },
-    { id: 'inspections', label: 'Inspections', href: '/inspections', icon: Search },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      children: [
-        { id: 'general', label: 'General', href: '/settings/general' },
-        { id: 'users', label: 'Users', href: '/settings/users' },
-        { id: 'billing', label: 'Billing', href: '/settings/billing' },
-      ]
-    },
-  ];
+  // Use keyboard hook
+  useKeyboard(isOpen, onClose);
 
-  const navItems = navigation.length > 0 ? navigation : defaultNavigation;
-
-  const defaultUserInfo: UserInfo = {
-    name: 'John Doe',
-    email: 'john@example.com',
-    initials: 'JD'
-  };
-
-  const currentUserInfo = userInfo || defaultUserInfo;
-
-  // Check if item is active
-  const isItemActive = (item: NavigationItem): boolean => {
+  const isItemActive = useCallback((item: NavigationItem): boolean => {
     if (item.href) {
       return pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
     }
@@ -340,136 +479,148 @@ export const Sidebar: React.FC<SidebarProps> = ({
       return item.children.some(child => isItemActive(child));
     }
     return false;
-  };
+  }, [pathname]);
+
+  const handleItemClick = useCallback(() => {
+    // Close sidebar on mobile when clicking navigation items
+    if ((layout === 'overlay' || isMobile || isTablet) && onClose) {
+      onClose();
+    }
+  }, [layout, isMobile, isTablet, onClose]);
 
   const sidebarClasses = cn(
     styles.sidebar,
-    getSidebarClasses({ layout, size, theme }),
+    getSidebarClasses({ 
+      layout: layout as 'overlay' | 'push' | 'static', 
+      size: size as 'sm' | 'md' | 'lg', 
+      theme: currentTheme as 'light' | 'dark' 
+    }),
     isCollapsed && styles.collapsed,
     isOpen ? styles.visible : styles.hidden,
-    className
+    className,
+    "transition-all duration-300 ease-in-out"
   );
 
-  const handleItemClick = (item: NavigationItem) => {
-    // Close sidebar on mobile when navigation item is clicked
-    if (layout === 'overlay' && onClose) {
-      onClose();
-    }
-  };
+  const navigationContent = useMemo(() => {
+    if (children) return children;
 
-  // Close sidebar on escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && onClose) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, onClose]);
+    return (
+      <nav className="px-3 space-y-6" aria-label={ariaLabel}>
+        <SidebarSection isCollapsed={isCollapsed}>
+          <div className="space-y-1">
+            {navigation.map((item) => (
+              <SidebarItem
+                key={item.id}
+                item={item}
+                isActive={isItemActive(item)}
+                isCollapsed={isCollapsed}
+                theme={currentTheme}
+                onItemClick={() => handleItemClick()}
+                isItemActive={isItemActive}
+              />
+            ))}
+          </div>
+        </SidebarSection>
+      </nav>
+    );
+  }, [children, ariaLabel, isCollapsed, navigation, isItemActive, currentTheme, handleItemClick]);
 
   return (
     <>
       {/* Backdrop for overlay layout */}
-      {layout === 'overlay' && isOpen && typeof window !== 'undefined' && (
+      {layout === 'overlay' && isOpen && (
         <div 
-          className={cn(styles.backdrop, styles.visible)}
+          className={cn(styles.backdrop, styles.visible, "transition-opacity duration-300")}
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={sidebarClasses}
         role="navigation"
-        aria-label="Sidebar navigation"
-        aria-hidden={!isOpen}
+        aria-label={ariaLabel}
+        {...props}
       >
         {/* Header */}
         <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
-          {/* Mobile: Hamburger + Menu text */}
-          <div className="lg:hidden flex items-center gap-3 flex-1">
-            {onToggle && (
+          {/* Mobile Header */}
+          <div className="lg:hidden flex items-center justify-between w-full">
+            <span className="font-medium text-lg dark:text-white">Menu</span>
+            {onClose && (
               <button
-                onClick={onToggle}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Close navigation menu"
               >
-                <div className={cn(styles.hamburger, isOpen && styles.open)}>
-                  <div className={styles.hamburgerLine} />
-                  <div className={styles.hamburgerLine} />
-                  <div className={styles.hamburgerLine} />
-                </div>
+                <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
             )}
-            <span className="font-medium text-lg">Menu</span>
           </div>
           
-          {/* Desktop: Full logo */}
-          <div className="hidden lg:flex items-center gap-3 flex-1">
-            {!isCollapsed ? (
-              <Link href="/" className="flex items-center gap-3">
-                <Home className="w-6 h-6" />
-                <span className="font-bold text-lg">Claims App</span>
-              </Link>
-            ) : (
-              <Link href="/" className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
-                <Home className="w-5 h-5 text-white" />
-              </Link>
-            )}
+          {/* Desktop Header */}
+          <div className="hidden lg:flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              {!isCollapsed ? (
+                <Link href="/" className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
+                  <Home className="w-6 h-6 dark:text-white" />
+                  <span className="font-bold text-lg dark:text-white">Claims App</span>
+                </Link>
+              ) : (
+                <Link 
+                  href="/" 
+                  className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-label="Claims App home"
+                >
+                  <Home className="w-5 h-5 text-white" />
+                </Link>
+              )}
+            </div>
+            
+            {/* Desktop Controls */}
+            <div className="flex items-center gap-2">
+              {onToggleCollapse && !isCollapsed && (
+                <button
+                  onClick={onToggleCollapse}
+                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Collapse sidebar"
+                  title="Collapse sidebar"
+                >
+                  <ChevronRight className="w-4 h-4 dark:text-gray-300" />
+                </button>
+              )}
+              
+              {onClose && layout === 'overlay' && (
+                <button
+                  onClick={onClose}
+                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Close sidebar"
+                  title="Close sidebar"
+                >
+                  <X className="w-4 h-4 dark:text-gray-300" />
+                </button>
+              )}
+            </div>
           </div>
-          
-          {/* Collapse Toggle (Desktop only) */}
-          {onToggleCollapse && (
-            <button
-              onClick={onToggleCollapse}
-              className="hidden lg:block p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-          )}
         </div>
 
-        {/* Navigation Content */}
+        {/* Main Content */}
         <div className="flex-1 overflow-y-auto py-4">
-          {children || (
-            <nav className="px-3 space-y-6">
-              <SidebarSection isCollapsed={isCollapsed}>
-                <div className="space-y-1">
-                  {navItems.map((item) => (
-                    <SidebarItem
-                      key={item.id}
-                      item={item}
-                      isActive={isItemActive(item)}
-                      isCollapsed={isCollapsed}
-                      theme={theme}
-                      onItemClick={handleItemClick}
-                    />
-                  ))}
-                </div>
-              </SidebarSection>
-            </nav>
-          )}
+          {navigationContent}
         </div>
 
-        {/* Profile Section */}
+        {/* User Profile */}
         {showProfile && (
           <SidebarProfile
-            userInfo={currentUserInfo}
+            userInfo={userInfo}
             isCollapsed={isCollapsed}
-            theme={theme}
-            onSignOut={() => {
-              // Handle sign out
-              console.log('Sign out clicked');
-            }}
+            theme={currentTheme}
+            onSignOut={() => console.log('Sign out clicked')}
           />
         )}
       </aside>
     </>
   );
-};
+});
+
+Sidebar.displayName = 'Sidebar';

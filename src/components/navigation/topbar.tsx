@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ChevronRight, Home, Search, Filter, Plus, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, Search, Filter, MoreHorizontal, Menu } from 'lucide-react';
 import { createVariants, cn, type VariantProps } from './utils';
 import styles from './navigation.module.css';
 
@@ -28,6 +28,8 @@ export interface TopbarProps extends VariantProps<typeof topbarVariants> {
   searchPlaceholder?: string;
   showSearch?: boolean;
   onSearch?: (query: string) => void;
+  showMenuButton?: boolean;
+  onMenuToggle?: () => void;
   className?: string;
   children?: React.ReactNode;
 }
@@ -71,28 +73,41 @@ export const TopbarBreadcrumbs: React.FC<TopbarBreadcrumbsProps> = ({
       <ol className="flex items-center space-x-1">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
-          const ItemComponent = item.href ? Link : 'span';
-          const itemProps = item.href ? { href: item.href } : {};
 
           return (
             <li key={index} className="flex items-center">
               {index > 0 && (
                 <ChevronRight className="w-4 h-4 text-gray-400 mx-1" aria-hidden="true" />
               )}
-              <ItemComponent
-                {...itemProps}
-                className={cn(
-                  "flex items-center gap-1 transition-colors",
-                  isLast 
-                    ? "text-gray-900 dark:text-white font-medium" 
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300",
-                  item.href && "hover:underline"
-                )}
-                aria-current={isLast ? "page" : undefined}
-              >
-                {item.icon && <item.icon className="w-4 h-4" />}
-                {item.label}
-              </ItemComponent>
+              {item.href ? (
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-1 transition-colors",
+                    isLast 
+                      ? "text-gray-900 dark:text-white font-medium" 
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300",
+                    "hover:underline"
+                  )}
+                  aria-current={isLast ? "page" : undefined}
+                >
+                  {item.icon && <item.icon className="w-4 h-4" />}
+                  {item.label}
+                </Link>
+              ) : (
+                <span
+                  className={cn(
+                    "flex items-center gap-1 transition-colors",
+                    isLast 
+                      ? "text-gray-900 dark:text-white font-medium" 
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  )}
+                  aria-current={isLast ? "page" : undefined}
+                >
+                  {item.icon && <item.icon className="w-4 h-4" />}
+                  {item.label}
+                </span>
+              )}
             </li>
           );
         })}
@@ -272,6 +287,8 @@ export const TopBar: React.FC<TopbarProps> = ({
   searchPlaceholder = "Search...",
   showSearch = false,
   onSearch,
+  showMenuButton = false,
+  onMenuToggle,
   className = '',
   children
 }) => {
@@ -284,30 +301,43 @@ export const TopBar: React.FC<TopbarProps> = ({
   return (
     <div className={topbarClasses}>
       {/* Left Section */}
-      <div className="flex-1 min-w-0">
-        {/* Breadcrumbs */}
-        {breadcrumbs.length > 0 && (
-          <TopbarBreadcrumbs items={breadcrumbs} className="mb-1" />
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Menu Button */}
+        {showMenuButton && onMenuToggle && (
+          <button
+            onClick={onMenuToggle}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Toggle sidebar"
+          >
+            <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+          </button>
         )}
-        
-        {/* Title & Subtitle */}
-        {(title || subtitle) && (
-          <div className="space-y-1">
-            {title && (
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
-                {title}
-              </h1>
-            )}
-            {subtitle && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                {subtitle}
-              </p>
-            )}
-          </div>
-        )}
-        
-        {/* Custom Content */}
-        {children}
+
+        <div className="flex-1 min-w-0">
+          {/* Breadcrumbs */}
+          {breadcrumbs.length > 0 && (
+            <TopbarBreadcrumbs items={breadcrumbs} className="mb-1" />
+          )}
+          
+          {/* Title & Subtitle */}
+          {(title || subtitle) && (
+            <div className="space-y-1">
+              {title && (
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
+                  {title}
+                </h1>
+              )}
+              {subtitle && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          )}
+          
+          {/* Custom Content */}
+          {children}
+        </div>
       </div>
 
       {/* Right Section */}

@@ -26,7 +26,7 @@ async function testAPIValidation() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sequentialNumber: existingClaim.sequentialNumber,
+          claimNumber: existingClaim.claimNumber,
           clientName: 'Test Duplicate',
           itemDescription: 'Test Item',
           damageDetails: 'Test damage',
@@ -77,7 +77,7 @@ async function testAPIValidation() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            sequentialNumber: existingClaim.sequentialNumber,
+            claimNumber: existingClaim.claimNumber,
             clientName: anotherClaim.clientName,
             itemDescription: anotherClaim.itemDescription,
             damageDetails: anotherClaim.damageDetails,

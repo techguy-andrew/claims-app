@@ -10,23 +10,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   asChild?: boolean;
 }
 
-export interface ButtonAsLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  variant?: 'primary' | 'secondary' | 'destructive' | 'ghost';
-  size?: 'small' | 'default' | 'large';
-  loading?: boolean;
-  fullWidth?: boolean;
-  children: React.ReactNode;
-  asChild: true;
-}
-
-type ButtonComponentProps = ButtonProps | ButtonAsLinkProps;
-
-function isLinkProps(props: ButtonComponentProps): props is ButtonAsLinkProps {
-  return 'asChild' in props && props.asChild === true;
-}
-
-const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonComponentProps>(
-  ({ variant = 'primary', size = 'default', loading = false, fullWidth = false, className, children, ...props }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', size = 'default', loading = false, fullWidth = false, className, children, asChild, ...props }, ref) => {
     // Combine CSS classes
     const classes = [
       styles.button,
@@ -37,27 +22,24 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonCom
       className
     ].filter(Boolean).join(' ');
 
-    if (isLinkProps(props)) {
-      const { asChild, ...linkProps } = props;
+    if (asChild) {
       return (
         <a
           ref={ref as React.Ref<HTMLAnchorElement>}
           className={classes}
-          {...linkProps}
+          {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
         >
           {children}
         </a>
       );
     }
 
-    const { asChild, ...buttonProps } = props as ButtonProps;
-    
     return (
       <button
-        ref={ref as React.Ref<HTMLButtonElement>}
+        ref={ref}
         className={classes}
-        disabled={loading || buttonProps.disabled}
-        {...buttonProps}
+        disabled={loading || props.disabled}
+        {...props}
       >
         {children}
       </button>

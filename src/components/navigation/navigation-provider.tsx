@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useReducer } from 'react';
-import { getScreenSize, type ScreenSize, BREAKPOINTS } from './utils';
+import { getScreenSize, type ScreenSize } from './utils';
 
 export interface NavigationState {
   // Sidebar state
@@ -161,9 +161,8 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     // Always start with desktop as default for SSR consistency
     const screenSize = 'desktop';
     
-    let theme = settings.defaultTheme;
-    let sidebarCollapsed = false;
-    let sidebarLayout = settings.defaultSidebarLayout;
+    const theme = settings.defaultTheme;
+    const sidebarLayout = settings.defaultSidebarLayout;
 
     // Only access localStorage on client side after mount
     // This prevents hydration mismatches

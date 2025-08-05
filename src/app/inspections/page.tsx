@@ -18,6 +18,8 @@ import {
   TableRow,
   Badge 
 } from "@/components/ui"
+import { TopBar } from '@/components/navigation/topbar'
+import { useSidebar } from '@/components/navigation'
 
 interface Inspection {
   id: string
@@ -49,6 +51,7 @@ const statusColors = {
 
 export default function InspectionsPage() {
   const router = useRouter()
+  const { toggle } = useSidebar()
   const [inspections, setInspections] = useState<Inspection[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
@@ -113,39 +116,40 @@ export default function InspectionsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Inspections</h1>
-            <p className="text-muted-foreground mt-2">
-              Manage property inspections and assessments
-            </p>
-          </div>
+      <>
+        <TopBar
+          title="Inspections"
+          subtitle="Manage property inspections and assessments"
+          showMenuButton={true}
+          onMenuToggle={toggle}
+        />
+        <div className="p-6 space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center py-8">
+                Loading inspections...
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center py-8">
-              Loading inspections...
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Inspections</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage property inspections and assessments
-          </p>
-        </div>
-        <Button onClick={() => router.push('/inspections/new')}>
-          + New Inspection
-        </Button>
-      </div>
+    <>
+      <TopBar
+        title="Inspections"
+        subtitle="Manage property inspections and assessments"
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <Button onClick={() => router.push('/inspections/new')}>
+            + New Inspection
+          </Button>
+        }
+      />
+      <div className="p-6 space-y-6">
 
       {/* Search */}
       <Card>
@@ -246,6 +250,7 @@ export default function InspectionsPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.css';
 
@@ -57,6 +57,16 @@ const Modal: React.FC<ModalProps> = ({
     setMounted(true);
   }, []);
 
+  const handleClose = useCallback(() => {
+    if (loading) return;
+    
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 150);
+  }, [loading, onClose]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -73,17 +83,7 @@ const Modal: React.FC<ModalProps> = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.classList.remove(styles.noScroll);
     };
-  }, [open, closeOnEscape]);
-
-  const handleClose = () => {
-    if (loading) return;
-    
-    setIsClosing(true);
-    setTimeout(() => {
-      setIsClosing(false);
-      onClose();
-    }, 150);
-  };
+  }, [open, closeOnEscape, handleClose]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (closeOnOverlayClick && e.target === e.currentTarget) {

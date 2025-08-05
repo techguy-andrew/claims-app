@@ -1,25 +1,31 @@
+"use client";
+
 import Link from 'next/link';
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
+import { TopBar } from '@/components/navigation/topbar';
+import { useSidebar } from '@/components/navigation';
 
 export default function Dashboard() {
-  return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your insurance claims and inspections efficiently
-          </p>
-        </div>
-        <Link href="/claims/new">
-          <Button>
-            <span style={{ marginRight: '0.5rem' }}>+</span>
-            New Claim
-          </Button>
-        </Link>
-      </div>
+  const { toggle } = useSidebar();
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  return (
+    <>
+      <TopBar
+        title="Dashboard"
+        subtitle="Manage your insurance claims and inspections efficiently"
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <Link href="/claims/new">
+            <Button>
+              <span style={{ marginRight: '0.5rem' }}>+</span>
+              New Claim
+            </Button>
+          </Link>
+        }
+      />
+      <div className="p-6 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -111,7 +117,8 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

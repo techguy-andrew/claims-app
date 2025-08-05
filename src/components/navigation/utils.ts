@@ -11,7 +11,7 @@ export const createVariants = <T extends Record<string, Record<string, string>>>
     const { className, ...variantProps } = props;
     
     const variantClasses = Object.entries(variantProps)
-      .filter(([_, value]) => value !== undefined)
+      .filter(([, value]) => value !== undefined)
       .map(([key, value]) => {
         const variantGroup = variants[key as keyof T];
         return variantGroup?.[value as string];

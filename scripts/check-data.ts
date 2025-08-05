@@ -4,12 +4,11 @@ import { prisma } from '../src/lib/prisma'
 
 async function main() {
   try {
-    const [orgs, users, claims, inspections, counters] = await Promise.all([
+    const [orgs, users, claims, inspections] = await Promise.all([
       prisma.organization.count(),
       prisma.user.count(),
       prisma.claim.count(),
-      prisma.inspection.count(),
-      prisma.numberCounter.findMany()
+      prisma.inspection.count()
     ])
 
     console.log('Database contents:')
@@ -17,21 +16,20 @@ async function main() {
     console.log(`Users: ${users}`)
     console.log(`Claims: ${claims}`)
     console.log(`Inspections: ${inspections}`)
-    console.log(`Number Counters:`, counters)
 
     if (claims > 0) {
       const sampleClaims = await prisma.claim.findMany({
         take: 3,
         select: {
           id: true,
-          sequentialNumber: true,
+          claimNumber: true,
           clientName: true,
           itemDescription: true
         }
       })
       console.log('\nSample claims:')
       sampleClaims.forEach(claim => {
-        console.log(`  Claim #${claim.sequentialNumber}: ${claim.clientName} - ${claim.itemDescription}`)
+        console.log(`  Claim #${claim.claimNumber}: ${claim.clientName} - ${claim.itemDescription}`)
       })
     }
 
@@ -40,15 +38,15 @@ async function main() {
         take: 3,
         select: {
           id: true,
-          sequentialNumber: true,
+          inspectionNumber: true,
           claim: {
-            select: { sequentialNumber: true, clientName: true }
+            select: { claimNumber: true, clientName: true }
           }
         }
       })
       console.log('\nSample inspections:')
       sampleInspections.forEach(inspection => {
-        console.log(`  Inspection #${inspection.sequentialNumber}: for Claim #${inspection.claim.sequentialNumber} (${inspection.claim.clientName})`)
+        console.log(`  Inspection #${inspection.inspectionNumber}: for Claim #${inspection.claim.claimNumber} (${inspection.claim.clientName})`)
       })
     }
   } catch (error) {

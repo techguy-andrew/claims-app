@@ -45,6 +45,7 @@ model Claim {
   clientPhone     String?
   itemDescription String
   damageDetails   String
+  photos          String[]
   status          ClaimStatus  @default(OPEN)
   incidentDate    DateTime?
   claimDate       DateTime     @default(now())

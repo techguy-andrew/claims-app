@@ -233,10 +233,7 @@ async function main() {
         inspectionDate,
         inspectorNotes: furnitureInspectionNotes[Math.floor(Math.random() * furnitureInspectionNotes.length)],
         damageAssessment: furnitureAssessments[Math.floor(Math.random() * furnitureAssessments.length)],
-        photos: [
-          `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000)}`,
-          `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000)}`
-        ].slice(0, Math.floor(Math.random() * 4) + 1), // 1-4 photos
+        photos: [], // No sample photos - will be uploaded by users
         claimId: claim.id,
         inspectorId: inspector.id
       }

@@ -71,6 +71,7 @@ export async function PUT(
       clientPhone,
       itemDescription,
       damageDetails,
+      photos,
       status,
       incidentDate,
       claimNumber
@@ -95,6 +96,7 @@ export async function PUT(
       clientPhone?: string | null;
       itemDescription?: string;
       damageDetails?: string;
+      photos?: string[];
       status?: ClaimStatus;
       incidentDate?: Date | null;
       claimNumber?: string;
@@ -107,6 +109,7 @@ export async function PUT(
     if (clientPhone !== undefined) updateData.clientPhone = clientPhone
     if (itemDescription !== undefined) updateData.itemDescription = itemDescription
     if (damageDetails !== undefined && damageDetails !== null) updateData.damageDetails = damageDetails
+    if (photos !== undefined) updateData.photos = photos
     if (status !== undefined) updateData.status = status as ClaimStatus
     if (incidentDate !== undefined) updateData.incidentDate = incidentDate ? new Date(incidentDate) : null
 
