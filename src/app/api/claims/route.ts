@@ -73,9 +73,22 @@ export async function GET(request: NextRequest) {
     
     return response
   } catch (error) {
-    console.error('Error fetching claims:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace'
+    
+    console.error('Error fetching claims:', {
+      message: errorMessage,
+      stack: errorStack,
+      url: request.url,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV
+    })
+    
     return NextResponse.json(
-      { error: 'Failed to fetch claims' },
+      { 
+        error: 'Failed to fetch claims',
+        ...(process.env.NODE_ENV === 'development' && { details: errorMessage })
+      },
       { status: 500 }
     )
   }
@@ -142,9 +155,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(claim, { status: 201 })
   } catch (error) {
-    console.error('Error creating claim:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace'
+    
+    console.error('Error creating claim:', {
+      message: errorMessage,
+      stack: errorStack,
+      url: request.url,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV
+    })
+    
     return NextResponse.json(
-      { error: 'Failed to create claim' },
+      { 
+        error: 'Failed to create claim',
+        ...(process.env.NODE_ENV === 'development' && { details: errorMessage })
+      },
       { status: 500 }
     )
   }

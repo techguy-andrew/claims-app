@@ -7,7 +7,7 @@ export type { CardProps } from './card';
 export type { TableProps } from './table';
 export type { SelectProps, SelectOption } from './select';
 export type { BadgeProps } from './badge';
-export type { ModalProps } from './Modal';
+export type { ModalProps } from './modal';
 
 // Component exports with proper casing
 export { Button } from './button';
@@ -42,4 +42,4 @@ export {
   ModalDescription, 
   ModalBody, 
   ModalFooter
-} from './Modal';
+} from './modal';
