@@ -6,5 +6,5 @@
     }
   },
   "regions": ["iad1"],
-  "installCommand": "npm ci"
+  "installCommand": "npm install"
 }
