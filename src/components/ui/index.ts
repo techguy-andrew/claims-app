@@ -1,19 +1,19 @@
 // Export all UI components with proper tree shaking support
-export type { ButtonProps } from './Button';
-export type { InputProps } from './Input';
-export type { TextareaProps } from './Textarea';
-export type { LabelProps, FieldProps } from './Label';
-export type { CardProps } from './Card';
-export type { TableProps } from './Table';
-export type { SelectProps, SelectOption } from './Select';
-export type { BadgeProps } from './Badge';
+export type { ButtonProps } from './button';
+export type { InputProps } from './input';
+export type { TextareaProps } from './textarea';
+export type { LabelProps, FieldProps } from './label';
+export type { CardProps } from './card';
+export type { TableProps } from './table';
+export type { SelectProps, SelectOption } from './select';
+export type { BadgeProps } from './badge';
 export type { ModalProps } from './Modal';
 
 // Component exports with proper casing
-export { Button } from './Button';
-export { Input } from './Input';
-export { Textarea } from './Textarea';
-export { Label, Field } from './Label';
+export { Button } from './button';
+export { Input } from './input';
+export { Textarea } from './textarea';
+export { Label, Field } from './label';
 export { 
   Card, 
   CardHeader, 
@@ -22,7 +22,7 @@ export {
   CardContent, 
   CardFooter, 
   CardGrid
-} from './Card';
+} from './card';
 export { 
   Table, 
   TableHeader, 
@@ -32,9 +32,9 @@ export {
   TableHead, 
   TableCell,
   TableEmpty
-} from './Table';
-export { Select } from './Select';
-export { Badge, BadgeGroup } from './Badge';
+} from './table';
+export { Select } from './select';
+export { Badge, BadgeGroup } from './badge';
 export { 
   Modal, 
   ModalHeader, 
