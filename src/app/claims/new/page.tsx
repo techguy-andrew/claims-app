@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { 
   Button, 
@@ -82,11 +81,12 @@ export default function NewClaimPage() {
         showMenuButton={true}
         onMenuToggle={toggle}
         actions={
-          <Link href="/claims">
-            <Button variant="secondary">
-              ← Back to Claims
-            </Button>
-          </Link>
+          <Button 
+            variant="secondary"
+            onClick={() => router.push('/claims')}
+          >
+            ← Back to Claims
+          </Button>
         }
       />
       <div className="p-6 space-y-6">

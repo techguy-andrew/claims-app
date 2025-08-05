@@ -82,9 +82,9 @@ export default function NewInspectionPage() {
         actions={
           <Button 
             variant="secondary" 
-            onClick={() => router.back()}
+            onClick={() => router.push('/inspections')}
           >
-            ← Back
+            ← Back to Inspections
           </Button>
         }
       />
@@ -183,7 +183,7 @@ export default function NewInspectionPage() {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.back()}
+            onClick={() => router.push('/inspections')}
           >
             Cancel
           </Button>

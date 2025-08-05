@@ -137,14 +137,26 @@ export const SidebarItem = memo<SidebarItemProps>(({
   const hasChildren = Boolean(item.children?.length);
   const indentLevel = level * 12;
 
-  const handleClick = useCallback(() => {
-    if (item.disabled) return;
-    
-    if (hasChildren) {
-      setIsExpanded(prev => !prev);
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (item.disabled) {
+      e.preventDefault();
+      return;
     }
     
-    item.onClick?.();
+    if (hasChildren) {
+      e.preventDefault();
+      setIsExpanded(prev => !prev);
+      return;
+    }
+    
+    // For items with hrefs, let the Link handle navigation
+    // For items with onClick, call it and prevent default
+    if (item.onClick) {
+      e.preventDefault();
+      item.onClick();
+    }
+    
+    // Always call onItemClick for sidebar management
     onItemClick?.(item);
   }, [hasChildren, item, onItemClick]);
 
@@ -198,7 +210,7 @@ export const SidebarItem = memo<SidebarItemProps>(({
     "relative transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
   );
 
-  const commonProps = useMemo(() => ({
+  const buttonProps = useMemo(() => ({
     className: itemClasses,
     style: { paddingLeft: `${12 + indentLevel}px` },
     title: isCollapsed ? item.label : undefined,
@@ -207,15 +219,25 @@ export const SidebarItem = memo<SidebarItemProps>(({
     onClick: handleClick,
   }), [itemClasses, indentLevel, isCollapsed, item.label, hasChildren, isExpanded, item.disabled, handleClick]);
 
+  const handleLinkClick = useCallback(() => {
+    // For navigation links, call onItemClick to handle sidebar closing
+    onItemClick?.(item);
+  }, [item, onItemClick]);
+
   const ItemElement = useMemo(() => {
     if (item.href && !item.disabled) {
       return (
         <Link
           href={item.href}
-          {...commonProps}
+          className={itemClasses}
+          style={{ paddingLeft: `${12 + indentLevel}px` }}
+          title={isCollapsed ? item.label : undefined}
           aria-current={isActive ? 'page' : undefined}
+          aria-expanded={hasChildren ? isExpanded : undefined}
+          aria-disabled={item.disabled}
           target={item.external ? '_blank' : undefined}
           rel={item.external ? 'noopener noreferrer' : undefined}
+          onClick={handleLinkClick}
         >
           {itemContent}
         </Link>
@@ -226,12 +248,12 @@ export const SidebarItem = memo<SidebarItemProps>(({
       <button
         type="button"
         disabled={item.disabled}
-        {...commonProps}
+        {...buttonProps}
       >
         {itemContent}
       </button>
     );
-  }, [item, commonProps, itemContent, isActive]);
+  }, [item, itemClasses, indentLevel, isCollapsed, isActive, hasChildren, isExpanded, buttonProps, itemContent, handleLinkClick]);
 
   return (
     <div>
@@ -481,10 +503,11 @@ export const Sidebar = memo<SidebarProps>(({
     return false;
   }, [pathname]);
 
-  const handleItemClick = useCallback(() => {
-    // Close sidebar on mobile when clicking navigation items
-    if ((layout === 'overlay' || isMobile || isTablet) && onClose) {
-      onClose();
+  const handleItemClick = useCallback((item: NavigationItem) => {
+    // Only close sidebar on mobile when clicking navigation items with hrefs (actual navigation)
+    if (item.href && (layout === 'overlay' || isMobile || isTablet) && onClose) {
+      // Small delay to allow navigation to complete before closing
+      setTimeout(() => onClose(), 150);
     }
   }, [layout, isMobile, isTablet, onClose]);
 
@@ -515,7 +538,7 @@ export const Sidebar = memo<SidebarProps>(({
                 isActive={isItemActive(item)}
                 isCollapsed={isCollapsed}
                 theme={currentTheme}
-                onItemClick={() => handleItemClick()}
+                onItemClick={handleItemClick}
                 isItemActive={isItemActive}
               />
             ))}
