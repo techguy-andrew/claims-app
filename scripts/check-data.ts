@@ -22,12 +22,14 @@ async function main() {
           id: true,
           claimNumber: true,
           clientName: true,
-          itemDescription: true
+          insuranceCompany: true,
+          adjustorName: true,
+          clientPhone: true
         }
       })
       console.log('\nSample claims:')
       sampleClaims.forEach(claim => {
-        console.log(`  Claim #${claim.claimNumber}: ${claim.clientName} - ${claim.itemDescription}`)
+        console.log(`  Claim #${claim.claimNumber}: ${claim.clientName} - ${claim.insuranceCompany} (${claim.adjustorName})`)
       })
     }
   } catch (error) {

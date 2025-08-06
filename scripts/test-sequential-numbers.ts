@@ -25,9 +25,11 @@ async function testSequentialNumbers() {
       data: {
         claimNumber: `CLM-${String(nextClaimNumber).padStart(6, '0')}`,
         clientName: 'Test Client 1',
-        clientEmail: 'test1@example.com',
-        itemDescription: 'Test Item 1',
-        damageDetails: 'Test damage description',
+        clientPhone: '(555) 999-0001',
+        clientAddress: '123 Test Street, Test City, TC 99999',
+        insuranceCompany: 'Test Insurance Company',
+        adjustorName: 'Test Adjustor 1',
+        adjustorEmail: 'test1.adjustor@testinsurance.com',
         organizationId: organization.id,
         createdById: user.id
       }
@@ -44,9 +46,11 @@ async function testSequentialNumbers() {
         data: {
           claimNumber: `CLM-${String(manualNumber).padStart(6, '0')}`,
           clientName: 'Test Client 2',
-          clientEmail: 'test2@example.com',
-          itemDescription: 'Test Item 2',
-          damageDetails: 'Test damage description',
+          clientPhone: '(555) 999-0002',
+          clientAddress: '456 Test Avenue, Test City, TC 99998',
+          insuranceCompany: 'Another Test Insurance',
+          adjustorName: 'Test Adjustor 2',
+          adjustorEmail: 'test2.adjustor@anothertestinsurance.com',
           organizationId: organization.id,
           createdById: user.id
         }
@@ -80,7 +84,8 @@ async function testSequentialNumbers() {
       select: {
         claimNumber: true,
         clientName: true,
-        itemDescription: true
+        insuranceCompany: true,
+        adjustorName: true
       }
     })
     console.log('Search results:', searchResult)

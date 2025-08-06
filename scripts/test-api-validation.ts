@@ -28,8 +28,11 @@ async function testAPIValidation() {
         body: JSON.stringify({
           claimNumber: existingClaim.claimNumber,
           clientName: 'Test Duplicate',
-          itemDescription: 'Test Item',
-          damageDetails: 'Test damage',
+          clientPhone: '(555) 999-0000',
+          clientAddress: '999 Test Street, Test City, TC 99999',
+          insuranceCompany: 'Test Insurance Co',
+          adjustorName: 'Test Adjustor',
+          adjustorEmail: 'test.adjustor@testinsurance.com',
           organizationId: organization.id,
           createdById: user.id
         })
@@ -51,8 +54,11 @@ async function testAPIValidation() {
         body: JSON.stringify({
           sequentialNumber: -1,
           clientName: 'Test Invalid',
-          itemDescription: 'Test Item',
-          damageDetails: 'Test damage',
+          clientPhone: '(555) 999-0001',
+          clientAddress: '998 Invalid Street, Invalid City, IC 99998',
+          insuranceCompany: 'Invalid Insurance Co',
+          adjustorName: 'Invalid Adjustor',
+          adjustorEmail: 'invalid.adjustor@invalidinsurance.com',
           organizationId: organization.id,
           createdById: user.id
         })
@@ -79,8 +85,11 @@ async function testAPIValidation() {
           body: JSON.stringify({
             claimNumber: existingClaim.claimNumber,
             clientName: anotherClaim.clientName,
-            itemDescription: anotherClaim.itemDescription,
-            damageDetails: anotherClaim.damageDetails,
+            clientPhone: anotherClaim.clientPhone,
+            clientAddress: anotherClaim.clientAddress,
+            insuranceCompany: anotherClaim.insuranceCompany,
+            adjustorName: anotherClaim.adjustorName,
+            adjustorEmail: anotherClaim.adjustorEmail,
             status: anotherClaim.status
           })
         })
