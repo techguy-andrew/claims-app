@@ -449,7 +449,6 @@ SidebarProfile.displayName = 'SidebarProfile';
 const DEFAULT_NAVIGATION: NavigationItem[] = [
   { id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
   { id: 'claims', label: 'Claims', href: '/claims', icon: FileText, badge: '3' },
-  { id: 'inspections', label: 'Inspections', href: '/inspections', icon: Search },
   {
     id: 'settings',
     label: 'Settings',

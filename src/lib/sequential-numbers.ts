@@ -1,6 +1,6 @@
 import { prisma } from './prisma'
 
-export type EntityType = 'CLAIM' | 'INSPECTION'
+export type EntityType = 'CLAIM'
 
 /**
  * Gets the next sequential number for a given entity type
@@ -9,9 +9,6 @@ export type EntityType = 'CLAIM' | 'INSPECTION'
 export async function getNextSequentialNumber(entityType: EntityType): Promise<number> {
   if (entityType === 'CLAIM') {
     const count = await prisma.claim.count()
-    return count + 1
-  } else if (entityType === 'INSPECTION') {
-    const count = await prisma.inspection.count()
     return count + 1
   }
   

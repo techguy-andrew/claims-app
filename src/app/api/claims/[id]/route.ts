@@ -20,14 +20,6 @@ export async function GET(
         organization: {
           select: { name: true }
         },
-        inspections: {
-          include: {
-            inspector: {
-              select: { firstName: true, lastName: true, email: true }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        },
         auditLogs: {
           include: {
             user: {

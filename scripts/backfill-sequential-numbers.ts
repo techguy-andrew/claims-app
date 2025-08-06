@@ -3,7 +3,7 @@
 import { initializeCounters, backfillSequentialNumbers } from '../src/lib/sequential-numbers'
 
 /**
- * Script to backfill sequential numbers for existing claims and inspections
+ * Script to backfill sequential numbers for existing claims
  */
 async function main() {
   try {

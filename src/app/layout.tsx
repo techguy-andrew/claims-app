@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Claims App - Digital Inspection Management",
-  description: "Comprehensive digital claim and inspection management system for service businesses working with insurance companies and corporate clients.",
-  keywords: "claims management, digital inspections, insurance processing, business workflow",
+  title: "Claims App - Digital Claims Management",
+  description: "Comprehensive digital claims management system for service businesses working with insurance companies and corporate clients.",
+  keywords: "claims management, insurance processing, business workflow",
 };
 
 export default function RootLayout({

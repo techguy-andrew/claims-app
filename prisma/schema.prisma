@@ -25,13 +25,12 @@ model User {
   email          String       @unique
   firstName      String?
   lastName       String?
-  role           Role         @default(INSPECTOR)
+  role           Role         @default(ADMIN)
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   auditLogs      AuditLog[]
   claims         Claim[]
-  inspections    Inspection[]
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("users")
@@ -56,28 +55,10 @@ model Claim {
   auditLogs       AuditLog[]
   createdBy       User         @relation(fields: [createdById], references: [id])
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  inspections     Inspection[]
 
   @@map("claims")
 }
 
-model Inspection {
-  id               String     @id @default(cuid())
-  inspectionNumber String     @unique
-  inspectionDate   DateTime   @default(now())
-  inspectorNotes   String?
-  damageAssessment String?
-  photos           String[]
-  claimId          String
-  inspectorId      String
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  auditLogs        AuditLog[]
-  claim            Claim      @relation(fields: [claimId], references: [id], onDelete: Cascade)
-  inspector        User       @relation(fields: [inspectorId], references: [id])
-
-  @@map("inspections")
-}
 
 model AuditLog {
   id           String      @id @default(cuid())
@@ -85,10 +66,8 @@ model AuditLog {
   details      String?
   userId       String
   claimId      String?
-  inspectionId String?
   createdAt    DateTime    @default(now())
   claim        Claim?      @relation(fields: [claimId], references: [id], onDelete: Cascade)
-  inspection   Inspection? @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   user         User        @relation(fields: [userId], references: [id])
 
   @@map("audit_logs")
@@ -96,7 +75,6 @@ model AuditLog {
 
 
 enum Role {
-  INSPECTOR
   ADMIN
   SUPER_ADMIN
 }

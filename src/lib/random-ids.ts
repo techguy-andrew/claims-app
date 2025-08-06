@@ -1,6 +1,6 @@
 import { prisma } from './prisma'
 
-export type EntityType = 'CLAIM' | 'INSPECTION'
+export type EntityType = 'CLAIM'
 
 /**
  * Generates a random 10-character alphanumeric ID
@@ -51,15 +51,9 @@ export async function isIdUnique(entityType: EntityType, id: string, excludeReco
       }
     })
     return !existing
-  } else {
-    const existing = await prisma.inspection.findFirst({
-      where: {
-        inspectionNumber: id,
-        ...(excludeRecordId && { id: { not: excludeRecordId } })
-      }
-    })
-    return !existing
   }
+  
+  return false
 }
 
 /**
@@ -84,10 +78,9 @@ export async function validateId(
   const isUnique = await isIdUnique(entityType, id, excludeRecordId)
   
   if (!isUnique) {
-    const entityName = entityType === 'CLAIM' ? 'Claim' : 'Inspection'
     return {
       isValid: false,
-      message: `${entityName} number ${id} is already in use`
+      message: `Claim number ${id} is already in use`
     }
   }
   
@@ -111,22 +104,6 @@ export async function createClaimNumber(userProvidedId?: string): Promise<string
   }
 }
 
-/**
- * Creates an inspection number (either user-provided or auto-generated)
- */
-export async function createInspectionNumber(userProvidedId?: string): Promise<string> {
-  if (userProvidedId) {
-    // Validate user-provided ID
-    const validation = await validateId('INSPECTION', userProvidedId.toUpperCase())
-    if (!validation.isValid) {
-      throw new Error(validation.message)
-    }
-    return userProvidedId.toUpperCase()
-  } else {
-    // Generate unique ID
-    return await generateUniqueId('INSPECTION')
-  }
-}
 
 /**
  * Formats an ID for display purposes

@@ -12,7 +12,7 @@ export default function Dashboard() {
     <>
       <TopBar
         title="Dashboard"
-        subtitle="Manage your insurance claims and inspections efficiently"
+        subtitle="Manage your insurance claims efficiently"
         showMenuButton={true}
         onMenuToggle={toggle}
         actions={
@@ -106,12 +106,6 @@ export default function Dashboard() {
                 <Button variant="secondary" fullWidth className="justify-start">
                   <span style={{ marginRight: '0.5rem' }}>📋</span>
                   View All Claims
-                </Button>
-              </Link>
-              <Link href="/inspections" className="block">
-                <Button variant="secondary" fullWidth className="justify-start">
-                  <span style={{ marginRight: '0.5rem' }}>🔍</span>
-                  View Inspections
                 </Button>
               </Link>
             </div>

@@ -92,29 +92,6 @@ const sampleDamageScenarios = [
   }
 ]
 
-const inspectionNotes = [
-  'Initial assessment shows damage is consistent with reported incident. Recommend full replacement.',
-  'Partial damage observed. Repair may be possible but cost-effectiveness needs evaluation.',
-  'Extensive damage beyond economical repair. Total loss recommended.',
-  'Minor cosmetic damage only. Functionality remains intact. Repair recommended.',
-  'Water damage evident with potential for secondary issues. Monitoring required.',
-  'Impact damage clear with structural integrity compromised. Replacement advised.',
-  'Wear and tear appears consistent with normal use. Additional investigation needed.',
-  'Pre-existing damage noted in addition to claimed incident damage.',
-  'Professional restoration may be possible. Specialist consultation recommended.',
-  'Damage appears recent and matches incident timeline. Claim appears valid.'
-]
-
-const damageAssessments = [
-  'Total loss - beyond economical repair',
-  'Repairable - estimated 60% of replacement value',
-  'Repairable - estimated 80% of replacement value',
-  'Minor repair required - estimated 25% of replacement value',
-  'Major repair required - estimated 90% of replacement value',
-  'Professional restoration needed - costs to be determined',
-  'Replacement recommended due to safety concerns',
-  'Cosmetic damage only - minimal repair costs'
-]
 
 async function main() {
   console.log('Starting database seed...')
@@ -125,7 +102,7 @@ async function main() {
   // Check if we already have an organization and users
   let organization = await prisma.organization.findFirst()
   let adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } })
-  let inspectorUsers = await prisma.user.findMany({ where: { role: 'INSPECTOR' } })
+  let adminUsers = await prisma.user.findMany({ where: { role: 'ADMIN' } })
 
   if (!organization) {
     console.log('No organization found. Please create an organization first.')
@@ -137,14 +114,14 @@ async function main() {
     return
   }
 
-  if (inspectorUsers.length === 0) {
-    console.log('No inspector users found. Please create inspector users first.')
+  if (adminUsers.length === 0) {
+    console.log('No admin users found. Please create admin users first.')
     return
   }
 
   console.log(`Found organization: ${organization.name}`)
   console.log(`Found admin user: ${adminUser.firstName} ${adminUser.lastName}`)
-  console.log(`Found ${inspectorUsers.length} inspector users`)
+  console.log(`Found ${adminUsers.length} admin users`)
 
   // Create sample claims
   console.log('Creating sample claims...')
@@ -231,41 +208,6 @@ async function main() {
     console.log(`Created claim #${claimNumber}: ${client.name} (Business) - Commercial ${scenario.item}`)
   }
 
-  // Create sample inspections
-  console.log('Creating sample inspections...')
-  const inspectionsToCreate = Math.min(30, claims.length * 2) // Up to 2 inspections per claim
-
-  for (let i = 0; i < inspectionsToCreate; i++) {
-    const claim = claims[Math.floor(Math.random() * claims.length)]
-    const inspector = inspectorUsers[Math.floor(Math.random() * inspectorUsers.length)]
-    const inspectionNumber = `INS-${String(await getNextSequentialNumber('INSPECTION')).padStart(6, '0')}`
-    
-    // Create inspection date between claim date and now
-    const inspectionDate = new Date(claim.claimDate)
-    inspectionDate.setDate(inspectionDate.getDate() + Math.floor(Math.random() * 10) + 1)
-    
-    // Ensure inspection date is not in the future
-    if (inspectionDate > new Date()) {
-      inspectionDate.setDate(new Date().getDate() - Math.floor(Math.random() * 5))
-    }
-
-    const inspection = await prisma.inspection.create({
-      data: {
-        inspectionNumber,
-        inspectionDate,
-        inspectorNotes: inspectionNotes[Math.floor(Math.random() * inspectionNotes.length)],
-        damageAssessment: damageAssessments[Math.floor(Math.random() * damageAssessments.length)],
-        photos: [
-          `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000)}`,
-          `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000)}`
-        ].slice(0, Math.floor(Math.random() * 3) + 1), // 1-3 photos
-        claimId: claim.id,
-        inspectorId: inspector.id
-      }
-    })
-
-    console.log(`Created inspection #${inspectionNumber} for claim #${claim.claimNumber} by ${inspector.firstName} ${inspector.lastName}`)
-  }
 
   // Create some audit log entries
   console.log('Creating audit log entries...')
@@ -295,7 +237,7 @@ async function main() {
   }
 
   console.log('Database seed completed successfully!')
-  console.log(`Created ${claims.length} claims and ${inspectionsToCreate} inspections`)
+  console.log(`Created ${claims.length} claims`)
 }
 
 main()

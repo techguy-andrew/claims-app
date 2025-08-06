@@ -38,10 +38,6 @@ interface Claim {
     firstName: string | null
     lastName: string | null
   }
-  inspections: Array<{
-    id: string
-    inspectionDate: string
-  }>
 }
 
 interface ClaimsResponse {
@@ -150,7 +146,7 @@ function ClaimsPageContent() {
     )
   }
 
-  const getInspectorName = (createdBy: Claim['createdBy']): string => {
+  const getCreatedByName = (createdBy: Claim['createdBy']): string => {
     if (!createdBy.firstName && !createdBy.lastName) {
       return 'Unknown'
     }
@@ -309,8 +305,7 @@ function ClaimsPageContent() {
                       <TableHead>Item</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Date</TableHead>
-                      <TableHead>Inspector</TableHead>
-                      <TableHead>Inspections</TableHead>
+                      <TableHead>Created By</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -345,13 +340,8 @@ function ClaimsPageContent() {
                         </TableCell>
                         <TableCell>
                           <span className="text-sm">
-                            {getInspectorName(claim.createdBy)}
+                            {getCreatedByName(claim.createdBy)}
                           </span>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" badgeStyle="outline">
-                            {claim.inspections.length} inspection{claim.inspections.length !== 1 ? 's' : ''}
-                          </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <Button 

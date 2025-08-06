@@ -12,7 +12,6 @@ export const AppSidebar: React.FC = () => {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: '🏠' },
     { name: 'Claims', href: '/claims', icon: '📋' },
-    { name: 'Inspections', href: '/inspections', icon: '🔍' },
   ];
 
   // Handle navigation link clicks - close sidebar on mobile/tablet

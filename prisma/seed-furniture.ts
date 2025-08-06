@@ -97,31 +97,6 @@ const furnitureItems = [
   }
 ]
 
-const furnitureInspectionNotes = [
-  'Structural integrity remains sound despite cosmetic damage. Restoration will focus on refinishing and reupholstering techniques.',
-  'Significant water damage noted but not beyond repair. Wood grain still visible under damaged finish. Professional stripping recommended.',
-  'Antique value preserved despite current condition. Original hardware and construction methods make this suitable for full restoration.',
-  'Modern construction techniques used in this reproduction piece. Repair will be more straightforward than period antiques.',
-  'Extensive wear consistent with heavy use over decades. Frame shows good bone structure for complete restoration.',
-  'Period-appropriate restoration techniques required to maintain authenticity and value. Research into original methods needed.',
-  'Multiple layers of paint indicate several previous restoration attempts. Complete stripping to bare wood recommended.',
-  'Natural aging processes visible. Wood movement and seasonal changes are primary cause of current issues.',
-  'Quality construction evident despite current damage. Original joinery methods still sound and repairable.',
-  'Professional conservation techniques needed to preserve historical significance while ensuring functionality.'
-]
-
-const furnitureAssessments = [
-  'Complete refinishing and reupholstering required - estimated 70-80% of replacement value',  
-  'Structural repairs and refinishing needed - estimated 50-60% of replacement value',
-  'Full restoration recommended including mechanism repair - estimated 85-95% of replacement value',
-  'Major restoration project with high authenticity value - estimated 90-100% of replacement value',
-  'Moderate restoration with focus on functionality - estimated 40-50% of replacement value',
-  'Professional conservation required - specialist consultation needed for pricing',
-  'Complete strip and refinish with hardware replacement - estimated 60-70% of replacement value',
-  'Partial restoration focusing on structural issues - estimated 30-40% of replacement value',
-  'Museum-quality restoration possible - significant investment required',
-  'Refinishing and minor repairs sufficient - estimated 25-35% of replacement value'
-]
 
 async function main() {
   console.log('Starting furniture restoration database seed...')
@@ -129,7 +104,7 @@ async function main() {
   // Check if we already have an organization and users
   let organization = await prisma.organization.findFirst()
   let adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } })
-  let inspectorUsers = await prisma.user.findMany({ where: { role: 'INSPECTOR' } })
+  let adminUsers = await prisma.user.findMany({ where: { role: 'ADMIN' } })
 
   if (!organization) {
     console.log('No organization found. Please create an organization first.')
@@ -141,19 +116,18 @@ async function main() {
     return
   }
 
-  if (inspectorUsers.length === 0) {
-    console.log('No inspector users found. Please create inspector users first.')
+  if (adminUsers.length === 0) {
+    console.log('No admin users found. Please create admin users first.')
     return
   }
 
   console.log(`Found organization: ${organization.name}`)
   console.log(`Found admin user: ${adminUser.firstName} ${adminUser.lastName}`)
-  console.log(`Found ${inspectorUsers.length} inspector users`)
+  console.log(`Found ${adminUsers.length} admin users`)
 
-  // Clear existing claims, inspections, and audit logs
+  // Clear existing claims and audit logs
   console.log('Clearing existing sample data...')
   await prisma.auditLog.deleteMany({})
-  await prisma.inspection.deleteMany({})
   await prisma.claim.deleteMany({})
 
   // Create furniture restoration claims
@@ -209,38 +183,6 @@ async function main() {
     console.log(`Created claim ${claimNumber}: ${client.name} - ${furnitureItem.item.split(' - ')[0]}`)
   }
 
-  // Create furniture restoration inspections
-  console.log('Creating furniture restoration inspections...')
-  const inspectionsToCreate = Math.min(25, claims.length * 2) // Up to 2 inspections per claim
-
-  for (let i = 0; i < inspectionsToCreate; i++) {
-    const claim = claims[Math.floor(Math.random() * claims.length)]
-    const inspector = inspectorUsers[Math.floor(Math.random() * inspectorUsers.length)]
-    const inspectionNumber = await generateUniqueId('INSPECTION')
-    
-    // Create inspection date between claim date and now
-    const inspectionDate = new Date(claim.claimDate)
-    inspectionDate.setDate(inspectionDate.getDate() + Math.floor(Math.random() * 14) + 1)
-    
-    // Ensure inspection date is not in the future
-    if (inspectionDate > new Date()) {
-      inspectionDate.setDate(new Date().getDate() - Math.floor(Math.random() * 7))
-    }
-
-    const inspection = await prisma.inspection.create({
-      data: {
-        inspectionNumber,
-        inspectionDate,
-        inspectorNotes: furnitureInspectionNotes[Math.floor(Math.random() * furnitureInspectionNotes.length)],
-        damageAssessment: furnitureAssessments[Math.floor(Math.random() * furnitureAssessments.length)],
-        photos: [], // No sample photos - will be uploaded by users
-        claimId: claim.id,
-        inspectorId: inspector.id
-      }
-    })
-
-    console.log(`Created inspection ${inspectionNumber} for claim ${claim.claimNumber} by ${inspector.firstName} ${inspector.lastName}`)
-  }
 
   // Create audit log entries for recent activity
   console.log('Creating audit log entries...')
@@ -270,7 +212,7 @@ async function main() {
   }
 
   console.log('Furniture restoration database seed completed successfully!')
-  console.log(`Created ${claims.length} furniture restoration claims and ${inspectionsToCreate} inspections`)
+  console.log(`Created ${claims.length} furniture restoration claims`)
 }
 
 main()

@@ -4,18 +4,16 @@ import { prisma } from '../src/lib/prisma'
 
 async function main() {
   try {
-    const [orgs, users, claims, inspections] = await Promise.all([
+    const [orgs, users, claims] = await Promise.all([
       prisma.organization.count(),
       prisma.user.count(),
-      prisma.claim.count(),
-      prisma.inspection.count()
+      prisma.claim.count()
     ])
 
     console.log('Database contents:')
     console.log(`Organizations: ${orgs}`)
     console.log(`Users: ${users}`)
     console.log(`Claims: ${claims}`)
-    console.log(`Inspections: ${inspections}`)
 
     if (claims > 0) {
       const sampleClaims = await prisma.claim.findMany({
@@ -30,23 +28,6 @@ async function main() {
       console.log('\nSample claims:')
       sampleClaims.forEach(claim => {
         console.log(`  Claim #${claim.claimNumber}: ${claim.clientName} - ${claim.itemDescription}`)
-      })
-    }
-
-    if (inspections > 0) {
-      const sampleInspections = await prisma.inspection.findMany({
-        take: 3,
-        select: {
-          id: true,
-          inspectionNumber: true,
-          claim: {
-            select: { claimNumber: true, clientName: true }
-          }
-        }
-      })
-      console.log('\nSample inspections:')
-      sampleInspections.forEach(inspection => {
-        console.log(`  Inspection #${inspection.inspectionNumber}: for Claim #${inspection.claim.claimNumber} (${inspection.claim.clientName})`)
       })
     }
   } catch (error) {

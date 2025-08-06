@@ -49,9 +49,6 @@ export async function GET(request: NextRequest) {
           },
           organization: {
             select: { name: true }
-          },
-          inspections: {
-            select: { id: true, inspectionDate: true }
           }
         }
       }),

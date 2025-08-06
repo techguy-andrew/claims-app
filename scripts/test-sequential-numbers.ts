@@ -62,22 +62,8 @@ async function testSequentialNumbers() {
     const nextClaimNumber2 = await getNextSequentialNumber('CLAIM')
     console.log(`Next claim number after manual reservation: ${nextClaimNumber2}`)
 
-    // Test 5: Auto-generated inspection numbers
-    console.log('\nTest 5: Auto-generated inspection numbers')
-    const nextInspectionNumber = await getNextSequentialNumber('INSPECTION')
-    console.log(`Next inspection number: ${nextInspectionNumber}`)
-
-    const inspection1 = await prisma.inspection.create({
-      data: {
-        inspectionNumber: `INS-${String(nextInspectionNumber).padStart(6, '0')}`,
-        inspectorNotes: 'Test inspection notes',
-        damageAssessment: 'Test assessment',
-        photos: ['test-photo.jpg'],
-        claimId: claim1.id,
-        inspectorId: user.id
-      }
-    })
-    console.log(`Created inspection #${inspection1.inspectionNumber} for claim #${claim1.claimNumber}`)
+    // Test 5: Skipped - inspection functionality removed
+    console.log('\nTest 5: Inspection functionality removed from system')
 
     // Test 6: View current counters
     console.log('\nTest 6: Counter functionality completed')

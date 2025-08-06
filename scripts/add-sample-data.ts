@@ -30,18 +30,6 @@ const sampleItems = [
   { item: 'Gaming PC Setup', damage: 'Graphics card damaged in power surge' }
 ]
 
-const inspectionNotes = [
-  'Initial assessment complete. Damage consistent with reported incident.',
-  'Extensive damage observed. Recommend professional evaluation.',
-  'Minor damage noted. Repair appears feasible.',
-  'Total loss assessment. Replacement recommended.',
-  'Partial damage with potential for restoration.',
-  'Pre-existing wear noted in addition to claim damage.',
-  'Professional restoration consultation recommended.',
-  'Damage matches timeline and incident description.',
-  'Secondary damage potential requires monitoring.',
-  'Assessment complete. Documentation submitted.'
-]
 
 async function main() {
   console.log('Adding sample data...')
@@ -98,34 +86,7 @@ async function main() {
     console.log(`Created Claim #${claimNumber}: ${client.name} - ${itemInfo.item}`)
   }
 
-  // Create 15 sample inspections
-  console.log('Creating sample inspections...')
-  
-  for (let i = 0; i < 15; i++) {
-    const claim = claims[Math.floor(Math.random() * claims.length)]
-    const inspectionNumber = `INS-${String(await getNextSequentialNumber('INSPECTION')).padStart(6, '0')}`
-    
-    const inspectionDate = new Date(claim.claimDate)
-    inspectionDate.setDate(inspectionDate.getDate() + Math.floor(Math.random() * 10) + 1)
-    
-    if (inspectionDate > new Date()) {
-      inspectionDate.setDate(new Date().getDate() - Math.floor(Math.random() * 5))
-    }
-
-    await prisma.inspection.create({
-      data: {
-        inspectionNumber,
-        inspectionDate,
-        inspectorNotes: inspectionNotes[Math.floor(Math.random() * inspectionNotes.length)],
-        damageAssessment: `Assessment ${i + 1}: ${Math.random() > 0.5 ? 'Repairable' : 'Total loss'}`,
-        photos: [`sample-photo-${i}-1.jpg`, `sample-photo-${i}-2.jpg`],
-        claimId: claim.id,
-        inspectorId: user.id
-      }
-    })
-
-    console.log(`Created Inspection #${inspectionNumber} for Claim #${claim.claimNumber}`)
-  }
+  console.log('Inspection creation skipped - inspection functionality removed')
 
   console.log('Sample data creation completed!')
 }
