@@ -1,34 +1,29 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { 
-  Button, 
-  Input, 
-  Label,
-  Card, 
-  CardContent, 
-  CardDescription,
-  CardHeader, 
-  CardTitle
-} from "@/components/ui"
-import { PhotoUpload } from '@/components/photo-upload'
-import { PhotoViewer } from '@/components/photo-viewer'
-import { TopBar } from '@/components/navigation/topbar'
-import { useSidebar } from '@/components/navigation'
+  ArrowLeft, 
+  Building2, 
+  User, 
+  Phone, 
+  Mail,
+  MapPin,
+  Edit,
+  Share2
+} from 'lucide-react'
+import { InfoCard } from '@/components/info-card'
 
 interface ClaimData {
   id: string
   claimNumber: string
+  status: 'OPEN' | 'IN_PROGRESS' | 'UNDER_REVIEW' | 'APPROVED' | 'DENIED' | 'CLOSED'
+  insuranceCompany: string
+  adjustorName: string
+  adjustorEmail: string
   clientName: string
-  clientEmail: string | null
-  clientPhone: string | null
-  itemDescription: string
-  damageDetails: string
-  photos: string[]
-  status: string
-  incidentDate: string | null
+  clientPhone: string
+  clientAddress: string
   claimDate: string
   createdBy: {
     firstName: string | null
@@ -40,31 +35,36 @@ interface ClaimData {
   }
 }
 
+const statusGradients = {
+  OPEN: 'from-blue-400 to-blue-500',
+  IN_PROGRESS: 'from-amber-400 to-orange-500',
+  UNDER_REVIEW: 'from-purple-400 to-purple-500',
+  APPROVED: 'from-green-400 to-emerald-500',
+  DENIED: 'from-red-400 to-red-500',
+  CLOSED: 'from-gray-400 to-gray-500'
+}
+
+const statusLabels = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN PROGRESS',
+  UNDER_REVIEW: 'UNDER REVIEW',
+  APPROVED: 'APPROVED',
+  DENIED: 'DENIED',
+  CLOSED: 'CLOSED'
+}
+
 export default function ClaimDetailsPage({
   params
 }: {
   params: Promise<{ id: string }>
 }) {
-  const { toggle } = useSidebar()
-  const [claimId, setClaimId] = useState<string>("")
+  const router = useRouter()
   const [claim, setClaim] = useState<ClaimData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [editing, setEditing] = useState(false)
-  const [viewerOpen, setViewerOpen] = useState(false)
-  const [viewerIndex, setViewerIndex] = useState(0)
-  const [formData, setFormData] = useState({
-    clientName: "",
-    clientEmail: "",
-    clientPhone: "",
-    itemDescription: "",
-    damageDetails: "",
-    photos: [] as string[]
-  })
 
   useEffect(() => {
     params.then(({ id }) => {
-      setClaimId(id)
       fetchClaim(id)
     })
   }, [params])
@@ -76,14 +76,6 @@ export default function ClaimDetailsPage({
       
       if (response.ok) {
         setClaim(data)
-        setFormData({
-          clientName: data.clientName,
-          clientEmail: data.clientEmail || "",
-          clientPhone: data.clientPhone || "",
-          itemDescription: data.itemDescription,
-          damageDetails: data.damageDetails,
-          photos: data.photos || []
-        })
       } else {
         console.error("Failed to fetch claim:", data.error)
       }
@@ -94,290 +86,160 @@ export default function ClaimDetailsPage({
     }
   }
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+  const handleCopy = (value: string) => {
+    navigator.clipboard.writeText(value)
   }
 
-  const handlePhotosChange = (photos: string[]) => {
-    setFormData(prev => ({
-      ...prev,
-      photos
-    }))
-  }
-
-  const openPhotoViewer = (index: number) => {
-    setViewerIndex(index);
-    setViewerOpen(true);
-  }
-
-  const handleSave = async () => {
-    setSaving(true)
-    try {
-      const response = await fetch(`/api/claims/${claimId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `Claim ${claim?.claimNumber}`,
+        text: `Insurance claim details for ${claim?.clientName}`,
+        url: window.location.href
       })
-
-      if (response.ok) {
-        const updatedClaim = await response.json()
-        setClaim(updatedClaim)
-        setEditing(false)
-      } else {
-        const error = await response.json()
-        console.error("Failed to update claim:", error)
-        alert("Failed to save changes. Please try again.")
-      }
-    } catch (error) {
-      console.error("Error updating claim:", error)
-      alert("Failed to save changes. Please try again.")
-    } finally {
-      setSaving(false)
+    } else {
+      navigator.clipboard.writeText(window.location.href)
     }
   }
 
-  const handleCancel = () => {
-    if (claim) {
-      setFormData({
-        clientName: claim.clientName,
-        clientEmail: claim.clientEmail || "",
-        clientPhone: claim.clientPhone || "",
-        itemDescription: claim.itemDescription,
-        damageDetails: claim.damageDetails,
-        photos: claim.photos || []
-      })
-    }
-    setEditing(false)
-  }
-
-  if (loading) {
+  if (loading || !claim) {
     return (
-      <>
-        <TopBar
-          title="Claim Details"
-          subtitle="View and edit claim information"
-          showMenuButton={true}
-          onMenuToggle={toggle}
-        />
-        <div className="p-6">
-          <Card>
-            <CardContent>
-              <div className="text-center py-8">Loading claim details...</div>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 max-w-md mx-auto">
+          <p className="text-gray-600">{loading ? "Loading premium claim..." : "Claim not found"}</p>
         </div>
-      </>
-    )
-  }
-
-  if (!claim) {
-    return (
-      <>
-        <TopBar
-          title="Claim Details"
-          subtitle="View and edit claim information"
-          showMenuButton={true}
-          onMenuToggle={toggle}
-        />
-        <div className="p-6">
-          <Card>
-            <CardContent>
-              <div className="text-center py-8 text-red-600">
-                Claim not found or failed to load.
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </>
+      </div>
     )
   }
 
   return (
-    <>
-      <TopBar
-        title={`Claim ${claim.claimNumber}`}
-        subtitle="View and edit claim information"
-        showMenuButton={true}
-        onMenuToggle={toggle}
-        actions={
-          <div className="flex items-center gap-2">
-            <Link href="/claims">
-              <Button variant="secondary">
-                ← Back to Claims
-              </Button>
-            </Link>
-            {!editing ? (
-              <Button onClick={() => setEditing(true)}>
-                ✏️ Edit
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button onClick={handleSave} loading={saving}>
-                  💾 Save
-                </Button>
-                <Button variant="secondary" onClick={handleCancel}>
-                  ✕ Cancel
-                </Button>
-              </div>
-            )}
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      {/* CSS Animation */}
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-      />
-      <div className="p-6 space-y-6">
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
 
-      {/* Client Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Client Information</CardTitle>
-          <CardDescription>
-            Client contact details for this claim
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="clientName">Client Name</Label>
-            {editing ? (
-              <Input
-                id="clientName"
-                value={formData.clientName}
-                onChange={(e) => handleInputChange('clientName', e.target.value)}
-                placeholder="Enter client name"
-              />
-            ) : (
-              <p className="text-gray-900 font-medium mt-2">{claim.clientName}</p>
-            )}
-          </div>
+      {/* Header - Floating style */}
+      <header className="relative">
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-gray-100/50 to-transparent" />
+        <div className="relative flex items-center justify-between px-6 pt-6 pb-4">
+          <button 
+            onClick={() => router.push('/claims')}
+            className="p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="clientEmail">Client Email</Label>
-              {editing ? (
-                <Input
-                  id="clientEmail"
-                  type="email"
-                  value={formData.clientEmail}
-                  onChange={(e) => handleInputChange('clientEmail', e.target.value)}
-                  placeholder="client@example.com"
-                />
-              ) : (
-                <p className="text-gray-900 font-medium mt-2">{claim.clientEmail || 'Not provided'}</p>
-              )}
-            </div>
-            
-            <div>
-              <Label htmlFor="clientPhone">Client Phone</Label>
-              {editing ? (
-                <Input
-                  id="clientPhone"
-                  type="tel"
-                  value={formData.clientPhone}
-                  onChange={(e) => handleInputChange('clientPhone', e.target.value)}
-                  placeholder="(555) 123-4567"
-                />
-              ) : (
-                <p className="text-gray-900 font-medium mt-2">{claim.clientPhone || 'Not provided'}</p>
-              )}
-            </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={handleShare}
+              className="p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105"
+            >
+              <Share2 className="h-5 w-5" />
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </header>
 
-      {/* Claim Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Claim Details</CardTitle>
-          <CardDescription>
-            Item and damage information
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="itemDescription">Item Description</Label>
-            {editing ? (
-              <Input
-                id="itemDescription"
-                value={formData.itemDescription}
-                onChange={(e) => handleInputChange('itemDescription', e.target.value)}
-                placeholder="Describe the item"
-              />
-            ) : (
-              <p className="text-gray-900 font-medium mt-2">{claim.itemDescription}</p>
-            )}
+      {/* Main content */}
+      <main className="px-6 pb-24">
+        {/* Hero Section */}
+        <div className="text-center mb-10" style={{ animation: 'fadeIn 0.8s ease-out' }}>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">{claim.claimNumber}</h1>
+          <span className={`
+            inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold text-white
+            bg-gradient-to-r ${statusGradients[claim.status]} shadow-lg
+          `}>
+            {statusLabels[claim.status]}
+          </span>
+        </div>
+
+        {/* Insurance Section */}
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-1">
+            Insurance Information
+          </h2>
+          <div className="space-y-3">
+            <InfoCard 
+              icon={Building2}
+              label="Company" 
+              value={claim.insuranceCompany}
+              delay={100}
+              onCopy={handleCopy}
+            />
+            <InfoCard 
+              icon={User}
+              label="Adjustor" 
+              value={claim.adjustorName}
+              delay={200}
+              onCopy={handleCopy}
+            />
+            <InfoCard 
+              icon={Mail}
+              label="Adjustor Email" 
+              value={claim.adjustorEmail}
+              delay={300}
+              onCopy={handleCopy}
+            />
           </div>
-          
-          <div>
-            <Label htmlFor="damageDetails">Damage Details</Label>
-            {editing ? (
-              <Input
-                id="damageDetails"
-                value={formData.damageDetails}
-                onChange={(e) => handleInputChange('damageDetails', e.target.value)}
-                placeholder="Describe the damage"
-              />
-            ) : (
-              <p className="text-gray-900 font-medium mt-2">{claim.damageDetails}</p>
-            )}
+        </div>
+
+        {/* Client Section */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 px-1">
+            Client Information
+          </h2>
+          <div className="space-y-3">
+            <InfoCard 
+              icon={User}
+              label="Name" 
+              value={claim.clientName}
+              delay={400}
+              onCopy={handleCopy}
+            />
+            <InfoCard 
+              icon={Phone}
+              label="Phone" 
+              value={claim.clientPhone}
+              delay={500}
+              onCopy={handleCopy}
+            />
+            <InfoCard 
+              icon={MapPin}
+              label="Address" 
+              value={claim.clientAddress}
+              delay={600}
+              onCopy={handleCopy}
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </main>
 
-      {/* Current Photos Display */}
-      {(claim?.photos && claim.photos.length > 0) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Photos</CardTitle>
-            <CardDescription>
-              {claim.photos.length} photo{claim.photos.length !== 1 ? 's' : ''} attached to this claim
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {claim.photos.map((photo, index) => (
-                <div key={index} className="relative group cursor-pointer">
-                  <Image
-                    src={photo}
-                    alt={`Claim photo ${index + 1}`}
-                    width={200}
-                    height={200}
-                    className="w-full h-24 object-cover rounded-lg border hover:opacity-80 transition-opacity"
-                    onClick={() => openPhotoViewer(index)}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path fillRule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Floating action button with gradient */}
+      <button 
+        onClick={() => setEditing(!editing)}
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl px-6 py-4 shadow-xl hover:shadow-2xl transition-all hover:scale-105 flex items-center gap-2"
+      >
+        <Edit className="h-5 w-5" />
+        <span className="font-medium">Edit Claim</span>
+      </button>
 
-      {/* Photo Upload (Edit Mode Only) */}
-      {editing && (
-        <PhotoUpload 
-          onPhotosChange={handlePhotosChange}
-          existingPhotos={formData.photos}
-          maxPhotos={10}
-        />
-      )}
-
-      <PhotoViewer
-        photos={claim?.photos || []}
-        initialIndex={viewerIndex}
-        isOpen={viewerOpen}
-        onClose={() => setViewerOpen(false)}
-      />
-      </div>
-    </>
+      {/* Subtle background decoration */}
+      <div className="fixed top-20 right-10 w-64 h-64 bg-blue-100 rounded-full filter blur-3xl opacity-20 pointer-events-none" />
+      <div className="fixed bottom-20 left-10 w-96 h-96 bg-purple-100 rounded-full filter blur-3xl opacity-20 pointer-events-none" />
+    </div>
   )
 }

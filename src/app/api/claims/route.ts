@@ -98,18 +98,18 @@ export async function POST(request: NextRequest) {
     
     const {
       clientName,
-      clientEmail,
       clientPhone,
-      itemDescription,
-      damageDetails,
-      incidentDate,
+      clientAddress,
+      insuranceCompany,
+      adjustorName,
+      adjustorEmail,
       organizationId,
       createdById,
       claimNumber: providedClaimNumber
     } = body
 
     // Validate required fields
-    if (!clientName || !itemDescription || !damageDetails || !organizationId || !createdById) {
+    if (!clientName || !clientPhone || !clientAddress || !insuranceCompany || !adjustorName || !adjustorEmail || !organizationId || !createdById) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -132,11 +132,11 @@ export async function POST(request: NextRequest) {
       data: {
         claimNumber,
         clientName,
-        clientEmail,
         clientPhone,
-        itemDescription,
-        damageDetails,
-        incidentDate: incidentDate ? new Date(incidentDate) : null,
+        clientAddress,
+        insuranceCompany,
+        adjustorName,
+        adjustorEmail,
         organizationId,
         createdById
       },

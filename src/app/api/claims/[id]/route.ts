@@ -59,13 +59,12 @@ export async function PUT(
     
     const {
       clientName,
-      clientEmail,
       clientPhone,
-      itemDescription,
-      damageDetails,
-      photos,
+      clientAddress,
+      insuranceCompany,
+      adjustorName,
+      adjustorEmail,
       status,
-      incidentDate,
       claimNumber
     } = body
 
@@ -84,26 +83,24 @@ export async function PUT(
     // Handle claim number update if provided
     type UpdateClaimData = {
       clientName?: string;
-      clientEmail?: string | null;
-      clientPhone?: string | null;
-      itemDescription?: string;
-      damageDetails?: string;
-      photos?: string[];
+      clientPhone?: string;
+      clientAddress?: string;
+      insuranceCompany?: string;
+      adjustorName?: string;
+      adjustorEmail?: string;
       status?: ClaimStatus;
-      incidentDate?: Date | null;
       claimNumber?: string;
     }
 
     const updateData: UpdateClaimData = {}
     
     if (clientName !== undefined) updateData.clientName = clientName
-    if (clientEmail !== undefined) updateData.clientEmail = clientEmail
     if (clientPhone !== undefined) updateData.clientPhone = clientPhone
-    if (itemDescription !== undefined) updateData.itemDescription = itemDescription
-    if (damageDetails !== undefined && damageDetails !== null) updateData.damageDetails = damageDetails
-    if (photos !== undefined) updateData.photos = photos
+    if (clientAddress !== undefined) updateData.clientAddress = clientAddress
+    if (insuranceCompany !== undefined) updateData.insuranceCompany = insuranceCompany
+    if (adjustorName !== undefined) updateData.adjustorName = adjustorName
+    if (adjustorEmail !== undefined) updateData.adjustorEmail = adjustorEmail
     if (status !== undefined) updateData.status = status as ClaimStatus
-    if (incidentDate !== undefined) updateData.incidentDate = incidentDate ? new Date(incidentDate) : null
 
     if (claimNumber !== undefined && claimNumber !== existingClaim.claimNumber) {
       // Validate the new claim number
