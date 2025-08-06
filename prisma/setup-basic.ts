@@ -37,43 +37,35 @@ async function main() {
     console.log(`Found existing admin user: ${adminUser.firstName} ${adminUser.lastName}`)
   }
 
-  // Create inspector users if they don't exist
-  const existingInspectors = await prisma.user.findMany({ where: { role: 'INSPECTOR' } })
+  // Create additional admin users if they don't exist
+  const existingAdmins = await prisma.user.findMany({ where: { role: 'ADMIN' } })
   
-  if (existingInspectors.length === 0) {
-    const inspectors = [
+  if (existingAdmins.length === 1) {
+    const additionalAdmins = [
       {
-        clerkId: 'user_demo_inspector1',
+        clerkId: 'user_demo_admin2',
         email: 'james.carpenter@furniturerestoration.com',
         firstName: 'James',
         lastName: 'Carpenter',
-        role: 'INSPECTOR' as const,
+        role: 'ADMIN' as const,
         organizationId: organization.id
       },
       {
-        clerkId: 'user_demo_inspector2', 
+        clerkId: 'user_demo_admin3', 
         email: 'maria.santos@furniturerestoration.com',
         firstName: 'Maria',
         lastName: 'Santos',
-        role: 'INSPECTOR' as const,
-        organizationId: organization.id
-      },
-      {
-        clerkId: 'user_demo_inspector3',
-        email: 'david.woodworth@furniturerestoration.com', 
-        firstName: 'David',
-        lastName: 'Woodworth',
-        role: 'INSPECTOR' as const,
+        role: 'ADMIN' as const,
         organizationId: organization.id
       }
     ]
 
-    for (const inspectorData of inspectors) {
-      const inspector = await prisma.user.create({ data: inspectorData })
-      console.log(`Created inspector: ${inspector.firstName} ${inspector.lastName}`)
+    for (const adminData of additionalAdmins) {
+      const admin = await prisma.user.create({ data: adminData })
+      console.log(`Created additional admin: ${admin.firstName} ${admin.lastName}`)
     }
   } else {
-    console.log(`Found ${existingInspectors.length} existing inspector users`)
+    console.log(`Found ${existingAdmins.length} existing admin users`)
   }
 
   console.log('Basic setup completed successfully!')
