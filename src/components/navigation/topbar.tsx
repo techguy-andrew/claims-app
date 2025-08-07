@@ -3,23 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, Search, Filter, MoreHorizontal, Menu } from 'lucide-react';
-import { createVariants, cn, type VariantProps } from './utils';
+import { cn } from './utils';
 import styles from './navigation.module.css';
 
-const topbarVariants = {
-  size: {
-    compact: styles.compact,
-    default: '',
-    spacious: styles.spacious,
-  },
-  theme: {
-    light: '',
-    dark: styles.dark,
-  },
-} as const;
-
-
-export interface TopbarProps extends VariantProps<typeof topbarVariants> {
+export interface TopbarProps {
   title?: string;
   subtitle?: string;
   breadcrumbs?: BreadcrumbItem[];

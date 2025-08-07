@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Plus, FileText, Home } from "lucide-react"
+import { Plus, FileText } from "lucide-react"
 import { ClaimCard } from "@/components/claim-card"
 import { ErrorBoundary } from '@/components/error-boundary'
 import { useDebounce } from '@/hooks/use-debounce'
