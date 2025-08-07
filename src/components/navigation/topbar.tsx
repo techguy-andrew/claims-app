@@ -18,7 +18,6 @@ const topbarVariants = {
   },
 } as const;
 
-const getTopbarClasses = createVariants(topbarVariants);
 
 export interface TopbarProps extends VariantProps<typeof topbarVariants> {
   title?: string;
@@ -278,8 +277,6 @@ export const TopbarActionsMenu: React.FC<{
 
 // Main TopBar Component
 export const TopBar: React.FC<TopbarProps> = ({ 
-  size = 'default',
-  theme = 'light',
   title,
   subtitle,
   breadcrumbs = [],

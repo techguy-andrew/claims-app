@@ -10,9 +10,7 @@ import {
   Mail,
   MapPin,
   Edit,
-  Share2,
-  Home,
-  FileText
+  Share2
 } from 'lucide-react'
 import { InfoCard } from '@/components/info-card'
 import { TopBar, TopbarAction } from '@/components/navigation/topbar'

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { TopBar, TopbarAction } from '@/components/navigation/topbar';
 import { useSidebar } from '@/components/navigation';
-import { Home, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 export default function Dashboard() {
   const router = useRouter();

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { TopBar, TopbarAction } from '@/components/navigation/topbar'
 import { useSidebar } from '@/components/navigation'
-import { ArrowLeft, Home, FileText } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export default function NewClaimPage() {
   const router = useRouter()

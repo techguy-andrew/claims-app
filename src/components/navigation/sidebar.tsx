@@ -573,17 +573,7 @@ export const Sidebar = memo<SidebarProps>(({
       )}
 
       <aside
-        className={cn(
-          "fixed top-0 left-0 z-1000 h-full transition-all duration-300 ease-in-out",
-          layout === 'overlay' && "bg-white/80 backdrop-blur-xl border-r border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.06)]",
-          layout === 'static' && "bg-white/60 backdrop-blur-xl",
-          size === 'sm' && "w-56",
-          size === 'md' && "w-64",
-          size === 'lg' && "w-72",
-          isCollapsed && "w-20",
-          isOpen ? "translate-x-0" : "-translate-x-full",
-          className
-        )}
+        className={sidebarClasses}
         role="navigation"
         aria-label={ariaLabel}
         {...props}
