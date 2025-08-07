@@ -10,9 +10,13 @@ import {
   Mail,
   MapPin,
   Edit,
-  Share2
+  Share2,
+  Home,
+  FileText
 } from 'lucide-react'
 import { InfoCard } from '@/components/info-card'
+import { TopBar, TopbarAction } from '@/components/navigation/topbar'
+import { useSidebar } from '@/components/navigation'
 
 interface ClaimData {
   id: string
@@ -59,6 +63,7 @@ export default function ClaimDetailsPage({
   params: Promise<{ id: string }>
 }) {
   const router = useRouter()
+  const { toggle } = useSidebar()
   const [claim, setClaim] = useState<ClaimData | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -113,7 +118,7 @@ export default function ClaimDetailsPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div>
       {/* CSS Animation */}
       <style jsx>{`
         @keyframes slideUp {
@@ -132,30 +137,30 @@ export default function ClaimDetailsPage({
         }
       `}</style>
 
-      {/* Header - Floating style */}
-      <header className="relative">
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-gray-100/50 to-transparent" />
-        <div className="relative flex items-center justify-between px-6 pt-6 pb-4">
-          <button 
-            onClick={() => router.push('/claims')}
-            className="p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          
-          <div className="flex gap-2">
-            <button 
+      <TopBar
+        title={claim?.claimNumber || "Claim Details"}
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        actions={
+          <div className="flex items-center gap-2">
+            <TopbarAction
+              icon={ArrowLeft}
+              label="Back to Claims"
+              variant="secondary"
+              onClick={() => router.push('/claims')}
+            />
+            <TopbarAction
+              icon={Share2}
+              label="Share"
+              variant="ghost"
               onClick={handleShare}
-              className="p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105"
-            >
-              <Share2 className="h-5 w-5" />
-            </button>
+            />
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Main content */}
-      <main className="px-6 pb-24">
+      <main className="px-4 sm:px-6 pb-24">
         {/* Hero Section */}
         <div className="text-center mb-10" style={{ animation: 'fadeIn 0.8s ease-out' }}>
           <h1 className="text-3xl font-bold text-gray-900 mb-3">{claim.claimNumber}</h1>
@@ -231,15 +236,12 @@ export default function ClaimDetailsPage({
       {/* Floating action button with gradient */}
       <button 
         onClick={() => setEditing(!editing)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl px-6 py-4 shadow-xl hover:shadow-2xl transition-all hover:scale-105 flex items-center gap-2"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl px-6 py-4 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] flex items-center gap-2"
       >
         <Edit className="h-5 w-5" />
         <span className="font-medium">Edit Claim</span>
       </button>
 
-      {/* Subtle background decoration */}
-      <div className="fixed top-20 right-10 w-64 h-64 bg-blue-100 rounded-full filter blur-3xl opacity-20 pointer-events-none" />
-      <div className="fixed bottom-20 left-10 w-96 h-96 bg-purple-100 rounded-full filter blur-3xl opacity-20 pointer-events-none" />
     </div>
   )
 }

@@ -201,12 +201,12 @@ export const SidebarItem = memo<SidebarItemProps>(({
   ), [item, isCollapsed, isExpanded, hasChildren]);
 
   const itemClasses = cn(
-    styles.navItem,
-    theme === 'dark' && styles.dark,
-    isActive && styles.active,
-    isActive && theme === 'dark' && styles.darkActive,
-    item.disabled && "opacity-50 cursor-not-allowed",
-    "relative transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+    "flex items-center gap-3 px-4 py-3 mx-2 rounded-2xl transition-all duration-300",
+    "hover:-translate-y-0.5 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20",
+    isActive 
+      ? "bg-gradient-to-r from-blue-600 to-blue-700 !text-white shadow-lg [&>*]:!text-white [&_span]:!text-white" 
+      : "bg-white/60 backdrop-blur-xl text-gray-700 hover:bg-white/80 hover:shadow-md",
+    item.disabled && "opacity-50 cursor-not-allowed hover:transform-none hover:scale-100"
   );
 
   const buttonProps = useMemo(() => ({
@@ -370,34 +370,31 @@ export const SidebarProfile = memo<{
   }
 
   return (
-    <div className="p-4 border-t border-gray-200 dark:border-gray-700" ref={menuRef}>
+    <div className="px-4 py-6 mt-4 border-t border-gray-100/50" ref={menuRef}>
       <div className="relative">
         <button
           onClick={toggleMenu}
-          className={cn(
-            styles.userMenu, 
-            "w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-lg"
-          )}
+          className="w-full flex items-center gap-3 p-4 bg-white/60 backdrop-blur-xl rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
           aria-expanded={isMenuOpen}
           aria-haspopup="true"
           aria-label={`User menu for ${userInfo.name}`}
         >
-          <div className={styles.userAvatar} aria-hidden="true">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center font-medium flex-shrink-0" aria-hidden="true">
             {userInitials}
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-medium truncate dark:text-white">
+            <p className="text-sm font-semibold truncate text-gray-900 leading-tight">
               {userInfo.name}
             </p>
             {userInfo.email && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-xs text-gray-500 truncate mt-0.5">
                 {userInfo.email}
               </p>
             )}
           </div>
           <ChevronDown 
             className={cn(
-              "w-4 h-4 transition-transform duration-200 text-gray-500 dark:text-gray-400",
+              "w-4 h-4 transition-transform duration-300 text-gray-500 flex-shrink-0",
               isMenuOpen && "rotate-180"
             )}
             aria-hidden="true"
@@ -406,13 +403,13 @@ export const SidebarProfile = memo<{
 
         {isMenuOpen && (
           <div 
-            className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 z-50"
+            className="absolute bottom-full left-0 right-0 mb-2 bg-white/80 backdrop-blur-xl border border-gray-100/50 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] py-2 z-50"
             role="menu"
             aria-orientation="vertical"
           >
             <button
               onClick={handleProfileClick}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset dark:text-white"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/60 rounded-xl mx-1 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 transition-all hover:scale-[1.02]"
               role="menuitem"
             >
               <User className="w-4 h-4" aria-hidden="true" />
@@ -420,16 +417,16 @@ export const SidebarProfile = memo<{
             </button>
             <button
               onClick={handleSettingsClick}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset dark:text-white"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/60 rounded-xl mx-1 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 transition-all hover:scale-[1.02]"
               role="menuitem"
             >
               <Settings className="w-4 h-4" aria-hidden="true" />
               Settings
             </button>
-            <hr className="my-1 border-gray-200 dark:border-gray-700" role="separator" />
+            <hr className="my-2 border-gray-100/50 mx-2" role="separator" />
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-inset"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-red-50 rounded-xl mx-1 text-red-600 text-left focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-all hover:scale-[1.02]"
               role="menuitem"
             >
               <LogOut className="w-4 h-4" aria-hidden="true" />
@@ -447,7 +444,7 @@ SidebarProfile.displayName = 'SidebarProfile';
 // Default navigation data
 const DEFAULT_NAVIGATION: NavigationItem[] = [
   { id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
-  { id: 'claims', label: 'Claims', href: '/claims', icon: FileText, badge: '3' },
+  { id: 'claims', label: 'Claims', href: '/claims', icon: FileText },
   {
     id: 'settings',
     label: 'Settings',
@@ -526,19 +523,23 @@ export const Sidebar = memo<SidebarProps>(({
     if (children) return children;
 
     return (
-      <nav className="px-3 space-y-6" aria-label={ariaLabel}>
+      <nav className="px-0 space-y-6" aria-label={ariaLabel}>
         <SidebarSection isCollapsed={isCollapsed}>
-          <div className="space-y-1">
-            {navigation.map((item) => (
-              <SidebarItem
+          <div className="space-y-2">
+            {navigation.map((item, index) => (
+              <div 
                 key={item.id}
-                item={item}
-                isActive={isItemActive(item)}
-                isCollapsed={isCollapsed}
-                theme={currentTheme}
-                onItemClick={handleItemClick}
-                isItemActive={isItemActive}
-              />
+                style={{ animation: `slideUp 0.6s ease-out ${(index * 100) + 200}ms both` }}
+              >
+                <SidebarItem
+                  item={item}
+                  isActive={isItemActive(item)}
+                  isCollapsed={isCollapsed}
+                  theme={currentTheme}
+                  onItemClick={handleItemClick}
+                  isItemActive={isItemActive}
+                />
+              </div>
             ))}
           </div>
         </SidebarSection>
@@ -548,33 +549,57 @@ export const Sidebar = memo<SidebarProps>(({
 
   return (
     <>
-      {/* Backdrop for overlay layout */}
+      {/* Animation styles */}
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+
+      {/* Glass Morphism Backdrop for overlay layout */}
       {layout === 'overlay' && isOpen && (
         <div 
-          className={cn(styles.backdrop, styles.visible, "transition-opacity duration-300")}
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm transition-all duration-300 z-999"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
       <aside
-        className={sidebarClasses}
+        className={cn(
+          "fixed top-0 left-0 z-1000 h-full transition-all duration-300 ease-in-out",
+          layout === 'overlay' && "bg-white/80 backdrop-blur-xl border-r border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.06)]",
+          layout === 'static' && "bg-white/60 backdrop-blur-xl",
+          size === 'sm' && "w-56",
+          size === 'md' && "w-64",
+          size === 'lg' && "w-72",
+          isCollapsed && "w-20",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          className
+        )}
         role="navigation"
         aria-label={ariaLabel}
         {...props}
       >
-        {/* Header */}
-        <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+        {/* Floating Header */}
+        <div className="flex items-center h-20 px-6 pt-6">
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center justify-between w-full">
-            <span className="font-medium text-lg dark:text-white">Menu</span>
+            <span className="font-bold text-xl text-gray-900">Menu</span>
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 aria-label="Close navigation menu"
               >
-                <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <X className="w-5 h-5 text-gray-700" />
               </button>
             )}
           </div>
@@ -583,14 +608,16 @@ export const Sidebar = memo<SidebarProps>(({
           <div className="hidden lg:flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
               {!isCollapsed ? (
-                <Link href="/" className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
-                  <Home className="w-6 h-6 dark:text-white" />
-                  <span className="font-bold text-lg dark:text-white">Claims App</span>
+                <Link href="/" className="flex items-center gap-3 p-2 rounded-2xl hover:bg-white/60 backdrop-blur-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                  <div className="p-2 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl">
+                    <Home className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-bold text-lg text-gray-900">Claims App</span>
                 </Link>
               ) : (
                 <Link 
                   href="/" 
-                  className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="flex items-center justify-center p-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   aria-label="Claims App home"
                 >
                   <Home className="w-5 h-5 text-white" />
@@ -598,27 +625,27 @@ export const Sidebar = memo<SidebarProps>(({
               )}
             </div>
             
-            {/* Desktop Controls */}
+            {/* Floating Desktop Controls */}
             <div className="flex items-center gap-2">
               {onToggleCollapse && !isCollapsed && (
                 <button
                   onClick={onToggleCollapse}
-                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="p-2 bg-white/60 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   aria-label="Collapse sidebar"
                   title="Collapse sidebar"
                 >
-                  <ChevronRight className="w-4 h-4 dark:text-gray-300" />
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
                 </button>
               )}
               
               {onClose && layout === 'overlay' && (
                 <button
                   onClick={onClose}
-                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="p-2 bg-white/60 backdrop-blur rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   aria-label="Close sidebar"
                   title="Close sidebar"
                 >
-                  <X className="w-4 h-4 dark:text-gray-300" />
+                  <X className="w-4 h-4 text-gray-600" />
                 </button>
               )}
             </div>
@@ -626,7 +653,7 @@ export const Sidebar = memo<SidebarProps>(({
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex-1 overflow-y-auto py-6">
           {navigationContent}
         </div>
 

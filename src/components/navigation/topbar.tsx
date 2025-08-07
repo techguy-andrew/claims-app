@@ -173,14 +173,14 @@ export const TopbarAction: React.FC<TopbarActionProps> = ({
   className 
 }) => {
   const buttonVariants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-blue-500',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
+    primary: 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]',
+    secondary: 'bg-white/80 backdrop-blur-xl text-gray-700 border border-gray-100/50 shadow-sm hover:shadow-md hover:-translate-y-0.5',
+    ghost: 'bg-white/60 backdrop-blur-xl text-gray-700 hover:bg-white/80 hover:scale-[1.02]'
   };
 
   const baseClasses = cn(
-    "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-    "focus:outline-none focus:ring-2 focus:ring-offset-2",
+    "inline-flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300",
+    "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2",
     "disabled:opacity-50 disabled:cursor-not-allowed",
     buttonVariants[variant],
     className
@@ -219,11 +219,11 @@ export const TopbarFilter: React.FC<{
     <button
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-        "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+        "relative inline-flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300",
+        "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2",
         isActive
-          ? "bg-blue-100 text-blue-700 border border-blue-200"
-          : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50",
+          ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]"
+          : "bg-white/80 backdrop-blur-xl text-gray-700 border border-gray-100/50 shadow-sm hover:shadow-md hover:-translate-y-0.5",
         className
       )}
       aria-label="Open filters"
@@ -231,7 +231,7 @@ export const TopbarFilter: React.FC<{
       <Filter className="w-4 h-4" />
       Filter
       {count !== undefined && count > 0 && (
-        <span className="ml-1 bg-blue-600 text-white text-xs font-medium px-2 py-0.5 rounded-full">
+        <span className="ml-1 bg-white/20 text-white text-xs font-medium px-2 py-0.5 rounded-full">
           {count}
         </span>
       )}
@@ -292,71 +292,88 @@ export const TopBar: React.FC<TopbarProps> = ({
   className = '',
   children
 }) => {
-  const topbarClasses = cn(
-    styles.topbar,
-    getTopbarClasses({ size, theme }),
-    className
-  );
-
   return (
-    <div className={topbarClasses}>
-      {/* Left Section */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        {/* Menu Button */}
-        {showMenuButton && onMenuToggle && (
-          <button
-            onClick={onMenuToggle}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Toggle sidebar"
-          >
-            <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          </button>
-        )}
+    <div className="relative">
+      {/* Floating Glass Morphism Header */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-gray-100/50 to-transparent pointer-events-none" />
+      
+      <div className={cn(
+        "relative bg-white/80 backdrop-blur-xl border border-gray-100/50 mx-3 sm:mx-6 mt-4 sm:mt-6 rounded-2xl",
+        "shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300",
+        "hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)]",
+        className
+      )}>
+        <div className="px-4 sm:px-6 py-4">
+          {/* Left Section */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            {/* Floating Menu Button */}
+            {showMenuButton && onMenuToggle && (
+              <button
+                onClick={onMenuToggle}
+                className="p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                aria-label="Toggle sidebar"
+              >
+                <Menu className="w-5 h-5 text-gray-700" />
+              </button>
+            )}
 
-        <div className="flex-1 min-w-0">
-          {/* Breadcrumbs */}
-          {breadcrumbs.length > 0 && (
-            <TopbarBreadcrumbs items={breadcrumbs} className="mb-1" />
-          )}
-          
-          {/* Title & Subtitle */}
-          {(title || subtitle) && (
-            <div className="space-y-1">
-              {title && (
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
-                  {title}
-                </h1>
+            <div className="flex-1 min-w-0">
+              {/* Breadcrumbs */}
+              {breadcrumbs.length > 0 && (
+                <TopbarBreadcrumbs items={breadcrumbs} className="mb-2" />
               )}
-              {subtitle && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                  {subtitle}
-                </p>
+              
+              {/* Title & Subtitle */}
+              {(title || subtitle) && (
+                <div className="space-y-1">
+                  {title && (
+                    <h1 className="text-2xl font-bold text-gray-900 truncate">
+                      {title}
+                    </h1>
+                  )}
+                  {subtitle && (
+                    <p className="text-sm text-gray-600 truncate">
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {/* Custom Content */}
+              {children}
+            </div>
+
+            {/* Right Section */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {/* Floating Search */}
+              {showSearch && (
+                <div className="relative hidden sm:block">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={searchPlaceholder}
+                    onChange={(e) => onSearch?.(e.target.value)}
+                    className="pl-11 pr-4 py-3 w-48 md:w-64 bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-100/50 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all duration-300 text-sm"
+                  />
+                </div>
+              )}
+              
+              {/* Mobile Search Toggle */}
+              {showSearch && (
+                <button className="sm:hidden p-3 bg-white/80 backdrop-blur rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                  <Search className="h-5 w-5 text-gray-600" />
+                </button>
+              )}
+              
+              {/* Floating Actions */}
+              {actions && (
+                <div className="flex items-center gap-2">
+                  {actions}
+                </div>
               )}
             </div>
-          )}
-          
-          {/* Custom Content */}
-          {children}
-        </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {/* Search */}
-        {showSearch && (
-          <TopbarSearch
-            placeholder={searchPlaceholder}
-            onSearch={onSearch}
-            className="hidden sm:block w-64"
-          />
-        )}
-        
-        {/* Actions */}
-        {actions && (
-          <div className="flex items-center gap-2">
-            {actions}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

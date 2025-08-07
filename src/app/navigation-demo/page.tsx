@@ -12,21 +12,20 @@ import {
   useTheme,
   useNavigation
 } from '@/components/navigation';
-import { Plus, Download, Settings, Home, FileText } from 'lucide-react';
+import { Plus, Download, Settings, Home, FileText, Code } from 'lucide-react';
 
 export default function NavigationDemoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCount, setFilterCount] = useState(3);
   const [isFilterActive, setIsFilterActive] = useState(false);
   
-  const { layout, setLayout, toggleCollapse, isCollapsed } = useSidebar();
+  const { layout, setLayout, toggleCollapse, isCollapsed, toggle } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const navigation = useNavigation();
 
   const breadcrumbs: BreadcrumbItem[] = [
     { label: 'Home', href: '/', icon: Home },
-    { label: 'Components', href: '/components' },
-    { label: 'Navigation Demo' },
+    { label: 'Navigation Demo', icon: Code },
   ];
 
   const handleSearch = (query: string) => {
@@ -40,14 +39,42 @@ export default function NavigationDemoPage() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Navigation System Demo</h1>
-        <p className="text-gray-600">
-          Showcase of the new variant-based navigation components with responsive design and theming.
-        </p>
-      </div>
+    <div>
+      {/* Animation styles */}
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
+
+      <TopBar
+        title="Navigation System Demo"
+        subtitle="Showcase of the new variant-based navigation components"
+        showMenuButton={true}
+        onMenuToggle={toggle}
+        breadcrumbs={breadcrumbs}
+        actions={
+          <TopbarAction
+            icon={Home}
+            label="Back to App"
+            variant="primary"
+            onClick={() => window.location.href = '/'}
+          />
+        }
+      />
+
+      <div className="p-4 sm:p-6 space-y-8">
 
       {/* Demo Controls */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -264,6 +291,7 @@ export default function NavigationDemoPage() {
             </ul>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

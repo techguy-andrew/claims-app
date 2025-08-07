@@ -176,6 +176,20 @@
   height: 2px;
   background: #374151;
   transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger.open .hamburgerLine:first-child {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.open .hamburgerLine:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.open .hamburgerLine:last-child {
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* Floating hamburger button styles */
@@ -206,10 +220,10 @@
   background: #374151;
 }
 
-/* Improved mobile sidebar behavior */
+/* Enhanced mobile sidebar behavior for glass morphism */
 @media (max-width: 1023px) {
   .sidebar {
-    width: 280px;
+    width: 320px; /* Slightly wider for better touch targets */
   }
 }
 
@@ -220,11 +234,21 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 280px;
+    width: 320px; /* Consistent mobile width */
   }
 
   .collapsed {
-    width: 280px;
+    width: 320px; /* Mobile doesn't collapse */
+  }
+  
+  /* Ensure floating elements have proper touch targets on mobile */
+  .hamburger {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .hamburgerLine {
+    height: 2.5px; /* Slightly thicker for better visibility */
   }
 }
 

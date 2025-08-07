@@ -35,9 +35,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <main 
-        className="min-h-screen bg-white transition-all duration-300"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 transition-all duration-300"
         style={getMainContentStyle()}
       >
+        {/* Decorative background elements */}
+        <div className="fixed top-20 right-10 w-64 h-64 bg-blue-100 rounded-full filter blur-3xl opacity-20 pointer-events-none" />
+        <div className="fixed bottom-20 left-10 w-96 h-96 bg-purple-100 rounded-full filter blur-3xl opacity-20 pointer-events-none" />
         {children}
       </main>
     </div>
