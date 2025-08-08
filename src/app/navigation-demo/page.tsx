@@ -135,7 +135,7 @@ export default function NavigationDemoPage() {
           <div>
             <h3 className="font-medium text-gray-700 mb-2">Sidebar State</h3>
             <ul className="space-y-1 text-gray-600">
-              <li>Is open: {navigation.sidebar.isOpen ? 'Yes' : 'No'}</li>
+              <li>Is open: {navigation.sidebarOpen ? 'Yes' : 'No'}</li>
               <li>Is collapsed: {isCollapsed ? 'Yes' : 'No'}</li>
               <li>Theme: {theme}</li>
             </ul>
