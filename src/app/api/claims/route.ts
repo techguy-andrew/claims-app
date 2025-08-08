@@ -108,10 +108,11 @@ export async function POST(request: NextRequest) {
       claimNumber: providedClaimNumber
     } = body
 
-    // Validate required fields
-    if (!clientName || !clientPhone || !clientAddress || !insuranceCompany || !adjustorName || !adjustorEmail || !organizationId || !createdById) {
+    // Validate required fields - only organizationId and createdById are required (system fields)
+    // All claim fields are optional except claim number (handled by createClaimNumber)
+    if (!organizationId || !createdById) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required system fields' },
         { status: 400 }
       )
     }
@@ -131,12 +132,12 @@ export async function POST(request: NextRequest) {
     const claim = await prisma.claim.create({
       data: {
         claimNumber,
-        clientName,
-        clientPhone,
-        clientAddress,
-        insuranceCompany,
-        adjustorName,
-        adjustorEmail,
+        clientName: clientName || '',
+        clientPhone: clientPhone || '',
+        clientAddress: clientAddress || '',
+        insuranceCompany: insuranceCompany || '',
+        adjustorName: adjustorName || '',
+        adjustorEmail: adjustorEmail || '',
         organizationId,
         createdById
       },

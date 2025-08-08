@@ -2,10 +2,10 @@
 
 import { 
   NavigationProvider, 
-  Sidebar,
   useSidebar, 
   useTheme 
 } from "@/components/navigation";
+import { SidebarV2 } from "@/components/navigation/sidebar-v2";
 import { Menu } from "lucide-react";
 
 // Layout content component that uses navigation hooks
@@ -14,18 +14,20 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
   
 
-  // Calculate main content margin for static sidebar
+  // Calculate main content margin for static sidebar and hamburger spacing
   const getMainContentStyle = () => {
-    if (layout === 'static' && isDesktop && isOpen) {
-      return { marginLeft: '16rem' }; // 256px sidebar width
-    }
-    return {};
+    const styles: React.CSSProperties = {};
+    
+    // Always add top padding to prevent hamburger menu interference on all screen sizes
+    styles.paddingTop = '4rem'; // 64px to clear the hamburger button
+    
+    return styles;
   };
 
   return (
     <div className={`min-h-screen w-full relative ${theme === 'dark' ? 'dark' : ''}`}>
       {/* Sidebar */}
-      <Sidebar
+      <SidebarV2
         layout={layout}
         size="md"
         theme={theme}
@@ -38,10 +40,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       {/* Floating Hamburger Menu Button */}
       <button
         onClick={toggle}
-        className="fixed top-6 left-6 z-50 p-3 bg-white/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] hover:scale-[1.02] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        className="fixed top-4 left-4 z-50 p-2.5 bg-white/90 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-200/60 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
         aria-label="Toggle navigation menu"
       >
-        <Menu className="w-5 h-5 text-gray-700" />
+        <Menu className="w-5 h-5 text-gray-600" />
       </button>
 
       {/* Main Content Area */}
@@ -63,7 +65,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     <NavigationProvider
       defaultSettings={{
         persistCollapsedState: false,
-        autoCollapseOnMobile: false,
+        autoCollapseOnMobile: true,
         defaultSidebarLayout: 'overlay',
         defaultTheme: 'light',
       }}

@@ -1,34 +1,90 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { CheckCircle, AlertCircle } from "lucide-react"
+import { ClaimForm } from "@/components/claim-form"
+import { ClaimFormData } from "@/lib/form-validation"
 
 export default function NewClaimPage() {
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleBackClick = () => {
-    console.log('Back button clicked')
+  const handleSubmit = async (data: ClaimFormData & { organizationId: string; createdById: string }) => {
+    setLoading(true)
+    setError(null)
+
     try {
-      router.push('/claims')
-      console.log('Router push called')
-    } catch (error) {
-      console.error('Router error:', error)
-      // Emergency fallback
-      window.location.href = '/claims'
+      const response = await fetch('/api/claims', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create claim')
+      }
+
+      const newClaim = await response.json()
+      setSuccess(true)
+      
+      // Redirect to the new claim's detail page after a brief success display
+      setTimeout(() => {
+        router.push(`/claims/${newClaim.id}`)
+      }, 1500)
+    } catch (err) {
+      console.error('Error creating claim:', err)
+      setError(err instanceof Error ? err.message : 'Failed to create claim')
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleCancelClick = () => {
-    console.log('Cancel button clicked')
-    try {
-      router.push('/claims')
-      console.log('Cancel router push called')
-    } catch (error) {
-      console.error('Cancel router error:', error)
-      // Emergency fallback
-      window.location.href = '/claims'
-    }
+  const handleCancel = () => {
+    router.push('/claims')
   }
 
+  // Success state
+  if (success) {
+    return (
+      <div>
+        {/* Animation styles */}
+        <style jsx>{`
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+        `}</style>
+
+        <div className="pt-20 p-4 sm:p-6">
+          <div className="max-w-md mx-auto text-center" style={{ animation: 'fadeIn 0.8s ease-out' }}>
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50">
+              <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl w-fit mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Claim Created Successfully!</h1>
+              <p className="text-gray-600">Redirecting to claim details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -50,63 +106,35 @@ export default function NewClaimPage() {
         }
       `}</style>
 
-      <div className="pt-20 p-4 sm:p-6 space-y-8">
+      <div className="pt-20 p-4 sm:p-6 pb-24">
         {/* Page Header */}
         <div className="text-center mb-8" style={{ animation: 'fadeIn 0.8s ease-out' }}>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">New Claim</h1>
-          <p className="text-gray-600">Create a new insurance claim</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create New Claim</h1>
+          <p className="text-gray-600">Fill out the form below to create a new insurance claim</p>
         </div>
 
-        <div style={{ animation: 'slideUp 0.6s ease-out 100ms both' }}>
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Premium Claim Form</h2>
-              <p className="text-sm text-gray-600">Create a new insurance claim with our streamlined process</p>
-            </div>
-            <div className="space-y-6">
-              <p className="text-gray-600">Claim form functionality coming soon. Our premium interface will provide:</p>
-              <ul className="space-y-3 text-sm text-gray-600">
-                <li className="flex items-start gap-3">
-                  <div className="p-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg mt-0.5">
-                    ✓
-                  </div>
-                  Step-by-step guided form with validation
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="p-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg mt-0.5">
-                    ✓
-                  </div>
-                  Document upload with preview
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="p-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg mt-0.5">
-                    ✓
-                  </div>
-                  Real-time status tracking
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="p-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg mt-0.5">
-                    ✓
-                  </div>
-                  Integration with insurance company systems
-                </li>
-              </ul>
-              <div className="flex gap-4 pt-4">
-                <button 
-                  onClick={handleBackClick}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                >
-                  View Existing Claims
-                </button>
-                <button 
-                  onClick={handleCancelClick}
-                  className="bg-white/60 backdrop-blur-xl text-gray-700 border border-gray-100/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 px-6 py-3 rounded-2xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                >
-                  Dashboard
-                </button>
+        {/* Error Message */}
+        {error && (
+          <div className="max-w-2xl mx-auto mb-6" style={{ animation: 'slideUp 0.6s ease-out' }}>
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error Creating Claim</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Claim Form */}
+        <div className="max-w-2xl mx-auto" style={{ animation: 'slideUp 0.6s ease-out 100ms both' }}>
+          <ClaimForm
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            loading={loading}
+            submitText="Create Claim"
+            cancelText="Cancel"
+          />
         </div>
       </div>
     </div>

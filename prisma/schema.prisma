@@ -60,6 +60,8 @@ model Claim {
   
   // Relationships
   auditLogs        AuditLog[]
+  items            ClaimItem[]
+  files            ClaimFile[]
   createdBy        User         @relation(fields: [createdById], references: [id])
   organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -80,6 +82,38 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+model ClaimItem {
+  id          String    @id @default(cuid())
+  claimId     String
+  itemName    String    // Required: "Desk", "Chair", "Sofa"
+  details     String?   // Optional: "Scratched surface", "Water damage"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relationships
+  claim       Claim     @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  files       ClaimFile[]
+  
+  @@map("claim_items")
+}
+
+model ClaimFile {
+  id          String     @id @default(cuid())
+  claimId     String
+  itemId      String?    // Optional: can be unassigned initially
+  fileName    String
+  fileUrl     String
+  fileType    String     // "image", "pdf", "document"
+  fileSize    Int?
+  mimeType    String?
+  uploadedAt  DateTime   @default(now())
+  
+  // Relationships
+  claim       Claim      @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  item        ClaimItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  
+  @@map("claim_files")
+}
 
 enum Role {
   ADMIN

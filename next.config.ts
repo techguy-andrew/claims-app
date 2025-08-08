@@ -26,12 +26,12 @@ const nextConfig: NextConfig = {
       };
     }
     
-    // Add proper module resolution
+    // Configure basic webpack aliases
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname, 'src'),
     };
-    
+
     return config;
   },
   

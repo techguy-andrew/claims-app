@@ -11,7 +11,7 @@ interface InfoCardProps {
   onCopy?: (value: string) => void
 }
 
-export function InfoCard({ label, value, icon: Icon, delay = 0, onCopy }: InfoCardProps) {
+export function InfoCard({ label, value, icon: Icon, onCopy }: InfoCardProps) {
   const handleCopy = () => {
     if (onCopy) {
       onCopy(value)
@@ -21,26 +21,22 @@ export function InfoCard({ label, value, icon: Icon, delay = 0, onCopy }: InfoCa
   }
 
   return (
-    <div 
-      className="group relative"
-      style={{
-        animation: `slideUp 0.6s ease-out ${delay}ms both`,
-      }}
-    >
-      <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1">
-        <div className="flex items-start gap-4">
-          <div className="p-2.5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
-            <Icon className="h-5 w-5 text-gray-600" />
+    <div className="group relative">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-lg hover:shadow-xl transition-all duration-200">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gray-50 rounded-lg">
+            <Icon className="h-4 w-4 text-gray-600" />
           </div>
-          <div className="flex-1">
-            <p className="text-xs font-medium text-gray-400 mb-1 uppercase tracking-wide">{label}</p>
-            <p className="text-base text-gray-900 font-medium leading-relaxed">{value}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">{label}</p>
+            <p className="text-sm text-gray-900 font-medium truncate">{value}</p>
           </div>
           <button 
             onClick={handleCopy}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-100 rounded-lg"
+            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            title={`Copy ${label.toLowerCase()}`}
           >
-            <Copy className="h-4 w-4 text-gray-400" />
+            <Copy className="h-4 w-4 text-gray-500" />
           </button>
         </div>
       </div>
