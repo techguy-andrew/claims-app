@@ -204,7 +204,7 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
       setError(errorMessage)
       clearMessages()
     }
-  }, [claimId, files, onFilesChange, clearMessages])
+  }, [claimId, files, onFilesChange, clearMessages, validateFile])
 
   // Handle drag events
   const handleDragOver = useCallback((e: React.DragEvent) => {

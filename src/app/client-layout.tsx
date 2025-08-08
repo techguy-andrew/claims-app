@@ -10,7 +10,7 @@ import { Menu } from "lucide-react";
 
 // Layout content component that uses navigation hooks
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { isOpen, layout, isDesktop, toggle, close } = useSidebar();
+  const { isOpen, layout, toggle, close } = useSidebar();
   const { theme } = useTheme();
   
 
