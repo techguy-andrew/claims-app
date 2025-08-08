@@ -13,8 +13,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const { isOpen, layout, isDesktop, toggle, close } = useSidebar();
   const { theme } = useTheme();
   
-  // Debug logging
-  console.log('LayoutContent render:', { isOpen, layout, isDesktop });
 
   // Calculate main content margin for static sidebar
   const getMainContentStyle = () => {
@@ -39,20 +37,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Floating Hamburger Menu Button */}
       <button
-        onClick={() => {
-          console.log('Hamburger clicked, current isOpen:', isOpen);
-          toggle();
-        }}
+        onClick={toggle}
         className="fixed top-6 left-6 z-50 p-3 bg-white/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] hover:scale-[1.02] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         aria-label="Toggle navigation menu"
       >
         <Menu className="w-5 h-5 text-gray-700" />
       </button>
-      
-      {/* Debug indicator */}
-      <div className="fixed top-20 left-6 z-50 p-2 bg-red-500 text-white text-xs rounded">
-        isOpen: {isOpen ? 'true' : 'false'} | layout: {layout} | isDesktop: {isDesktop ? 'true' : 'false'}
-      </div>
 
       {/* Main Content Area */}
       <main 

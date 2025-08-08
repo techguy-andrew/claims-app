@@ -85,7 +85,6 @@ type NavigationActionType =
 
 // Reducer function
 const navigationReducer = (state: NavigationState, action: NavigationActionType): NavigationState => {
-  console.log('navigationReducer:', action.type, action.payload, 'current state:', state.sidebarOpen);
   switch (action.type) {
     case 'SET_SIDEBAR_OPEN':
       return { ...state, sidebarOpen: action.payload };
@@ -192,17 +191,13 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
 
     const handleResize = () => {
       const newScreenSize = getScreenSize(window.innerWidth);
-      console.log('handleResize: window width =', window.innerWidth, 'newScreenSize =', newScreenSize);
       dispatch({ type: 'SET_SCREEN_SIZE', payload: newScreenSize });
       
       // Auto-adjust sidebar based on screen size
       if (settings.autoCollapseOnMobile) {
-        console.log('handleResize autoCollapseOnMobile logic');
         if (newScreenSize === 'desktop') {
-          console.log('handleResize: Setting sidebar open for desktop resize');
           dispatch({ type: 'SET_SIDEBAR_OPEN', payload: true });
         } else {
-          console.log('handleResize: Setting sidebar closed for mobile/tablet resize');
           dispatch({ type: 'SET_SIDEBAR_OPEN', payload: false });
           dispatch({ type: 'SET_MOBILE_MENU_OPEN', payload: false });
         }
@@ -263,12 +258,10 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
 
   // Set mounted flag and initialize client-side state
   useEffect(() => {
-    console.log('Mount effect starting, window.innerWidth =', window.innerWidth);
     setMounted(true);
     
     // Initialize client-side state after mount to prevent hydration mismatch
     const screenSize = getScreenSize(window.innerWidth);
-    console.log('Initial mount: screenSize =', screenSize);
     dispatch({ type: 'SET_SCREEN_SIZE', payload: screenSize });
     
     // Load saved settings from localStorage
@@ -300,12 +293,9 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     
     // Set initial sidebar state based on screen size
     if (settings.autoCollapseOnMobile) {
-      console.log('autoCollapseOnMobile logic: screenSize =', screenSize);
       if (screenSize === 'desktop') {
-        console.log('Setting sidebar open for desktop');
         dispatch({ type: 'SET_SIDEBAR_OPEN', payload: true });
       } else {
-        console.log('Setting sidebar closed for mobile/tablet');
         dispatch({ type: 'SET_SIDEBAR_OPEN', payload: false });
       }
     }
@@ -315,17 +305,14 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   const actions: NavigationActions = {
     // Sidebar actions
     openSidebar: useCallback(() => {
-      console.log('openSidebar called');
       dispatch({ type: 'SET_SIDEBAR_OPEN', payload: true });
     }, []),
     
     closeSidebar: useCallback(() => {
-      console.log('closeSidebar called');
       dispatch({ type: 'SET_SIDEBAR_OPEN', payload: false });
     }, []),
     
     toggleSidebar: useCallback(() => {
-      console.log('toggleSidebar called, current state:', state.sidebarOpen);
       dispatch({ type: 'SET_SIDEBAR_OPEN', payload: !state.sidebarOpen });
     }, [state.sidebarOpen]),
     
