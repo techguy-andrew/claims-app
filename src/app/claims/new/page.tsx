@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { ArrowLeft } from 'lucide-react'
 
 export default function NewClaimPage() {
   const router = useRouter()
@@ -30,15 +29,6 @@ export default function NewClaimPage() {
     }
   }
 
-  const handleMenuToggle = () => {
-    console.log('Menu toggle clicked')
-    try {
-      toggle()
-      console.log('Toggle function called')
-    } catch (error) {
-      console.error('Toggle error:', error)
-    }
-  }
 
   return (
     <div>

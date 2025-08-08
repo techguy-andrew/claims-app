@@ -1,8 +1,6 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@/components/navigation';
-import { Plus } from 'lucide-react';
 
 export default function Dashboard() {
   const router = useRouter();

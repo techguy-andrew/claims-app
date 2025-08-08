@@ -1,36 +1,15 @@
 "use client";
 
-import { useState } from 'react';
 import { 
-  type BreadcrumbItem,
   useSidebar,
   useTheme,
   useNavigation
 } from '@/components/navigation';
-import { Plus, Download, Settings, Home, FileText, Code } from 'lucide-react';
 
 export default function NavigationDemoPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCount, setFilterCount] = useState(3);
-  const [isFilterActive, setIsFilterActive] = useState(false);
-  
   const { layout, setLayout, toggleCollapse, isCollapsed, toggle } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const navigation = useNavigation();
-
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', href: '/', icon: Home },
-    { label: 'Navigation Demo', icon: Code },
-  ];
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    console.log('Search query:', query);
-  };
-
-  const handleFilterClick = () => {
-    setIsFilterActive(!isFilterActive);
-  };
 
   return (
     <div>

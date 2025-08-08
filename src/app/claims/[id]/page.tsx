@@ -1,16 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { 
-  ArrowLeft, 
   Building2, 
   User, 
   Phone, 
   Mail,
   MapPin,
-  Edit,
-  Share2
+  Edit
 } from 'lucide-react'
 import { InfoCard } from '@/components/info-card'
 
@@ -58,7 +55,6 @@ export default function ClaimDetailsPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const router = useRouter()
   const [claim, setClaim] = useState<ClaimData | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -90,17 +86,6 @@ export default function ClaimDetailsPage({
     navigator.clipboard.writeText(value)
   }
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: `Claim ${claim?.claimNumber}`,
-        text: `Insurance claim details for ${claim?.clientName}`,
-        url: window.location.href
-      })
-    } else {
-      navigator.clipboard.writeText(window.location.href)
-    }
-  }
 
   if (loading || !claim) {
     return (
