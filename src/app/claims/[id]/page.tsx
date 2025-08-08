@@ -13,8 +13,6 @@ import {
   Share2
 } from 'lucide-react'
 import { InfoCard } from '@/components/info-card'
-import { TopBar, TopbarAction } from '@/components/navigation/topbar'
-import { useSidebar } from '@/components/navigation'
 
 interface ClaimData {
   id: string
@@ -61,7 +59,6 @@ export default function ClaimDetailsPage({
   params: Promise<{ id: string }>
 }) {
   const router = useRouter()
-  const { toggle } = useSidebar()
   const [claim, setClaim] = useState<ClaimData | null>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -135,30 +132,9 @@ export default function ClaimDetailsPage({
         }
       `}</style>
 
-      <TopBar
-        title={claim?.claimNumber || "Claim Details"}
-        showMenuButton={true}
-        onMenuToggle={toggle}
-        actions={
-          <div className="flex items-center gap-2">
-            <TopbarAction
-              icon={ArrowLeft}
-              label="Back to Claims"
-              variant="secondary"
-              onClick={() => router.push('/claims')}
-            />
-            <TopbarAction
-              icon={Share2}
-              label="Share"
-              variant="ghost"
-              onClick={handleShare}
-            />
-          </div>
-        }
-      />
 
       {/* Main content */}
-      <main className="px-4 sm:px-6 pb-24">
+      <main className="pt-20 px-4 sm:px-6 pb-24">
         {/* Hero Section */}
         <div className="text-center mb-10" style={{ animation: 'fadeIn 0.8s ease-out' }}>
           <h1 className="text-3xl font-bold text-gray-900 mb-3">{claim.claimNumber}</h1>

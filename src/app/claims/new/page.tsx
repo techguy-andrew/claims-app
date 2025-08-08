@@ -1,13 +1,10 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { TopBar, TopbarAction } from '@/components/navigation/topbar'
-import { useSidebar } from '@/components/navigation'
 import { ArrowLeft } from 'lucide-react'
 
 export default function NewClaimPage() {
   const router = useRouter()
-  const { toggle } = useSidebar()
 
   const handleBackClick = () => {
     console.log('Back button clicked')
@@ -63,20 +60,13 @@ export default function NewClaimPage() {
         }
       `}</style>
 
-      <TopBar
-        title="New Claim"
-        showMenuButton={true}
-        onMenuToggle={handleMenuToggle}
-        actions={
-          <TopbarAction
-            icon={ArrowLeft}
-            label="Back to Claims"
-            variant="secondary"
-            onClick={handleBackClick}
-          />
-        }
-      />
-      <div className="p-4 sm:p-6 space-y-8">
+      <div className="pt-20 p-4 sm:p-6 space-y-8">
+        {/* Page Header */}
+        <div className="text-center mb-8" style={{ animation: 'fadeIn 0.8s ease-out' }}>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">New Claim</h1>
+          <p className="text-gray-600">Create a new insurance claim</p>
+        </div>
+
         <div style={{ animation: 'slideUp 0.6s ease-out 100ms both' }}>
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] transition-all duration-300">
             <div className="mb-6">

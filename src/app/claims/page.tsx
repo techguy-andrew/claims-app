@@ -6,7 +6,6 @@ import { Plus, FileText } from "lucide-react"
 import { ClaimCard } from "@/components/claim-card"
 import { ErrorBoundary } from '@/components/error-boundary'
 import { useDebounce } from '@/hooks/use-debounce'
-import { TopBar, TopbarAction } from '@/components/navigation/topbar'
 import { useSidebar } from '@/components/navigation'
 
 interface Claim {
@@ -58,7 +57,6 @@ const EmptyState = () => (
 
 function ClaimsPageContent() {
   const router = useRouter()
-  const { toggle } = useSidebar()
   
   // State management
   const [claims, setClaims] = useState<Claim[]>([])
@@ -138,25 +136,15 @@ function ClaimsPageContent() {
         }
       `}</style>
 
-      <TopBar
-        title="Claims"
-        showMenuButton={true}
-        onMenuToggle={toggle}
-        showSearch={true}
-        searchPlaceholder="Search claims..."
-        onSearch={setSearchQuery}
-        actions={
-          <TopbarAction
-            icon={Plus}
-            label="New Claim"
-            variant="primary"
-            onClick={() => router.push('/claims/new')}
-          />
-        }
-      />
 
       {/* Claims content */}
-      <main className="px-4 sm:px-6 pb-24">
+      <main className="pt-20 px-4 sm:px-6 pb-24">
+        {/* Page Header */}
+        <div className="text-center mb-8" style={{ animation: 'fadeIn 0.8s ease-out' }}>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Claims Management</h1>
+          <p className="text-gray-600">Manage your insurance claims</p>
+        </div>
+
         {loading ? (
           <div className="text-center py-12" style={{ animation: 'fadeIn 0.5s ease-out' }}>
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 max-w-md mx-auto">
@@ -212,6 +200,15 @@ function ClaimsPageContent() {
           </div>
         )}
       </main>
+
+      {/* Floating Action Button */}
+      <button 
+        onClick={() => router.push('/claims/new')}
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl px-6 py-4 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] flex items-center gap-2 z-40"
+      >
+        <Plus className="h-5 w-5" />
+        <span className="font-medium">New Claim</span>
+      </button>
 
     </div>
   )

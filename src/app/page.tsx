@@ -1,13 +1,11 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { TopBar, TopbarAction } from '@/components/navigation/topbar';
 import { useSidebar } from '@/components/navigation';
 import { Plus } from 'lucide-react';
 
 export default function Dashboard() {
   const router = useRouter();
-  const { toggle } = useSidebar();
 
   return (
     <div>
@@ -29,20 +27,13 @@ export default function Dashboard() {
         }
       `}</style>
 
-      <TopBar
-        title="Dashboard"
-        showMenuButton={true}
-        onMenuToggle={toggle}
-        actions={
-          <TopbarAction
-            icon={Plus}
-            label="New Claim"
-            variant="primary"
-            onClick={() => router.push('/claims/new')}
-          />
-        }
-      />
-      <div className="p-4 sm:p-6 space-y-8">
+      <div className="pt-20 p-4 sm:p-6 space-y-8">
+        {/* Page Header */}
+        <div className="text-center mb-8" style={{ animation: 'fadeIn 0.8s ease-out' }}>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600">Premium insurance claims platform</p>
+        </div>
+
         {/* Premium Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div style={{ animation: 'slideUp 0.6s ease-out 100ms both' }}>

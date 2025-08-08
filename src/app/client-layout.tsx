@@ -6,6 +6,7 @@ import {
   useSidebar, 
   useTheme 
 } from "@/components/navigation";
+import { Menu } from "lucide-react";
 
 // Layout content component that uses navigation hooks
 function LayoutContent({ children }: { children: React.ReactNode }) {
@@ -32,6 +33,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         onToggle={toggle}
         showProfile={true}
       />
+
+      {/* Floating Hamburger Menu Button */}
+      <button
+        onClick={toggle}
+        className="fixed top-6 left-6 z-50 p-3 bg-white/80 backdrop-blur-xl rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50 hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] hover:scale-[1.02] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        aria-label="Toggle navigation menu"
+      >
+        <Menu className="w-5 h-5 text-gray-700" />
+      </button>
 
       {/* Main Content Area */}
       <main 
