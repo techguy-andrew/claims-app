@@ -1,13 +1,13 @@
-/* Button Base Styles */
+/* Button Base Styles - Mobile First */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 12px 20px; /* Mobile-optimized padding */
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  font-size: 0.9375rem; /* Slightly larger for mobile readability */
   font-weight: 500;
   line-height: 1.25rem;
   text-decoration: none;
@@ -16,6 +16,19 @@
   outline: none;
   position: relative;
   overflow: hidden;
+  min-height: 44px; /* Apple HIG minimum touch target */
+  min-width: 44px;
+  touch-action: manipulation; /* Improve touch responsiveness */
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    min-height: 36px;
+    min-width: auto;
+  }
 }
 
 .button:disabled {
@@ -49,15 +62,36 @@
   color: white;
   border-color: transparent;
   border-radius: 10px;
-  padding: 8px 16px;
+  padding: 12px 20px; /* Mobile-optimized padding */
   box-shadow: 0 2px 8px rgba(0, 102, 255, 0.25);
   font-weight: 600;
+  min-height: 44px;
 }
 
 .modern:hover:not(:disabled) {
   background: linear-gradient(90deg, #0052cc 0%, #003d99 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
+}
+
+/* Mobile-specific hover/active states */
+@media (max-width: 767px) {
+  .modern:active:not(:disabled) {
+    transform: scale(0.98);
+    background: linear-gradient(90deg, #0052cc 0%, #003d99 100%);
+  }
+  
+  .modern:hover:not(:disabled) {
+    transform: none; /* Remove hover transform on mobile */
+  }
+}
+
+/* Desktop adjustments for modern variant */
+@media (min-width: 768px) {
+  .modern {
+    padding: 8px 16px;
+    min-height: 36px;
+  }
 }
 
 .floating {
@@ -113,17 +147,34 @@
   color: var(--text-primary);
 }
 
-/* Button Sizes */
+/* Button Sizes - Mobile First */
 .small {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: 0.75rem;
+  padding: 8px 16px; /* Mobile-optimized small button */
+  font-size: 0.8125rem;
   line-height: 1rem;
+  min-height: 40px; /* Slightly smaller but still accessible */
 }
 
 .large {
-  padding: var(--spacing-md) var(--spacing-xl);
-  font-size: 1rem;
+  padding: 16px 28px; /* Mobile-optimized large button */
+  font-size: 1.0625rem;
   line-height: 1.5rem;
+  min-height: 52px; /* Larger touch target for primary actions */
+}
+
+/* Desktop size adjustments */
+@media (min-width: 768px) {
+  .small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem;
+    min-height: 32px;
+  }
+
+  .large {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1rem;
+    min-height: 44px;
+  }
 }
 
 /* Loading State */

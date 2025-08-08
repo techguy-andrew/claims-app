@@ -18,9 +18,9 @@ import styles from './navigation.module.css';
 import { useNavigation } from './navigation-provider';
 import { Button } from '@/components/ui/button';
 
-// Base style utilities for consistency
-const baseItemStyles = "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20";
-const baseButtonStyles = "p-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20";
+// Base style utilities for consistency - mobile-first approach
+const baseItemStyles = "flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[44px] md:min-h-[36px]";
+const baseButtonStyles = "p-3 md:p-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[44px] md:min-h-[36px]";
 
 // Types and Interfaces
 const sidebarVariants = {
@@ -179,22 +179,22 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {item.icon && (
               <item.icon 
-                className="w-4 h-4 flex-shrink-0" 
+                className="w-5 h-5 md:w-4 md:h-4 flex-shrink-0" 
                 aria-hidden="true"
               />
             )}
-            <span className="text-sm truncate font-normal">
+            <span className="text-base md:text-sm truncate font-normal">
               {item.label}
             </span>
             {item.badge && (
-              <span className="ml-auto flex-shrink-0 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-200">
+              <span className="ml-auto flex-shrink-0 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 md:py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-200">
                 {item.badge}
               </span>
             )}
           </div>
           <ChevronRight 
             className={cn(
-              "w-4 h-4 transition-transform duration-200",
+              "w-5 h-5 md:w-4 md:h-4 transition-transform duration-200",
               isExpanded && "rotate-90"
             )}
             aria-hidden="true" 
@@ -224,17 +224,17 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
     <div className="flex items-center gap-3 flex-1 min-w-0">
       {item.icon && (
         <item.icon 
-          className="w-4 h-4 flex-shrink-0" 
+          className="w-5 h-5 md:w-4 md:h-4 flex-shrink-0" 
           aria-hidden="true"
         />
       )}
       {!isCollapsed && (
         <>
-          <span className="text-sm truncate font-normal">
+          <span className="text-base md:text-sm truncate font-normal">
             {item.label}
           </span>
           {item.badge && (
-            <span className="ml-auto flex-shrink-0 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-200">
+            <span className="ml-auto flex-shrink-0 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 md:py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-200">
               {item.badge}
             </span>
           )}
@@ -370,22 +370,22 @@ export const SidebarProfileV2 = memo<{
   }
 
   return (
-    <div className="px-3 py-4 mt-4 border-t border-gray-200 dark:border-gray-700" ref={menuRef}>
+    <div className="px-3 py-4" ref={menuRef}>
       <div className="relative">
         <button
           onClick={toggleMenu}
-          className="w-full flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="w-full flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[44px] md:min-h-[40px] md:p-3"
           aria-expanded={isMenuOpen}
           aria-haspopup="true"
           aria-label={`User menu for ${userInfo.name}`}
         >
-          <div className="w-8 h-8 rounded-lg text-white text-sm font-medium flex items-center justify-center flex-shrink-0" 
+          <div className="w-10 h-10 md:w-8 md:h-8 rounded-lg text-white text-sm font-medium flex items-center justify-center flex-shrink-0" 
                style={{background: 'linear-gradient(90deg, rgba(0, 122, 255, 0.5) 0%, rgba(0, 91, 181, 0.5) 100%)'}} 
                aria-hidden="true">
             {userInitials}
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-sm font-medium truncate text-gray-900 leading-tight">
+            <p className="text-sm md:text-sm font-medium truncate text-gray-900 leading-tight">
               {userInfo.name}
             </p>
             {userInfo.email && (
@@ -396,7 +396,7 @@ export const SidebarProfileV2 = memo<{
           </div>
           <ChevronDown 
             className={cn(
-              "w-4 h-4 transition-transform duration-200 text-gray-500 flex-shrink-0",
+              "w-5 h-5 md:w-4 md:h-4 transition-transform duration-200 text-gray-500 flex-shrink-0",
               isMenuOpen && "rotate-180"
             )}
             aria-hidden="true"
@@ -411,27 +411,27 @@ export const SidebarProfileV2 = memo<{
           >
             <button
               onClick={handleProfileClick}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-100 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 text-sm hover:bg-gray-100 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 transition-colors min-h-[44px] md:min-h-[36px]"
               role="menuitem"
             >
-              <User className="w-4 h-4" aria-hidden="true" />
+              <User className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true" />
               View Profile
             </button>
             <button
               onClick={handleSettingsClick}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-100 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 text-sm hover:bg-gray-100 text-left focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 transition-colors min-h-[44px] md:min-h-[36px]"
               role="menuitem"
             >
-              <Settings className="w-4 h-4" aria-hidden="true" />
+              <Settings className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true" />
               Settings
             </button>
             <hr className="my-1 border-gray-200" role="separator" />
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-red-50 text-red-600 text-left focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 text-sm hover:bg-red-50 text-red-600 text-left focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-colors min-h-[44px] md:min-h-[36px]"
               role="menuitem"
             >
-              <LogOut className="w-4 h-4" aria-hidden="true" />
+              <LogOut className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true" />
               Sign Out
             </button>
           </div>
@@ -553,17 +553,17 @@ export const SidebarV2 = memo<SidebarV2Props>(({
         {...props}
       >
         {/* Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between h-16 md:h-14 px-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center justify-between w-full">
-            <span className="font-semibold text-lg text-gray-900">Menu</span>
+            <span className="font-semibold text-xl md:text-lg text-gray-900">Menu</span>
             {onClose && (
               <button
                 onClick={onClose}
                 className={cn(baseButtonStyles, "hover:bg-gray-100")}
                 aria-label="Close navigation menu"
               >
-                <X className="w-5 h-5 text-gray-700" />
+                <X className="w-6 h-6 md:w-5 md:h-5 text-gray-700" />
               </button>
             )}
           </div>
@@ -574,7 +574,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
               {!isCollapsed ? (
                 <Link href="/" className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                   <div className="p-1 rounded-lg" style={{background: 'linear-gradient(90deg, rgba(0, 122, 255, 0.5) 0%, rgba(0, 91, 181, 0.5) 100%)'}}>
-                    <Home className="w-4 h-4 text-white" />
+                    <Home className="w-5 h-5 md:w-4 md:h-4 text-white" />
                   </div>
                   <span className="font-semibold text-base text-gray-900">Claims App</span>
                 </Link>
@@ -585,7 +585,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
                   style={{background: 'linear-gradient(90deg, rgba(0, 122, 255, 0.5) 0%, rgba(0, 91, 181, 0.5) 100%)'}}
                   aria-label="Claims App home"
                 >
-                  <Home className="w-4 h-4 text-white" />
+                  <Home className="w-5 h-5 md:w-4 md:h-4 text-white" />
                 </Link>
               )}
             </div>
@@ -599,7 +599,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
                   aria-label="Collapse sidebar"
                   title="Collapse sidebar"
                 >
-                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                  <ChevronRight className="w-5 h-5 md:w-4 md:h-4 text-gray-600" />
                 </button>
               )}
               
@@ -610,26 +610,30 @@ export const SidebarV2 = memo<SidebarV2Props>(({
                   aria-label="Close sidebar"
                   title="Close sidebar"
                 >
-                  <X className="w-4 h-4 text-gray-600" />
+                  <X className="w-5 h-5 md:w-4 md:h-4 text-gray-600" />
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {navigationContent}
+        {/* Main Content - Scrollable area that respects profile section */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 min-h-0">
+          <div className="pb-4"> {/* Add padding bottom to prevent content cutoff */}
+            {navigationContent}
+          </div>
         </div>
 
-        {/* User Profile */}
+        {/* User Profile - Always visible at bottom */}
         {showProfile && (
-          <SidebarProfileV2
-            userInfo={userInfo}
-            isCollapsed={isCollapsed}
-            theme={currentTheme}
-            onSignOut={() => console.log('Sign out clicked')}
-          />
+          <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700">
+            <SidebarProfileV2
+              userInfo={userInfo}
+              isCollapsed={isCollapsed}
+              theme={currentTheme}
+              onSignOut={() => console.log('Sign out clicked')}
+            />
+          </div>
         )}
       </aside>
     </>

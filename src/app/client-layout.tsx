@@ -37,13 +37,13 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         showProfile={true}
       />
 
-      {/* Floating Hamburger Menu Button */}
+      {/* Floating Hamburger Menu Button - Mobile Optimized */}
       <button
         onClick={toggle}
-        className="fixed top-4 left-4 z-50 p-2.5 bg-white/90 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-200/60 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+        className="fixed top-4 left-4 z-50 p-3 md:p-2.5 bg-white/90 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-200/60 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[44px] md:min-h-[40px] min-w-[44px] md:min-w-[40px]"
         aria-label="Toggle navigation menu"
       >
-        <Menu className="w-5 h-5 text-gray-600" />
+        <Menu className="w-6 h-6 md:w-5 md:h-5 text-gray-600" />
       </button>
 
       {/* Main Content Area */}

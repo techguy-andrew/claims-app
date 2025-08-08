@@ -90,24 +90,110 @@
   --border-color-strong: var(--color-gray-600);
 }
 
-/* Base Styles */
+/* Mobile-First Typography Scale */
+:root {
+  /* Mobile font sizes */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.8125rem;   /* 13px - improved mobile readability */
+  --text-base: 0.9375rem; /* 15px - base mobile text size */
+  --text-lg: 1.0625rem;   /* 17px */
+  --text-xl: 1.1875rem;   /* 19px */
+  --text-2xl: 1.375rem;   /* 22px */
+  --text-3xl: 1.625rem;   /* 26px */
+  --text-4xl: 2rem;       /* 32px */
+  
+  /* Mobile line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  
+  /* Mobile spacing scale */
+  --spacing-touch: 12px;  /* Minimum spacing between touch targets */
+}
+
+/* Desktop typography adjustments */
+@media (min-width: 768px) {
+  :root {
+    --text-xs: 0.75rem;     /* 12px */
+    --text-sm: 0.75rem;     /* 12px */
+    --text-base: 0.875rem;  /* 14px */
+    --text-lg: 1rem;        /* 16px */
+    --text-xl: 1.125rem;    /* 18px */
+    --text-2xl: 1.25rem;    /* 20px */
+    --text-3xl: 1.5rem;     /* 24px */
+    --text-4xl: 1.875rem;   /* 30px */
+  }
+}
+
+/* Base Styles - Mobile First */
 * {
   box-sizing: border-box;
+  /* Improve touch scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
 }
 
 html {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  line-height: 1.5;
+  line-height: var(--leading-normal);
+  font-size: var(--text-base);
+  /* Improve text rendering on mobile */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent zoom on input focus on iOS */
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+  /* Improve mobile touch performance */
+  touch-action: manipulation;
+  /* Better mobile text rendering */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile-first touch optimizations */
+button, a, [role="button"] {
+  /* Improve touch responsiveness */
+  touch-action: manipulation;
+  /* Remove default touch highlight on iOS */
+  -webkit-tap-highlight-color: transparent;
+  /* Ensure minimum touch target size on mobile */
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Desktop adjustments for touch targets */
+@media (min-width: 768px) {
+  button, a, [role="button"] {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Mobile input optimizations */
+input, textarea, select {
+  /* Prevent zoom on focus on iOS */
+  font-size: 16px;
+  /* Better mobile styling */
+  -webkit-appearance: none;
+  border-radius: var(--radius-md);
+}
+
+/* Desktop input adjustments */
+@media (min-width: 768px) {
+  input, textarea, select {
+    font-size: var(--text-sm);
+  }
+}
+
+/* Mobile-first spacing utilities */
+.mobile-spacing {
+  padding: var(--spacing-touch);
+}
+
+.mobile-gap {
+  gap: var(--spacing-touch);
 }
 
 /* Focus styles for accessibility */
