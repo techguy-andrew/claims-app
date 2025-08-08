@@ -48,6 +48,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       >
         <Menu className="w-5 h-5 text-gray-700" />
       </button>
+      
+      {/* Debug indicator */}
+      <div className="fixed top-20 left-6 z-50 p-2 bg-red-500 text-white text-xs rounded">
+        isOpen: {isOpen ? 'true' : 'false'} | layout: {layout} | isDesktop: {isDesktop ? 'true' : 'false'}
+      </div>
 
       {/* Main Content Area */}
       <main 
@@ -67,8 +72,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <NavigationProvider
       defaultSettings={{
-        persistCollapsedState: true,
-        autoCollapseOnMobile: true,
+        persistCollapsedState: false,
+        autoCollapseOnMobile: false,
         defaultSidebarLayout: 'overlay',
         defaultTheme: 'light',
       }}
