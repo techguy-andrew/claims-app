@@ -40,6 +40,14 @@ export function ItemTagModal({
     details: ''
   })
 
+  // Reset form state
+  const resetForm = useCallback(() => {
+    setSearchTerm('')
+    setShowCreateForm(false)
+    setNewItemForm({ itemName: '', details: '' })
+    setError(null)
+  }, [])
+
   // Filter items based on search term
   const filteredItems = useMemo(() => {
     if (!searchTerm.trim()) return items
@@ -93,14 +101,6 @@ export function ItemTagModal({
       setLoading(false)
     }
   }, [file, newItemForm, onCreateItem, onTagFile, onClose, resetForm])
-
-  // Reset form state
-  const resetForm = useCallback(() => {
-    setSearchTerm('')
-    setShowCreateForm(false)
-    setNewItemForm({ itemName: '', details: '' })
-    setError(null)
-  }, [])
 
   // Handle modal close
   const handleClose = useCallback(() => {
