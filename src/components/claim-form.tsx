@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { RefreshCw, Wand2 } from 'lucide-react'
+import { RefreshCw, Wand2, FileText } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
@@ -145,8 +145,8 @@ export function ClaimForm({
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100/50">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="enterprise-card p-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {/* Claim Number */}
         <Field 
           label="Claim Number" 
@@ -165,9 +165,11 @@ export function ClaimForm({
             />
             <Button
               type="button"
-              variant="secondary"
+              variant="modern"
+              size="small"
               onClick={handleGenerateClaimNumber}
               disabled={loading}
+              className="touch-target-lg"
             >
               <Wand2 className="h-4 w-4" />
             </Button>
@@ -175,8 +177,13 @@ export function ClaimForm({
         </Field>
 
         {/* Insurance Information Section */}
-        <div className="border-t pt-6 mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Insurance Information</h3>
+        <div className="border-t border-gray-100/60 pt-8 mt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="thumbnail-modern p-2.5 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-gray-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Insurance Information</h3>
+          </div>
           
           <div className="space-y-4">
             <Field 
@@ -224,8 +231,13 @@ export function ClaimForm({
         </div>
 
         {/* Client Information Section */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Client Information</h3>
+        <div className="border-t border-gray-100/60 pt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="thumbnail-modern p-2.5 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-gray-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Client Information</h3>
+          </div>
           
           <div className="space-y-4">
             <Field 
@@ -273,8 +285,13 @@ export function ClaimForm({
         </div>
 
         {/* Status Section */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Claim Status</h3>
+        <div className="border-t border-gray-100/60 pt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="thumbnail-modern p-2.5 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-gray-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Claim Status</h3>
+          </div>
           
           <Field label="Status">
             <Select
@@ -286,12 +303,13 @@ export function ClaimForm({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 pt-6 border-t">
+        <div className="flex gap-4 pt-8 border-t border-gray-100/60">
           <Button
             type="submit"
             variant="primary"
             loading={loading}
-            className="flex-1"
+            className="flex-1 touch-target-lg"
+            size="large"
           >
             {loading ? (
               <>
@@ -305,10 +323,11 @@ export function ClaimForm({
           
           <Button
             type="button"
-            variant="secondary"
+            variant="modern"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 touch-target-lg"
+            size="large"
           >
             {cancelText}
           </Button>

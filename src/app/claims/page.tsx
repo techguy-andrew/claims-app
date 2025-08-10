@@ -71,22 +71,22 @@ function useDebounce(value: string, delay: number) {
   return debouncedValue
 }
 
-// Clean empty state component
+// Clean empty state component - Mobile Optimized
 const EmptyState = () => (
   <div className="text-center py-12 px-4">
-    <div className="bg-white rounded-lg border border-gray-200 p-12 shadow-lg max-w-lg mx-auto">
-      <div className="p-4 bg-gray-50 rounded-lg w-fit mx-auto mb-6">
-        <FileText className="h-8 w-8 text-gray-600" />
+    <div className="enterprise-card p-8 md:p-12 max-w-lg mx-auto">
+      <div className="thumbnail-modern p-4 mx-auto mb-6 flex items-center justify-center min-h-[56px] min-w-[56px]">
+        <FileText className="h-9 w-9 md:h-8 md:w-8 text-gray-600" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">No claims yet</h3>
-      <p className="text-sm text-gray-600 mb-6">Get started by creating your first claim</p>
+      <h3 className="text-xl font-semibold text-gray-900 mb-4 md:mb-3 leading-tight">No claims yet</h3>
+      <p className="text-sm text-gray-600 mb-8 md:mb-6 leading-relaxed">Get started by creating your first claim</p>
       <Button 
         onClick={() => window.location.href = '/claims/new'}
         variant="modern"
-        size="small"
-        className="mx-auto"
+        size="large"
+        className="mx-auto touch-target-lg w-full sm:w-auto"
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="h-5 w-5" />
         Create First Claim
       </Button>
     </div>
@@ -186,59 +186,65 @@ function ClaimsPageContent() {
       {/* Claims content */}
       <main className="px-4 sm:px-6 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Page Header */}
+          {/* Page Header - Mobile Optimized */}
           <div className="mb-8">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-lg font-semibold text-gray-900 mb-1">Claims</h1>
-                  <p className="text-sm text-gray-600">Manage and track insurance claims</p>
+            <div className="enterprise-card p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="thumbnail-modern p-3 flex items-center justify-center min-h-[48px] md:min-h-[44px] min-w-[48px] md:min-w-[44px]">
+                    <FileText className="h-7 w-7 md:h-6 md:w-6 text-gray-600" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl md:text-xl font-semibold text-gray-900 mb-2 md:mb-1 tracking-tight leading-tight">Claims</h1>
+                    <p className="text-sm text-gray-600 leading-relaxed">Manage and track insurance claims</p>
+                  </div>
                 </div>
                 <Button 
                   onClick={() => router.push('/claims/new')}
                   variant="modern"
-                  size="small"
+                  size="large"
+                  className="touch-target-lg w-full sm:w-auto"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-5 w-5" />
                   New Claim
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative">
+          {/* Search Bar - Mobile Optimized */}
+          <div className="mb-8">
+            <div className="enterprise-card-sm p-4 md:p-3">
               <Input
                 type="text"
-                placeholder="Search claims by number, client, company, adjustor..."
+                placeholder="Search claims..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                leftIcon={<Search className="h-4 w-4" />}
+                leftIcon={<Search className="h-5 w-5 md:h-4 md:w-4" />}
                 rightIcon={searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="hover:bg-gray-100 rounded-lg p-1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="touch-target-lg hover:bg-gray-100 active:bg-gray-200 rounded-xl p-2 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-5 w-5 md:h-4 md:w-4" />
                   </button>
                 )}
-                className="bg-white border border-gray-200 rounded-lg text-sm py-3 px-4 shadow-lg focus:shadow-xl transition-all duration-200"
+                className="bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-xl focus:bg-white/80 transition-all duration-200"
               />
             </div>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-2 mb-8">
+          {/* Filter Buttons - Mobile Optimized */}
+          <div className="flex flex-wrap gap-3 mb-8">
             {FILTER_STATUSES.map((status) => (
               <button
                 key={status}
                 onClick={() => setActiveStatus(status)}
                 className={`
-                  px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                  px-5 py-3.5 md:px-4 md:py-3 rounded-xl text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/30 touch-target-lg min-h-[48px] md:min-h-[44px] active:scale-95
                   ${activeStatus === status
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                    ? 'bg-blue-50/90 text-blue-700 border border-blue-200/80 shadow-sm backdrop-blur-sm'
+                    : 'bg-white/80 text-gray-700 border border-gray-200/60 hover:bg-white/95 active:bg-gray-50 backdrop-blur-sm'
                   }
                 `}
               >
@@ -249,18 +255,18 @@ function ClaimsPageContent() {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-lg max-w-md mx-auto">
+              <div className="enterprise-card p-12 max-w-md mx-auto">
                 <p className="text-sm text-gray-700">Loading claims...</p>
               </div>
             </div>
           ) : error ? (
             <div className="text-center py-12">
-              <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-lg max-w-md mx-auto">
-                <p className="text-sm text-red-600 mb-4">Error loading claims: {error}</p>
+              <div className="enterprise-card p-12 max-w-md mx-auto">
+                <p className="text-sm text-red-600 mb-6 leading-relaxed">Error loading claims: {error}</p>
                 <Button
                   onClick={fetchClaims}
                   variant="modern"
-                  size="small"
+                  className="touch-target-lg"
                 >
                   Try Again
                 </Button>
@@ -270,25 +276,25 @@ function ClaimsPageContent() {
           <EmptyState />
           ) : filteredClaims.length === 0 ? (
             <div className="text-center py-12 px-4">
-              <div className="bg-white rounded-lg border border-gray-200 p-12 shadow-lg max-w-lg mx-auto">
-                <div className="p-4 bg-gray-50 rounded-lg w-fit mx-auto mb-6">
+              <div className="enterprise-card p-12 max-w-lg mx-auto">
+                <div className="thumbnail-modern p-4 mx-auto mb-6 flex items-center justify-center">
                   <Search className="h-8 w-8 text-gray-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
                   {debouncedSearchTerm ? "No matching claims found" : "No claims match this status"}
                 </h3>
-                <p className="text-sm text-gray-600 mb-6">
+                <p className="text-sm text-gray-600 mb-8 leading-relaxed">
                   {debouncedSearchTerm 
                     ? `Try adjusting your search "${debouncedSearchTerm}" or clearing filters`
                     : "Try selecting a different filter or create a new claim"
                   }
                 </p>
-                <div className="flex flex-wrap gap-3 justify-center">
+                <div className="flex flex-wrap gap-4 justify-center">
                   {debouncedSearchTerm && (
                     <Button 
                       onClick={() => setSearchTerm("")}
                       variant="modern"
-                      size="small"
+                      className="touch-target-lg"
                     >
                       Clear Search
                     </Button>
@@ -297,7 +303,7 @@ function ClaimsPageContent() {
                     <Button 
                       onClick={() => setActiveStatus("All")}
                       variant={debouncedSearchTerm ? "secondary" : "modern"}
-                      size="small"
+                      className="touch-target-lg"
                     >
                       Show All Statuses
                     </Button>
@@ -305,7 +311,7 @@ function ClaimsPageContent() {
                   <Button 
                     onClick={() => router.push('/claims/new')}
                     variant="modern"
-                    size="small"
+                    className="touch-target-lg"
                   >
                     Create New Claim
                   </Button>

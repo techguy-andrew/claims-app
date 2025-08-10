@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
-import { Upload, File, Trash2, Link2, Unlink, AlertCircle, CheckCircle, FileText, Eye, Download } from 'lucide-react'
+import React, { useState, useCallback, useRef } from 'react'
+import { Upload, File, Trash2, AlertCircle, CheckCircle, FileText, Eye, Download, MoreVertical, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ClaimItem, ClaimFile } from './claim-items-section'
 import { SimplePDFModal } from './simple-pdf-modal'
 import { SimpleImageModal } from './simple-image-modal'
+import { ItemTagModal } from './item-tag-modal'
 
 // Re-export for external usage
 export type { ClaimFile }
@@ -30,9 +31,11 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
   const [success, setSuccess] = useState<string | null>(null)
   const [viewingPDF, setViewingPDF] = useState<ClaimFile | null>(null)
   const [viewingImage, setViewingImage] = useState<ClaimFile | null>(null)
+  const [activeActionMenu, setActiveActionMenu] = useState<string | null>(null)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null)
+  const [tagModalFile, setTagModalFile] = useState<ClaimFile | null>(null)
+  const menuButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const unassignedFiles = files.filter(file => !file.item)
 
   // Clear messages after timeout
   const clearMessages = useCallback(() => {
@@ -235,87 +238,6 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
     }
   }, [handleFileUpload])
 
-  // Assign file to item
-  const handleAssignToItem = useCallback(async (fileId: string, itemId: string) => {
-    setLoading(fileId)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/claims/${claimId}/files/${fileId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to assign file to item')
-      }
-
-      const updatedFile = await response.json()
-      
-      // Update files list
-      onFilesChange(files.map(file => file.id === fileId ? updatedFile : file))
-      
-      // Update items list to include the new file
-      const targetItem = items.find(item => item.id === itemId)
-      if (targetItem) {
-        const updatedItems = items.map(item => 
-          item.id === itemId 
-            ? { ...item, files: [...item.files, updatedFile] }
-            : item
-        )
-        onItemsChange(updatedItems)
-      }
-
-      setSuccess('File assigned to item successfully')
-      clearMessages()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to assign file')
-      clearMessages()
-    } finally {
-      setLoading(null)
-    }
-  }, [claimId, files, items, onFilesChange, onItemsChange, clearMessages])
-
-  // Unassign file from item
-  const handleUnassignFromItem = useCallback(async (fileId: string) => {
-    setLoading(fileId)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/claims/${claimId}/files/${fileId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId: null })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to unassign file')
-      }
-
-      const updatedFile = await response.json()
-      
-      // Update files list
-      onFilesChange(files.map(file => file.id === fileId ? updatedFile : file))
-      
-      // Update items list to remove the file
-      const updatedItems = items.map(item => ({
-        ...item,
-        files: item.files.filter(file => file.id !== fileId)
-      }))
-      onItemsChange(updatedItems)
-
-      setSuccess('File unassigned successfully')
-      clearMessages()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to unassign file')
-      clearMessages()
-    } finally {
-      setLoading(null)
-    }
-  }, [claimId, files, items, onFilesChange, onItemsChange, clearMessages])
 
   // Delete file
   const handleDeleteFile = useCallback(async (fileId: string) => {
@@ -325,6 +247,7 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
 
     setLoading(fileId)
     setError(null)
+    setActiveActionMenu(null)
 
     try {
       const response = await fetch(`/api/claims/${claimId}/files/${fileId}`, {
@@ -356,6 +279,198 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
     }
   }, [claimId, files, items, onFilesChange, onItemsChange, clearMessages])
 
+  // Handle tagging file to item
+  const handleTagFile = useCallback(async (fileId: string, itemId: string | null) => {
+    setLoading(fileId)
+    setError(null)
+    
+    try {
+      const response = await fetch(`/api/claims/${claimId}/files/${fileId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to tag file')
+      }
+
+      const updatedFile = await response.json()
+      
+      // Update files list
+      onFilesChange(files.map(file => file.id === fileId ? updatedFile : file))
+      
+      // Update items list to reflect new file assignments
+      const updatedItems = items.map(item => {
+        // Remove file from its current item
+        const filesWithoutThis = item.files.filter(f => f.id !== fileId)
+        
+        if (itemId && item.id === itemId) {
+          // Add file to the target item
+          return { ...item, files: [...filesWithoutThis, updatedFile] }
+        } else {
+          // Just remove the file if it was previously assigned to this item
+          return { ...item, files: filesWithoutThis }
+        }
+      })
+      onItemsChange(updatedItems)
+
+      setSuccess(itemId ? 'File tagged successfully' : 'File tag removed successfully')
+      clearMessages()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to tag file')
+      clearMessages()
+    } finally {
+      setLoading(null)
+    }
+  }, [claimId, files, items, onFilesChange, onItemsChange, clearMessages])
+
+  // Handle creating new item
+  const handleCreateItem = useCallback(async (itemName: string, details?: string): Promise<ClaimItem> => {
+    const response = await fetch(`/api/claims/${claimId}/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        itemName: itemName.trim(),
+        details: details?.trim() || null
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to create item')
+    }
+
+    const newItem = await response.json()
+    onItemsChange([...items, newItem])
+    return newItem
+  }, [claimId, items, onItemsChange])
+
+  // Toggle floating menu and calculate position
+  const toggleFloatingMenu = useCallback((fileId: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    if (activeActionMenu === fileId) {
+      setActiveActionMenu(null)
+      setMenuPosition(null)
+      return
+    }
+
+    const button = event.currentTarget
+    const rect = button.getBoundingClientRect()
+    const menuWidth = 160
+    const menuHeight = 140 // Approximate height for 3 menu items
+    
+    let top = rect.bottom + 8
+    let right = window.innerWidth - rect.right
+    
+    // Flip vertically if too close to bottom
+    if (top + menuHeight > window.innerHeight - 20) {
+      top = rect.top - menuHeight - 8
+    }
+    
+    // Flip horizontally if too close to left edge
+    if (right + menuWidth > window.innerWidth - 20) {
+      right = 20
+    }
+    
+    setMenuPosition({ top, right })
+    setActiveActionMenu(fileId)
+  }, [activeActionMenu])
+
+  // Handle action menu actions
+  const handleActionMenuAction = useCallback((action: string, file: ClaimFile) => {
+    setActiveActionMenu(null)
+    setMenuPosition(null)
+    
+    switch (action) {
+      case 'view':
+        if (file.fileType === 'image') {
+          handleViewImage(file)
+        } else if (file.fileType === 'pdf') {
+          handleViewPDF(file)
+        } else {
+          window.open(file.fileUrl, '_blank')
+        }
+        break
+      case 'tag':
+        setTagModalFile(file)
+        break
+      case 'download':
+        handleDownloadFile(file)
+        break
+      case 'delete':
+        handleDeleteFile(file.id)
+        break
+    }
+  }, [handleViewImage, handleViewPDF, handleDownloadFile, handleDeleteFile])
+
+  // Close floating menu when clicking outside
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    const target = event.target as Element
+    if (!target.closest('.floating-menu') && !target.closest('.menu-button')) {
+      setActiveActionMenu(null)
+      setMenuPosition(null)
+    }
+  }, [])
+
+  // Setup click outside listener
+  React.useEffect(() => {
+    if (activeActionMenu) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [activeActionMenu, handleClickOutside])
+
+  // Floating Context Menu Component
+  const FloatingContextMenu = ({ file }: { file: ClaimFile }) => {
+    if (!menuPosition || activeActionMenu !== file.id) return null
+
+    return (
+      <div 
+        className="floating-menu fixed z-50 bg-white/95 backdrop-blur-md border border-gray-200/80 rounded-xl shadow-lg min-w-[160px] p-1 transition-all duration-200 opacity-100 scale-100"
+        style={{
+          top: `${menuPosition.top}px`,
+          right: `${menuPosition.right}px`
+        }}
+      >
+        <button
+          onClick={() => handleActionMenuAction('view', file)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
+        >
+          <Eye className="h-4 w-4 text-gray-600" />
+          <span className="text-sm font-medium">View</span>
+        </button>
+        
+        <button
+          onClick={() => handleActionMenuAction('tag', file)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
+        >
+          <Tag className="h-4 w-4 text-gray-600" />
+          <span className="text-sm font-medium">Tag Item</span>
+        </button>
+        
+        <button
+          onClick={() => handleActionMenuAction('download', file)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
+        >
+          <Download className="h-4 w-4 text-gray-600" />
+          <span className="text-sm font-medium">Download</span>
+        </button>
+        
+        <button
+          onClick={() => handleActionMenuAction('delete', file)}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50/80 transition-colors duration-150 text-left text-red-600"
+        >
+          <Trash2 className="h-4 w-4 text-red-500" />
+          <span className="text-sm font-medium">Delete</span>
+        </button>
+      </div>
+    )
+  }
+
+  // Sort files by most recent first
+  const sortedFiles = [...files].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
+
   return (
     <div className="space-y-6">
       {/* Section Header */}
@@ -367,7 +482,7 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
           <div>
             <h2 className="text-sm font-medium text-gray-900">Files & Documents</h2>
             <p className="text-xs text-gray-600">
-              {files.length} total files • {unassignedFiles.length} unassigned
+              {files.length} files uploaded
             </p>
           </div>
         </div>
@@ -450,261 +565,95 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
             <p className="text-sm font-medium text-gray-900 mb-1">
               {isDragOver ? 'Drop files here' : 'Drag and drop files here'}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 mb-2">
               Or click &quot;Upload Files&quot; to browse • Supports images (50MB), PDFs (10MB), and documents
             </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-blue-600 bg-blue-50/50 rounded-lg px-3 py-2 mt-2">
+              <Tag className="h-3 w-3" />
+              <span>Tip: Add <code className="bg-blue-100 px-1 rounded">#ItemName</code> to filename for auto-tagging (e.g., <code className="bg-blue-100 px-1 rounded">kitchen_damage_#DiningTable.jpg</code>)</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Unassigned Files */}
-      {unassignedFiles.length > 0 && (
+      {/* Unified Files List */}
+      {sortedFiles.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-            <Unlink className="h-4 w-4 text-gray-600" />
-            Unassigned Files ({unassignedFiles.length})
-          </h3>
-          
-          <div className="space-y-3">
-            {unassignedFiles.map((file) => (
-              <div key={file.id} className="bg-white rounded-lg border border-gray-200 p-3 shadow-lg hover:shadow-xl transition-all duration-200">
-                <div className="flex items-center gap-3">
-                  {/* File Icon */}
-                  <div className="flex-shrink-0">
-                    {file.fileType === 'image' ? (
-                      <div 
-                        className="w-10 h-10 bg-gray-50 rounded-lg border flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-                        onClick={() => handleViewImage(file)}
-                        title="View image"
-                      >
-                        <img
-                          src={file.fileUrl}
-                          alt={file.fileName}
-                          className="w-8 h-8 object-cover rounded"
-                        />
-                      </div>
-                    ) : (
-                      <div 
-                        className="w-10 h-10 bg-gray-50 rounded-lg border flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-                        onClick={() => {
-                          if (file.fileType === 'pdf') {
-                            handleViewPDF(file)
-                          } else {
-                            window.open(file.fileUrl, '_blank')
-                          }
-                        }}
-                        title={file.fileType === 'pdf' ? 'View PDF in app' : 'Open file'}
-                      >
-                        {file.fileType === 'pdf' ? (
-                          <FileText className="h-4 w-4 text-gray-600" />
-                        ) : (
-                          <File className="h-4 w-4 text-gray-600" />
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* File Info */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-gray-900 truncate">{file.fileName}</h4>
-                    <p className="text-xs text-gray-600">
-                      {new Date(file.uploadedAt).toLocaleDateString()} • {file.fileType.toUpperCase()}
-                    </p>
-                  </div>
-
-                  {/* Assignment Dropdown - Mobile First */}
-                  <div className="flex-shrink-0">
-                    <select
-                      className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors duration-200"
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleAssignToItem(file.id, e.target.value)
-                        }
-                      }}
-                      disabled={loading === file.id}
-                      defaultValue=""
-                    >
-                      <option value="">Assign...</option>
-                      {items.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.itemName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-1">
-                    {file.fileType === 'pdf' && (
-                      <button
-                        onClick={() => handleViewPDF(file)}
-                        disabled={loading === file.id}
-                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200 text-gray-600 hover:text-gray-900 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                        title="View PDF"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDownloadFile(file)}
-                      disabled={loading === file.id}
-                      className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200 text-gray-600 hover:text-gray-900 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      title="Download file"
-                    >
-                      <Download className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFile(file.id)}
-                      disabled={loading === file.id}
-                      className="p-1 hover:bg-red-50 rounded-lg transition-colors duration-200 text-gray-600 hover:text-red-600 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                      title="Delete file"
-                    >
-                      {loading === file.id ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-gray-900">Files</h3>
+            <p className="text-sm text-gray-600">
+              {files.length} files • {files.filter(f => f.item).length} tagged
+            </p>
           </div>
-        </div>
-      )}
-
-      {/* All Files */}
-      {files.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-            <File className="h-4 w-4 text-gray-600" />
-            All Files ({files.length})
-          </h3>
           
-          <div className="space-y-3">
-            {files.map((file) => (
-              <div key={file.id} className="bg-white rounded-lg border border-gray-200 p-3 shadow-lg hover:shadow-xl transition-all duration-200">
-                <div className="flex items-center gap-3">
-                  {/* File Icon */}
-                  <div className="flex-shrink-0">
+          <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+            {sortedFiles.map((file, index) => (
+              <div key={file.id} className={`relative flex items-center p-4 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-200 ${index !== sortedFiles.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                {/* File Thumbnail */}
+                <div className="flex-shrink-0 mr-4">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                       onClick={() => {
+                         if (file.fileType === 'image') {
+                           handleViewImage(file)
+                         } else if (file.fileType === 'pdf') {
+                           handleViewPDF(file)
+                         } else {
+                           window.open(file.fileUrl, '_blank')
+                         }
+                       }}>
                     {file.fileType === 'image' ? (
-                      <div 
-                        className="w-10 h-10 bg-gray-50 rounded-lg border flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-                        onClick={() => handleViewImage(file)}
-                        title="View image"
-                      >
-                        <img
-                          src={file.fileUrl}
-                          alt={file.fileName}
-                          className="w-8 h-8 object-cover rounded"
-                        />
-                      </div>
+                      <img
+                        src={file.fileUrl}
+                        alt={file.fileName}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
-                      <div 
-                        className="w-10 h-10 bg-gray-50 rounded-lg border flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-                        onClick={() => {
-                          if (file.fileType === 'pdf') {
-                            handleViewPDF(file)
-                          } else {
-                            window.open(file.fileUrl, '_blank')
-                          }
-                        }}
-                        title={file.fileType === 'pdf' ? 'View PDF in app' : 'Open file'}
-                      >
+                      <div className="w-full h-full flex items-center justify-center">
                         {file.fileType === 'pdf' ? (
-                          <FileText className="h-4 w-4 text-gray-600" />
+                          <FileText className="h-7 w-7 text-gray-500" />
                         ) : (
-                          <File className="h-4 w-4 text-gray-600" />
+                          <File className="h-7 w-7 text-gray-500" />
                         )}
                       </div>
                     )}
                   </div>
+                </div>
 
-                  {/* File Info */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-gray-900 truncate">{file.fileName}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs text-gray-600">
-                        {new Date(file.uploadedAt).toLocaleDateString()} • {file.fileType.toUpperCase()}
-                      </p>
-                      {file.item && (
-                        <div className="flex items-center gap-1">
-                          <Link2 className="h-3 w-3 text-blue-500" />
-                          <span className="text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-medium">
-                            {file.item.itemName}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Assignment/Unassign Control */}
-                  <div className="flex-shrink-0">
-                    {file.item ? (
-                      <button
-                        onClick={() => handleUnassignFromItem(file.id)}
-                        disabled={loading === file.id}
-                        className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 transition-colors duration-200 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                        title="Unassign from item"
-                      >
-                        <Unlink className="h-3 w-3 inline mr-1" />
-                        Unassign
-                      </button>
-                    ) : (
-                      <select
-                        className="text-xs px-2 py-1 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors duration-200"
-                        onChange={(e) => {
-                          if (e.target.value) {
-                            handleAssignToItem(file.id, e.target.value)
-                          }
-                        }}
-                        disabled={loading === file.id}
-                        defaultValue=""
-                      >
-                        <option value="">Assign...</option>
-                        {items.map((item) => (
-                          <option key={item.id} value={item.id}>
-                            {item.itemName}
-                          </option>
-                        ))}
-                      </select>
+                {/* File Info */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-base font-medium text-gray-900 truncate mb-1">{file.fileName}</h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">
+                      {new Date(file.uploadedAt).toLocaleDateString()} • {file.fileType.toUpperCase()}
+                    </span>
+                    {file.item && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                        <Tag className="h-3 w-3 mr-1" />
+                        {file.item.itemName}
+                      </span>
                     )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-1">
-                    {file.fileType === 'pdf' && (
-                      <button
-                        onClick={() => handleViewPDF(file)}
-                        disabled={loading === file.id}
-                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200 text-gray-600 hover:text-gray-900 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                        title="View PDF"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDownloadFile(file)}
-                      disabled={loading === file.id}
-                      className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-200 text-gray-600 hover:text-gray-900 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                      title="Download file"
-                    >
-                      <Download className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFile(file.id)}
-                      disabled={loading === file.id}
-                      className="p-1 hover:bg-red-50 rounded-lg transition-colors duration-200 text-gray-600 hover:text-red-600 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
-                      title="Delete file"
-                    >
-                      {loading === file.id ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
-                    </button>
                   </div>
                 </div>
+
+                {/* Menu Button */}
+                <div className="flex-shrink-0">
+                  <button
+                    ref={(el) => { menuButtonRefs.current[file.id] = el }}
+                    onClick={(e) => toggleFloatingMenu(file.id, e)}
+                    disabled={loading === file.id}
+                    className="menu-button w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    title="More actions"
+                  >
+                    {loading === file.id ? (
+                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+                    ) : (
+                      <MoreVertical className="h-5 w-5 text-gray-600" />
+                    )}
+                  </button>
+                </div>
+
+                {/* Floating Context Menu */}
+                <FloatingContextMenu file={file} />
               </div>
             ))}
           </div>
@@ -745,6 +694,17 @@ export function ClaimFilesSection({ claimId, files, items, onFilesChange, onItem
         isOpen={!!viewingImage}
         onClose={handleCloseImageViewer}
       />
+
+      {/* Item Tag Modal */}
+      <ItemTagModal
+        isOpen={!!tagModalFile}
+        onClose={() => setTagModalFile(null)}
+        file={tagModalFile}
+        items={items}
+        onTagFile={handleTagFile}
+        onCreateItem={handleCreateItem}
+      />
+      
     </div>
   )
 }

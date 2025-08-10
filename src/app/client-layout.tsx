@@ -18,10 +18,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const getMainContentStyle = () => {
     const styles: React.CSSProperties = {};
     
-    // Always add top padding to prevent hamburger menu interference on all screen sizes
-    styles.paddingTop = '4rem'; // 64px to clear the hamburger button
+    // Mobile-first padding to prevent hamburger menu interference
+    styles.paddingTop = '4.5rem'; // 72px on mobile for better clearance
     
     return styles;
+  };
+
+  // Desktop adjustment via CSS
+  const desktopContentAdjustment = {
+    paddingTop: '4rem' // 64px on desktop
   };
 
   return (
@@ -37,18 +42,18 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         showProfile={true}
       />
 
-      {/* Floating Hamburger Menu Button - Mobile Optimized */}
+      {/* Floating Hamburger Menu Button - Ultra Mobile Optimized */}
       <button
         onClick={toggle}
-        className="fixed top-4 left-4 z-50 p-3 md:p-2.5 bg-white/90 backdrop-blur-xl rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-200/60 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/95 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[44px] md:min-h-[40px] min-w-[44px] md:min-w-[40px]"
+        className="fixed top-4 left-4 z-50 p-4 md:p-2.5 bg-white/95 backdrop-blur-xl rounded-2xl md:rounded-xl shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-200/60 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-white/98 active:scale-95 active:bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[52px] md:min-h-[40px] min-w-[52px] md:min-w-[40px] mobile-touch-feedback"
         aria-label="Toggle navigation menu"
       >
-        <Menu className="w-6 h-6 md:w-5 md:h-5 text-gray-600" />
+        <Menu className="w-6 h-6 md:w-5 md:h-5 text-gray-700" />
       </button>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Mobile First */}
       <main 
-        className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 transition-all duration-300"
+        className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 transition-all duration-300 md:pt-16"
         style={getMainContentStyle()}
       >
         {/* Decorative background elements */}

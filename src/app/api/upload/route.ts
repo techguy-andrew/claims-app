@@ -8,6 +8,17 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
+// Helper function to parse #Item tags from filename
+function parseItemTagFromFilename(filename: string): string | null {
+  // Match #ItemName pattern in filename (case insensitive)
+  // Supports: #Chair, #DiningTable, #Living Room Sofa, etc.
+  const tagMatch = filename.match(/#([^#\s][^#]*?)(?=\s|$|\.)/i)
+  if (tagMatch && tagMatch[1]) {
+    return tagMatch[1].trim()
+  }
+  return null
+}
+
 // POST /api/upload - Upload file to Cloudinary with optional claim context
 export async function POST(request: NextRequest) {
   let file: File | null = null
@@ -97,10 +108,40 @@ export async function POST(request: NextRequest) {
         // Import prisma here to avoid circular dependency issues
         const { prisma } = await import('@/lib/prisma')
         
+        // Parse #Item tags from filename
+        let resolvedItemId = itemId || null
+        const itemTag = parseItemTagFromFilename(file.name)
+        
+        if (itemTag && !resolvedItemId) {
+          // Try to find existing item with matching name
+          let existingItem = await prisma.claimItem.findFirst({
+            where: {
+              claimId,
+              itemName: {
+                equals: itemTag,
+                mode: 'insensitive'
+              }
+            }
+          })
+          
+          // If no matching item exists, create a new one
+          if (!existingItem) {
+            existingItem = await prisma.claimItem.create({
+              data: {
+                claimId,
+                itemName: itemTag,
+                details: `Auto-created from file tag: ${file.name}`
+              }
+            })
+          }
+          
+          resolvedItemId = existingItem.id
+        }
+        
         const fileRecord = await prisma.claimFile.create({
           data: {
             claimId,
-            itemId: itemId || null,
+            itemId: resolvedItemId,
             fileName: file.name,
             fileUrl: result.secure_url,
             fileType,
