@@ -24,10 +24,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     return styles;
   };
 
-  // Desktop adjustment via CSS
-  const desktopContentAdjustment = {
-    paddingTop: '4rem' // 64px on desktop
-  };
 
   return (
     <div className={`min-h-screen w-full relative ${theme === 'dark' ? 'dark' : ''}`}>

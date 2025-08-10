@@ -67,7 +67,7 @@ export function ItemTagModal({
     } finally {
       setLoading(false)
     }
-  }, [file, onTagFile, onClose])
+  }, [file, onTagFile, onClose, resetForm])
 
   // Handle creating new item and tagging file to it
   const handleCreateAndTag = useCallback(async () => {
@@ -92,7 +92,7 @@ export function ItemTagModal({
     } finally {
       setLoading(false)
     }
-  }, [file, newItemForm, onCreateItem, onTagFile, onClose])
+  }, [file, newItemForm, onCreateItem, onTagFile, onClose, resetForm])
 
   // Reset form state
   const resetForm = useCallback(() => {

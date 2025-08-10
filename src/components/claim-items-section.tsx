@@ -261,7 +261,7 @@ export function ClaimItemsSection({ claimId, items, onItemsChange }: ClaimItemsS
         handleDeleteItem(item.id)
         break
     }
-  }, [handleStartEdit, toggleItemExpansion, handleDeleteItem])
+  }, [handleStartEdit, handleDeleteItem])
 
   // Handle PDF viewing
   const handleViewPDF = useCallback((file: ClaimFile) => {
