@@ -9,13 +9,18 @@ import {
   MapPin,
   Edit,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Package
 } from 'lucide-react'
 import { InfoCard } from '@/components/info-card'
 import { ClaimForm } from '@/components/claim-form'
 import { ClaimFormData } from '@/lib/form-validation'
-import { ClaimItemsSection, ClaimItem } from '@/components/claim-items-section'
+import { ClaimItem } from '@/components/claim-items-section'
+import { ItemsCard } from '@/components/items-card'
 import { ClaimFilesSection, ClaimFile } from '@/components/claim-files-section'
+import { SimpleImageModal } from '@/components/simple-image-modal'
+import { SimplePDFModal } from '@/components/simple-pdf-modal'
 import { Button } from '@/components/ui/button'
 
 interface ClaimData {
@@ -70,9 +75,16 @@ export default function ClaimDetailsPage({
   const [updating, setUpdating] = useState(false)
   const [updateSuccess, setUpdateSuccess] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
+  const [expandedItem, setExpandedItem] = useState<string | null>(null)
+  const [viewingImage, setViewingImage] = useState<ClaimFile | null>(null)
+  const [viewingPDF, setViewingPDF] = useState<ClaimFile | null>(null)
+  const [itemsLoading, setItemsLoading] = useState<string | null>(null)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [claimId, setClaimId] = useState<string>('')
 
   useEffect(() => {
     params.then(({ id }) => {
+      setClaimId(id)
       fetchClaimData(id)
     })
   }, [params])
@@ -167,6 +179,129 @@ export default function ClaimDetailsPage({
       setUpdateError(err instanceof Error ? err.message : 'Failed to update claim')
     } finally {
       setUpdating(false)
+    }
+  }
+
+  // Items handlers
+  const handleEditItem = (item: ClaimItem) => {
+    // TODO: Implement edit item functionality
+    console.log('Edit item:', item)
+  }
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!confirm('Are you sure you want to delete this item? Associated files will become unassigned.')) {
+      return
+    }
+
+    setItemsLoading(itemId)
+
+    try {
+      const response = await fetch(`/api/claims/${claim?.id}/items/${itemId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete item')
+      }
+
+      setItems(items.filter(item => item.id !== itemId))
+    } catch (err) {
+      console.error('Failed to delete item:', err)
+      alert('Failed to delete item')
+    } finally {
+      setItemsLoading(null)
+    }
+  }
+
+  const handleViewFile = (file: ClaimFile) => {
+    if (file.fileType === 'image') {
+      setViewingImage(file)
+    } else if (file.fileType === 'pdf') {
+      setViewingPDF(file)
+    } else {
+      window.open(file.fileUrl, '_blank')
+    }
+  }
+
+  const handleDownloadFile = async (file: ClaimFile) => {
+    try {
+      const link = document.createElement('a')
+      link.href = `/api/download/${file.id}`
+      link.download = file.fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Download failed:', error)
+      alert('Failed to download file')
+    }
+  }
+
+  const handleUntagFile = async (fileId: string) => {
+    if (!claim) return
+    
+    setItemsLoading(fileId)
+    
+    try {
+      const response = await fetch(`/api/claims/${claim.id}/files/${fileId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: null })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to untag file')
+      }
+
+      // Remove file from all items
+      const updatedItems = items.map(item => ({
+        ...item,
+        files: item.files.filter(f => f.id !== fileId)
+      }))
+      setItems(updatedItems)
+    } catch (err) {
+      console.error('Failed to untag file:', err)
+      alert('Failed to untag file')
+    } finally {
+      setItemsLoading(null)
+    }
+  }
+
+  const handleDeleteFile = async (fileId: string) => {
+    if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+      return
+    }
+
+    if (!claim) return
+    
+    setItemsLoading(fileId)
+
+    try {
+      const response = await fetch(`/api/claims/${claim.id}/files/${fileId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete file')
+      }
+
+      // Remove file from all items
+      const updatedItems = items.map(item => ({
+        ...item,
+        files: item.files.filter(f => f.id !== fileId)
+      }))
+      setItems(updatedItems)
+      
+      // Also update files list if we're displaying it separately
+      setFiles(files.filter(f => f.id !== fileId))
+    } catch (err) {
+      console.error('Failed to delete file:', err)
+      alert('Failed to delete file')
+    } finally {
+      setItemsLoading(null)
     }
   }
 
@@ -328,11 +463,76 @@ export default function ClaimDetailsPage({
 
             {/* Items Section */}
             <div className="mb-8">
-              <ClaimItemsSection
-                claimId={claim.id}
-                items={items}
-                onItemsChange={setItems}
-              />
+              <div className="space-y-6">
+                {/* Section Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-50 rounded-lg">
+                      <Package className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-medium text-gray-900">Items & Inventory</h2>
+                      <p className="text-xs text-gray-600">
+                        {items.length} items documented
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setShowAddForm(true)}
+                      variant="modern"
+                      size="small"
+                      disabled={showAddForm}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Item
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Items List */}
+                {items.length > 0 ? (
+                  <div className="space-y-4">
+                    {items.map((item) => (
+                      <ItemsCard
+                        key={item.id}
+                        item={item}
+                        claimId={claimId}
+                        isExpanded={expandedItem === item.id}
+                        onToggleExpanded={(itemId) => {
+                          setExpandedItem(expandedItem === itemId ? null : itemId)
+                        }}
+                        onEdit={handleEditItem}
+                        onDelete={handleDeleteItem}
+                        onViewFile={handleViewFile}
+                        onDownloadFile={handleDownloadFile}
+                        onUntagFile={handleUntagFile}
+                        onDeleteFile={handleDeleteFile}
+                        loading={itemsLoading === item.id}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 px-4">
+                    <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
+                      <div className="p-3 bg-gray-50 rounded-lg w-fit mx-auto mb-4">
+                        <Package className="h-6 w-6 text-gray-600" />
+                      </div>
+                      <h3 className="text-sm font-medium text-gray-900 mb-2">No items added yet</h3>
+                      <p className="text-sm text-gray-600 mb-4">Start documenting damaged or claimed items</p>
+                      <Button
+                        onClick={() => setShowAddForm(true)}
+                        variant="modern"
+                        size="small"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Your First Item
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Files Section */}
@@ -349,6 +549,19 @@ export default function ClaimDetailsPage({
         )}
       </main>
 
+      {/* Image Modal */}
+      <SimpleImageModal
+        file={viewingImage}
+        isOpen={!!viewingImage}
+        onClose={() => setViewingImage(null)}
+      />
+
+      {/* PDF Modal */}
+      <SimplePDFModal
+        file={viewingPDF}
+        isOpen={!!viewingPDF}
+        onClose={() => setViewingPDF(null)}
+      />
     </div>
   )
 }
