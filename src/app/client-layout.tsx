@@ -6,6 +6,7 @@ import {
   useTheme 
 } from "@/components/navigation";
 import { SidebarV2 } from "@/components/navigation/sidebar-v2";
+import { ToastProvider } from "@/context/toast-context";
 import { Menu } from "lucide-react";
 
 // Layout content component that uses navigation hooks
@@ -71,7 +72,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         defaultTheme: 'light',
       }}
     >
-      <LayoutContent>{children}</LayoutContent>
+      <ToastProvider>
+        <LayoutContent>{children}</LayoutContent>
+      </ToastProvider>
     </NavigationProvider>
   );
 }

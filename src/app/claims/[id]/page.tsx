@@ -75,10 +75,8 @@ export default function ClaimDetailsPage({
   const [updating, setUpdating] = useState(false)
   const [updateSuccess, setUpdateSuccess] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
-  const [expandedItem, setExpandedItem] = useState<string | null>(null)
   const [viewingImage, setViewingImage] = useState<ClaimFile | null>(null)
   const [viewingPDF, setViewingPDF] = useState<ClaimFile | null>(null)
-  const [itemsLoading, setItemsLoading] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [claimId, setClaimId] = useState<string>('')
 
@@ -193,7 +191,6 @@ export default function ClaimDetailsPage({
       return
     }
 
-    setItemsLoading(itemId)
 
     try {
       const response = await fetch(`/api/claims/${claim?.id}/items/${itemId}`, {
@@ -210,7 +207,6 @@ export default function ClaimDetailsPage({
       console.error('Failed to delete item:', err)
       alert('Failed to delete item')
     } finally {
-      setItemsLoading(null)
     }
   }
 
@@ -241,7 +237,6 @@ export default function ClaimDetailsPage({
   const handleUntagFile = async (fileId: string) => {
     if (!claim) return
     
-    setItemsLoading(fileId)
     
     try {
       const response = await fetch(`/api/claims/${claim.id}/files/${fileId}`, {
@@ -265,7 +260,6 @@ export default function ClaimDetailsPage({
       console.error('Failed to untag file:', err)
       alert('Failed to untag file')
     } finally {
-      setItemsLoading(null)
     }
   }
 
@@ -276,7 +270,6 @@ export default function ClaimDetailsPage({
 
     if (!claim) return
     
-    setItemsLoading(fileId)
 
     try {
       const response = await fetch(`/api/claims/${claim.id}/files/${fileId}`, {
@@ -301,7 +294,6 @@ export default function ClaimDetailsPage({
       console.error('Failed to delete file:', err)
       alert('Failed to delete file')
     } finally {
-      setItemsLoading(null)
     }
   }
 
@@ -499,17 +491,24 @@ export default function ClaimDetailsPage({
                         key={item.id}
                         item={item}
                         claimId={claimId}
-                        isExpanded={expandedItem === item.id}
-                        onToggleExpanded={(itemId) => {
-                          setExpandedItem(expandedItem === itemId ? null : itemId)
-                        }}
-                        onEdit={handleEditItem}
+                        onUpdate={handleEditItem}
                         onDelete={handleDeleteItem}
-                        onViewFile={handleViewFile}
-                        onDownloadFile={handleDownloadFile}
-                        onUntagFile={handleUntagFile}
-                        onDeleteFile={handleDeleteFile}
-                        loading={itemsLoading === item.id}
+                        onFileAction={(action, file) => {
+                          switch (action) {
+                            case 'view':
+                              handleViewFile(file)
+                              break
+                            case 'download':
+                              handleDownloadFile(file)
+                              break
+                            case 'untag':
+                              handleUntagFile(file.id)
+                              break
+                            case 'delete':
+                              handleDeleteFile(file.id)
+                              break
+                          }
+                        }}
                       />
                     ))}
                   </div>

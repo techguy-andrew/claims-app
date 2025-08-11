@@ -1,5 +1,122 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   INVISIBLE INPUT STYLES - Professional ContentEditable
+   ============================================================================ */
+
+/* Remove focus outlines for contenteditable */
+[contenteditable]:focus {
+  outline: none !important;
+}
+
+/* Invisible placeholder behavior */
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Prevent mobile zoom on focus - Critical for mobile UX */
+@media (max-width: 768px) {
+  [contenteditable],
+  input,
+  textarea {
+    font-size: 16px !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better text selection on mobile */
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* Prevent default browser styling for contenteditable */
+[contenteditable] {
+  border: none;
+  background: transparent;
+  resize: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  text-align: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+/* Ensure contentEditable maintains proper cursor */
+[contenteditable="true"] {
+  cursor: text;
+}
+
+[contenteditable="false"] {
+  cursor: default;
+}
+
+/* Ensure consistent line height for multiline editing */
+[contenteditable][data-multiline="true"] {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Enhanced focus styles for contentEditable */
+[contenteditable]:focus {
+  outline: none !important;
+  background-color: rgba(59, 130, 246, 0.02);
+  border-radius: 0.25rem;
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.1);
+  transition: all 0.15s ease;
+}
+
+/* Empty state placeholder styling */
+.empty-state[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Invisible Input Styles - Professional ContentEditable */
+.empty-placeholder[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-style: italic;
+  pointer-events: none;
+}
+
+.placeholder-text {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Text selection utilities */
+.select-text {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  user-select: text !important;
+}
+
+.select-none {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  user-select: none !important;
+}
+
 /* CSS Custom Properties for Theme System */
 :root {
   /* Colors */

@@ -1,25 +1,20 @@
 'use client'
 
-import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useState, useCallback, useRef, useLayoutEffect } from 'react'
 import { 
   ChevronDown, 
   Package, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Download, 
-  Tag, 
-  FileText, 
-  File,
   MoreVertical,
-  AlertCircle,
-  RefreshCw
+  X,
+  Check,
+  Edit,
+  Trash2
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { FilesList } from './files-list'
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 export interface ClaimItem {
   id: string
@@ -46,155 +41,443 @@ export interface ClaimFile {
 interface ItemsCardProps {
   item: ClaimItem
   claimId: string
-  isExpanded?: boolean
-  onToggleExpanded?: (itemId: string) => void
-  onEdit?: (item: ClaimItem) => void
+  onUpdate?: (item: ClaimItem) => void
   onDelete?: (itemId: string) => void
-  onViewFile?: (file: ClaimFile) => void
-  onDownloadFile?: (file: ClaimFile) => void
-  onUntagFile?: (fileId: string) => void
-  onDeleteFile?: (fileId: string) => void
-  loading?: boolean
-  className?: string
+  onFileAction?: (action: string, file: ClaimFile) => void
 }
 
-export function ItemsCard({
-  item,
-  claimId,
-  isExpanded = false,
-  onToggleExpanded,
-  onEdit,
-  onDelete,
-  onViewFile,
-  onDownloadFile,
-  onUntagFile,
-  onDeleteFile,
-  loading = false,
-  className = ''
-}: ItemsCardProps) {
-  const [showActions, setShowActions] = useState(false)
-  const [fileActions, setFileActions] = useState<string | null>(null)
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null)
-  const [fileMenuPosition, setFileMenuPosition] = useState<{ top: number; left: number } | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editData, setEditData] = useState({ itemName: item.itemName, details: item.details || '' })
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const actionButtonRef = useRef<HTMLButtonElement>(null)
-  const fileButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+// ============================================================================
+// INVISIBLE INPUT COMPONENT - The Secret Sauce
+// ============================================================================
 
-  // Update item via API
-  const updateItem = useCallback(async () => {
-    if (!editData.itemName.trim()) {
-      setError('Item name is required')
-      return false
-    }
+interface InvisibleInputProps {
+  value: string
+  onChange: (value: string) => void
+  onSave: () => void
+  onCancel: () => void
+  isEditing: boolean
+  className?: string
+  placeholder?: string
+  multiline?: boolean
+  autoSize?: boolean
+}
 
+const InvisibleInput: React.FC<InvisibleInputProps> = ({
+  value,
+  onChange,
+  onSave,
+  onCancel,
+  isEditing,
+  className = '',
+  placeholder = '',
+  multiline = false,
+  autoSize = true
+}) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const [localValue, setLocalValue] = useState(value)
+  const cursorPositionRef = useRef<{ start: number; end: number } | null>(null)
+  const isTypingRef = useRef(false)
+
+  // ============================================================================
+  // CURSOR POSITION UTILITIES - Professional Selection API Management
+  // ============================================================================
+  
+  const saveCursorPosition = useCallback(() => {
+    if (!ref.current || !isEditing) return
+    
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+    
+    const range = selection.getRangeAt(0)
+    const preCaretRange = range.cloneRange()
+    preCaretRange.selectNodeContents(ref.current)
+    preCaretRange.setEnd(range.startContainer, range.startOffset)
+    
+    const start = preCaretRange.toString().length
+    const end = start + range.toString().length
+    
+    cursorPositionRef.current = { start, end }
+  }, [isEditing])
+
+  const restoreCursorPosition = useCallback(() => {
+    if (!ref.current || !cursorPositionRef.current || !isEditing) return
+    
+    const { start, end } = cursorPositionRef.current
+    const selection = window.getSelection()
+    if (!selection) return
+    
     try {
-      setIsUpdating(true)
-      setError(null)
+      const textNodes = []
+      const walk = document.createTreeWalker(
+        ref.current,
+        NodeFilter.SHOW_TEXT,
+        null
+      )
       
+      let node
+      while (node = walk.nextNode()) {
+        textNodes.push(node)
+      }
+      
+      let charCount = 0
+      let startNode = null
+      let endNode = null
+      let startOffset = 0
+      let endOffset = 0
+      
+      for (const textNode of textNodes) {
+        const nodeLength = textNode.textContent?.length || 0
+        
+        if (!startNode && charCount + nodeLength >= start) {
+          startNode = textNode
+          startOffset = start - charCount
+        }
+        
+        if (!endNode && charCount + nodeLength >= end) {
+          endNode = textNode
+          endOffset = end - charCount
+          break
+        }
+        
+        charCount += nodeLength
+      }
+      
+      if (startNode) {
+        const range = document.createRange()
+        range.setStart(startNode, Math.min(startOffset, startNode.textContent?.length || 0))
+        range.setEnd(endNode || startNode, Math.min(endOffset, (endNode || startNode).textContent?.length || 0))
+        
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    } catch {
+      // Fallback: position cursor at end
+      const range = document.createRange()
+      const selection = window.getSelection()
+      range.selectNodeContents(ref.current)
+      range.collapse(false)
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+    }
+  }, [isEditing])
+
+  // ============================================================================
+  // SMART DUAL-MODE RENDERING - No React Interference During Editing
+  // ============================================================================
+
+  // Sync external value to local state when not actively typing
+  useLayoutEffect(() => {
+    if (!isTypingRef.current) {
+      setLocalValue(value)
+    }
+  }, [value])
+
+  // Direct DOM manipulation during editing (bypasses React reconciliation)
+  useLayoutEffect(() => {
+    if (!ref.current) return
+    
+    if (isEditing) {
+      // Save cursor before any DOM manipulation
+      saveCursorPosition()
+      
+      // Direct DOM update - React hands off control
+      const currentText = ref.current.textContent || ''
+      if (currentText !== localValue) {
+        ref.current.textContent = localValue
+        
+        // Restore cursor after DOM update
+        requestAnimationFrame(() => {
+          restoreCursorPosition()
+        })
+      }
+      
+      // Handle placeholder display
+      if (!localValue && placeholder) {
+        ref.current.setAttribute('data-placeholder', placeholder)
+        ref.current.classList.add('empty-placeholder')
+      } else {
+        ref.current.classList.remove('empty-placeholder')
+      }
+    }
+  }, [localValue, isEditing, placeholder, saveCursorPosition, restoreCursorPosition])
+
+  // Auto-resize for multiline (avoid during active typing)
+  useLayoutEffect(() => {
+    if (multiline && autoSize && ref.current && !isTypingRef.current) {
+      ref.current.style.height = 'auto'
+      ref.current.style.height = ref.current.scrollHeight + 'px'
+    }
+  }, [localValue, multiline, autoSize])
+
+  // Focus management with cursor positioning
+  useLayoutEffect(() => {
+    if (isEditing && ref.current) {
+      ref.current.focus()
+      
+      // Position cursor at end for initial focus
+      if (!cursorPositionRef.current) {
+        const range = document.createRange()
+        const selection = window.getSelection()
+        range.selectNodeContents(ref.current)
+        range.collapse(false)
+        selection?.removeAllRanges()
+        selection?.addRange(range)
+      }
+    }
+  }, [isEditing])
+
+  // ============================================================================
+  // EVENT HANDLERS - Optimized for Cursor Stability
+  // ============================================================================
+
+  const handleInput = useCallback((e: React.FormEvent<HTMLDivElement>) => {
+    if (!isEditing) return
+    
+    isTypingRef.current = true
+    const newValue = e.currentTarget.textContent || ''
+    
+    // Save cursor position before state updates
+    saveCursorPosition()
+    
+    // Update local state immediately (no React re-render issues)
+    setLocalValue(newValue)
+    
+    // Debounced parent callback to reduce re-renders
+    const timeoutId = setTimeout(() => {
+      onChange(newValue)
+      isTypingRef.current = false
+    }, 16) // ~60fps debounce
+    
+    return () => clearTimeout(timeoutId)
+  }, [isEditing, onChange, saveCursorPosition])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      onCancel()
+    } else if (e.key === 'Enter') {
+      if (!multiline) {
+        e.preventDefault()
+        onSave()
+      } else if (e.metaKey || e.ctrlKey) {
+        e.preventDefault()
+        onSave()
+      }
+    }
+  }, [multiline, onSave, onCancel])
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    
+    // Save cursor position
+    saveCursorPosition()
+    
+    // Use native API for better cursor handling
+    if (document.execCommand) {
+      document.execCommand('insertText', false, text)
+    } else {
+      // Modern browsers fallback
+      const selection = window.getSelection()
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        range.deleteContents()
+        range.insertNode(document.createTextNode(text))
+        range.collapse(false)
+      }
+    }
+  }, [saveCursorPosition])
+
+  // ============================================================================
+  // RENDER - Clean Separation Between Edit and Display Modes
+  // ============================================================================
+
+  return (
+    <div
+      ref={ref}
+      contentEditable={isEditing}
+      suppressContentEditableWarning
+      onInput={handleInput}
+      onKeyDown={handleKeyDown}
+      onPaste={handlePaste}
+      onBlur={() => { isTypingRef.current = false }}
+      className={`${className} ${
+        isEditing 
+          ? 'outline-none focus:outline-none cursor-text' 
+          : 'cursor-default'
+      }`}
+      role={isEditing ? 'textbox' : undefined}
+      aria-label={isEditing ? 'Edit field' : undefined}
+      spellCheck={false}
+      style={{
+        WebkitUserSelect: isEditing ? 'text' : 'none',
+        userSelect: isEditing ? 'text' : 'none',
+        WebkitTapHighlightColor: 'transparent',
+        minHeight: multiline ? '1.5em' : undefined,
+        whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
+        wordBreak: 'break-word'
+      }}
+      // Only use dangerouslySetInnerHTML in display mode
+      {...(!isEditing && { 
+        dangerouslySetInnerHTML: { 
+          __html: localValue || `<span class="text-gray-400 italic">${placeholder}</span>`
+        } 
+      })}
+    />
+  )
+}
+
+// ============================================================================
+// FLOATING TOAST COMPONENT
+// ============================================================================
+
+const Toast: React.FC<{ message: string; visible: boolean }> = ({ message, visible }) => (
+  <div
+    className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 z-50 ${
+      visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+    }`}
+  >
+    <div className="flex items-center space-x-2">
+      <Check className="h-4 w-4" />
+      <span className="text-sm font-medium">{message}</span>
+    </div>
+  </div>
+)
+
+
+// ============================================================================
+// MAIN COMPONENT - Clean Architecture
+// ============================================================================
+
+export function ItemsCard({ item, claimId, onUpdate, onDelete, onFileAction }: ItemsCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [draftData, setDraftData] = useState({
+    itemName: item.itemName,
+    details: item.details || ''
+  })
+  const [isSaving, setIsSaving] = useState(false)
+  const [showToast, setShowToast] = useState(false)
+  const [activeActionMenu, setActiveActionMenu] = useState<string | null>(null)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null)
+  
+  // Store scroll position without external dependencies
+  const scrollPosRef = useRef(0)
+  const menuButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
+
+  const enterEditMode = useCallback(() => {
+    scrollPosRef.current = window.scrollY
+    setIsEditing(true)
+    setDraftData({
+      itemName: item.itemName,
+      details: item.details || ''
+    })
+    
+    // Auto-expand if not already expanded
+    if (!isExpanded) {
+      setIsExpanded(true)
+    }
+  }, [item, isExpanded])
+
+  const handleSave = useCallback(async () => {
+    if (!draftData.itemName.trim()) return
+    
+    setIsSaving(true)
+    
+    try {
       const response = await fetch(`/api/claims/${claimId}/items/${item.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          itemName: editData.itemName.trim(),
-          details: editData.details.trim() || null
+          itemName: draftData.itemName.trim(),
+          details: draftData.details.trim() || null
         })
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update item')
-      }
-
-      const updatedItem = await response.json()
       
-      // Update parent component if onEdit callback is available
-      onEdit?.(updatedItem)
+      if (!response.ok) throw new Error('Failed to update')
       
-      // Update local state to reflect changes
-      item.itemName = updatedItem.itemName
-      item.details = updatedItem.details
+      const updated = await response.json()
+      onUpdate?.(updated)
+      
+      // Update local item data
+      Object.assign(item, updated)
       
       setIsEditing(false)
-      return true
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update item')
-      return false
+      setShowToast(true)
+      setTimeout(() => setShowToast(false), 2500)
+      
+      // Restore scroll position
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosRef.current)
+      })
+    } catch (error) {
+      console.error('Save failed:', error)
     } finally {
-      setIsUpdating(false)
+      setIsSaving(false)
     }
-  }, [editData, item, onEdit, claimId])
+  }, [draftData, item, claimId, onUpdate])
 
-  const handleToggleExpanded = useCallback(() => {
-    // Only allow expansion if there are files to show
-    if (item.files.length > 0) {
-      onToggleExpanded?.(item.id)
-    }
-  }, [item.id, onToggleExpanded, item.files.length])
-
-  const handleEdit = useCallback(() => {
-    setShowActions(false)
-    // Auto-expand the card if it's not already expanded
-    if (!isExpanded) {
-      onToggleExpanded?.(item.id)
-    }
-    setIsEditing(true)
-    setEditData({ itemName: item.itemName, details: item.details || '' })
-    setError(null)
-  }, [item, isExpanded, onToggleExpanded])
-  
-  const handleSave = useCallback(async () => {
-    const success = await updateItem()
-    if (success) {
-      setIsEditing(false)
-    }
-  }, [updateItem])
-  
   const handleCancel = useCallback(() => {
     setIsEditing(false)
-    setEditData({ itemName: item.itemName, details: item.details || '' })
-    setError(null)
+    setDraftData({
+      itemName: item.itemName,
+      details: item.details || ''
+    })
+    
+    // Restore scroll position
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosRef.current)
+    })
   }, [item])
 
-  const handleDelete = useCallback(() => {
-    setShowActions(false)
-    onDelete?.(item.id)
-  }, [item.id, onDelete])
+  // Floating Context Menu Component
+  const FloatingContextMenu = () => {
+    if (!menuPosition || activeActionMenu !== item.id) return null
 
-  const handleFileAction = useCallback((action: string, file: ClaimFile) => {
-    setFileActions(null)
+    return (
+      <div 
+        className="floating-menu fixed z-50 bg-white/95 backdrop-blur-md border border-gray-200/80 rounded-xl shadow-lg min-w-[160px] p-1 transition-all duration-200 opacity-100 scale-100"
+        style={{
+          top: `${menuPosition.top}px`,
+          right: `${menuPosition.right}px`
+        }}
+      >
+        <button
+          onClick={() => handleActionMenuAction('edit')}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
+        >
+          <Edit className="h-4 w-4 text-gray-600" />
+          <span className="text-sm font-medium">Edit Item</span>
+        </button>
+        
+        <button
+          onClick={() => handleActionMenuAction('delete')}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50/80 transition-colors duration-150 text-left text-red-600"
+        >
+          <Trash2 className="h-4 w-4 text-red-500" />
+          <span className="text-sm font-medium">Delete</span>
+        </button>
+      </div>
+    )
+  }
+
+  // Toggle floating menu and calculate position
+  const toggleFloatingMenu = useCallback((itemId: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation() // Prevent event bubbling to header click handler
     
-    switch (action) {
-      case 'view':
-        onViewFile?.(file)
-        break
-      case 'download':
-        onDownloadFile?.(file)
-        break
-      case 'untag':
-        onUntagFile?.(file.id)
-        break
-      case 'delete':
-        onDeleteFile?.(file.id)
-        break
+    if (activeActionMenu === itemId) {
+      setActiveActionMenu(null)
+      setMenuPosition(null)
+      return
     }
-  }, [onViewFile, onDownloadFile, onUntagFile, onDeleteFile])
 
-  // Calculate dropdown position with improved logic
-  const calculateMenuPosition = useCallback((buttonRef: HTMLButtonElement | null) => {
-    if (!buttonRef) return { top: 0, left: 0 }
-    
-    const rect = buttonRef.getBoundingClientRect()
-    const menuWidth = 160 // Updated width for new design
-    const menuHeight = 140 // Approximate height for 4 menu items
+    const button = event.currentTarget
+    const rect = button.getBoundingClientRect()
+    const menuWidth = 160
+    const menuHeight = 100 // Approximate height for 2 menu items
     
     let top = rect.bottom + 8
-    let left = rect.right - menuWidth
+    let right = window.innerWidth - rect.right
     
     // Flip vertically if too close to bottom
     if (top + menuHeight > window.innerHeight - 20) {
@@ -202,454 +485,179 @@ export function ItemsCard({
     }
     
     // Flip horizontally if too close to left edge
-    if (left < 20) {
-      left = rect.left
+    if (right + menuWidth > window.innerWidth - 20) {
+      right = 20
     }
     
-    // Ensure menu stays within viewport
-    if (left + menuWidth > window.innerWidth - 20) {
-      left = window.innerWidth - menuWidth - 20
-    }
+    setMenuPosition({ top, right })
+    setActiveActionMenu(itemId)
+  }, [activeActionMenu])
+
+  // Handle action menu actions
+  const handleActionMenuAction = useCallback((action: string) => {
+    setActiveActionMenu(null)
+    setMenuPosition(null)
     
-    return { top, left }
+    switch (action) {
+      case 'edit':
+        enterEditMode()
+        break
+      case 'delete':
+        onDelete?.(item.id)
+        break
+    }
+  }, [enterEditMode, onDelete, item.id])
+
+  // Close floating menu when clicking outside
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    const target = event.target as Element
+    if (!target.closest('.floating-menu') && !target.closest('.menu-button')) {
+      setActiveActionMenu(null)
+      setMenuPosition(null)
+    }
   }, [])
 
-  // Handle action button click
-  const handleActionClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation()
-    
-    if (showActions) {
-      setShowActions(false)
-      setMenuPosition(null)
-    } else {
-      const position = calculateMenuPosition(actionButtonRef.current)
-      setMenuPosition(position)
-      setShowActions(true)
+  // Setup click outside listener
+  useLayoutEffect(() => {
+    if (activeActionMenu) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
     }
-  }, [showActions, calculateMenuPosition])
+  }, [activeActionMenu, handleClickOutside])
 
-  // Handle file action button click
-  const handleFileActionClick = useCallback((e: React.MouseEvent<HTMLButtonElement>, fileId: string) => {
-    e.stopPropagation()
-    
-    if (fileActions === fileId) {
-      setFileActions(null)
-      setFileMenuPosition(null)
-    } else {
-      const position = calculateMenuPosition(fileButtonRefs.current[fileId])
-      setFileMenuPosition(position)
-      setFileActions(fileId)
-    }
-  }, [fileActions, calculateMenuPosition])
-
-  // Close menus and edit mode when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element
-      
-      // Handle dropdown menus with improved selector matching
-      if (!target.closest('[data-dropdown-menu]') && !target.closest('[data-dropdown-button]') && 
-          !target.closest('.floating-menu') && !target.closest('.menu-button')) {
-        setShowActions(false)
-        setMenuPosition(null)
-        setFileActions(null)
-        setFileMenuPosition(null)
-      }
-      
-      // Handle edit mode - cancel if clicking outside the expanded card
-      if (isEditing && isExpanded && !target.closest('.border-t.border-gray-100.bg-white')) {
-        handleCancel()
-      }
-    }
-
-    if (showActions || fileActions || isEditing) {
-      document.addEventListener('click', handleClickOutside, true)
-      return () => document.removeEventListener('click', handleClickOutside, true)
-    }
-  }, [showActions, fileActions, isEditing, isExpanded, handleCancel])
-  
-  // Handle keyboard shortcuts for edit mode
-  useEffect(() => {
-    if (!isEditing) return
-    
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        handleCancel()
-      } else if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        handleSave()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isEditing, handleCancel, handleSave])
-
-  // Auto-resize textarea based on content
-  useEffect(() => {
-    const textarea = textareaRef.current
-    if (textarea && isEditing) {
-      // Reset height to auto to get the correct scrollHeight
-      textarea.style.height = 'auto'
-      // Set height to scrollHeight with minimum of 80px
-      const newHeight = Math.max(80, textarea.scrollHeight)
-      textarea.style.height = `${newHeight}px`
-    }
-  }, [editData.details, isEditing])
-
-  // Portal-rendered dropdown menu
-  const ActionDropdown = () => {
-    if (!showActions || !menuPosition) return null
-
-    return createPortal(
-      <>
-        <div className="fixed inset-0 z-[9998]" />
-        <div 
-          data-dropdown-menu
-          className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg min-w-[144px] py-1"
-          style={{
-            top: `${menuPosition.top}px`,
-            left: `${menuPosition.left}px`
-          }}
-        >
-          <button
-            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
-            onClick={handleEdit}
-          >
-            <Edit className="h-4 w-4 text-gray-400" />
-            <span>Edit</span>
-          </button>
-          <button
-            className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center space-x-2"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4 text-red-500" />
-            <span>Delete</span>
-          </button>
-        </div>
-      </>,
-      document.body
-    )
-  }
-
-  // Portal-rendered file dropdown menu with improved styling
-  const FileActionDropdown = ({ file }: { file: ClaimFile }) => {
-    if (fileActions !== file.id || !fileMenuPosition) return null
-
-    return createPortal(
-      <>
-        <div className="fixed inset-0 z-[9998]" />
-        <div 
-          data-dropdown-menu
-          className="fixed z-[9999] bg-white/95 backdrop-blur-md border border-gray-200/80 rounded-xl shadow-lg min-w-[160px] p-1 transition-all duration-200 opacity-100 scale-100"
-          style={{
-            top: `${fileMenuPosition.top}px`,
-            left: `${fileMenuPosition.left}px`
-          }}
-        >
-          <button
-            onClick={() => handleFileAction('view', file)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
-          >
-            <Eye className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium">View</span>
-          </button>
-          
-          <button
-            onClick={() => handleFileAction('download', file)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
-          >
-            <Download className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium">Download</span>
-          </button>
-          
-          <button
-            onClick={() => handleFileAction('untag', file)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
-          >
-            <Tag className="h-4 w-4 text-gray-600" />
-            <span className="text-sm font-medium">Untag</span>
-          </button>
-          
-          <button
-            onClick={() => handleFileAction('delete', file)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50/80 transition-colors duration-150 text-left text-red-600"
-          >
-            <Trash2 className="h-4 w-4 text-red-500" />
-            <span className="text-sm font-medium">Delete</span>
-          </button>
-        </div>
-      </>,
-      document.body
-    )
-  }
+  const hasFiles = item.files.length > 0
 
   return (
-    <Card className={`group relative border-gray-200 hover:border-gray-300 transition-all duration-300 ${
-      isEditing ? 'border-blue-300 shadow-md' : ''
-    } ${
-      isExpanded ? 'border-blue-200 shadow-sm' : ''
-    } ${className}`}>
-      {/* Main Item Header */}
-      <CardHeader 
-        className={`p-0 transition-all duration-200 ${
-          isEditing ? '' : (
-            item.files.length > 0 ? 'cursor-pointer hover:bg-gray-50/50' : 'cursor-default'
-          )
-        }`}
-        onClick={isEditing ? undefined : handleToggleExpanded}
-      >
-        <div className={`flex items-center p-4 space-x-4 min-h-[80px] touch-manipulation transition-all duration-300 ${
-          isEditing ? 'bg-blue-50/30' : ''
-        } ${
-          isExpanded && !isEditing ? 'pb-3' : ''
-        }`}>
-          {/* Item Icon */}
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-              <Package className="h-6 w-6 text-blue-600" />
-            </div>
+    <>
+      <div className={`bg-white border rounded-lg transition-all duration-200 ${
+        isExpanded ? 'border-blue-200 shadow-sm' : 'border-gray-200 hover:border-gray-300'
+      }`}>
+        {/* Header */}
+        <div 
+          className={`flex items-center p-4 ${
+            hasFiles && !isEditing ? 'cursor-pointer' : ''
+          }`}
+          onClick={() => {
+            if (hasFiles && !isEditing) {
+              setIsExpanded(!isExpanded)
+            }
+          }}
+        >
+          {/* Icon */}
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center mr-4">
+            <Package className="h-6 w-6 text-blue-600" />
           </div>
 
-          {/* Item Info */}
+          {/* Title */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-gray-900 truncate mb-1">
-              {item.itemName}
-            </h3>
+            <InvisibleInput
+              value={draftData.itemName}
+              onChange={(v) => setDraftData(prev => ({ ...prev, itemName: v }))}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              isEditing={isEditing}
+              className="text-base font-semibold text-gray-900 truncate"
+              placeholder="Item name"
+            />
           </div>
 
-          {/* Actions */}
-          <div className="flex-shrink-0 flex items-center space-x-2">
-            {!isEditing && (
+          {/* Action Buttons Area - The Magic Morph */}
+          <div className="flex items-center space-x-2 ml-4">
+            {!isEditing ? (
               <>
-                {/* Expand/Collapse Arrow */}
                 <ChevronDown 
-                  className={`h-5 w-5 transition-all duration-300 ${
+                  className={`h-5 w-5 transition-transform duration-300 ${
                     isExpanded ? 'rotate-180 text-blue-600' : 'text-gray-400'
-                  } ${
-                    item.files.length > 0 ? 'hover:text-blue-500 cursor-pointer' : 'text-gray-300 cursor-default'
-                  }`}
+                  } ${hasFiles ? '' : 'opacity-30'}`}
                 />
                 
-                {/* More Actions Menu */}
-                <Button
-                  ref={actionButtonRef}
-                  data-dropdown-button
-                  variant="ghost"
-                  size="small"
-                  className="w-8 h-8 p-0 opacity-60 group-hover:opacity-100 transition-opacity"
-                  onClick={handleActionClick}
-                  disabled={loading}
+                <button
+                  ref={(el) => { menuButtonRefs.current[item.id] = el }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleFloatingMenu(item.id, e)
+                  }}
+                  className="menu-button w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  title="More actions"
                 >
-                  {loading ? (
-                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+                  <MoreVertical className="h-5 w-5 text-gray-600" />
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                  className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
+                  title="Cancel"
+                >
+                  <X className="h-4 w-4 text-gray-600" />
+                </button>
+                
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="w-8 h-8 flex items-center justify-center rounded hover:bg-blue-50 transition-colors"
+                  title="Save"
+                >
+                  {isSaving ? (
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
                   ) : (
-                    <MoreVertical className="h-4 w-4" />
+                    <Check className="h-4 w-4 text-blue-600" />
                   )}
-                </Button>
+                </button>
               </>
             )}
           </div>
         </div>
-      </CardHeader>
 
-      {/* Expanded Content - Title Edit, Description and Files */}
-      {isExpanded && (
-        <div className="border-t border-gray-100 bg-white">
-          {/* Title Edit Section - Only show when editing */}
-          {isEditing && (
+        {/* Expanded Content */}
+        {isExpanded && (
+          <div className="border-t border-gray-100">
+            {/* Description */}
             <div className="p-4 border-b border-gray-100">
-              <div className="space-y-3">
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Item Name</h4>
-                  <Input
-                    value={editData.itemName}
-                    onChange={(e) => setEditData(prev => ({ ...prev, itemName: e.target.value }))}
-                    placeholder="Item name"
-                    className="text-base font-semibold"
-                    state={error && !editData.itemName.trim() ? 'error' : 'default'}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        handleSave()
-                      } else if (e.key === 'Escape') {
-                        handleCancel()
-                      }
-                    }}
-                    autoFocus
-                  />
-                </div>
-                {error && (
-                  <p className="text-sm text-red-600 flex items-center space-x-1">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>{error}</span>
-                  </p>
-                )}
-              </div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-2">Description</h4>
+              <InvisibleInput
+                value={draftData.details}
+                onChange={(v) => setDraftData(prev => ({ ...prev, details: v }))}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                isEditing={isEditing}
+                className="text-sm text-gray-600 leading-relaxed"
+                placeholder="Add description..."
+                multiline
+              />
             </div>
-          )}
 
-          {/* Description Section */}
-          <div className="p-4 border-b border-gray-100">
-            {isEditing ? (
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-2">Description</h4>
-                <Textarea
-                  ref={textareaRef}
-                  value={editData.details}
-                  onChange={(e) => setEditData(prev => ({ ...prev, details: e.target.value }))}
-                  placeholder="Add details..."
-                  className="text-sm resize-none transition-all duration-200"
-                  style={{ minHeight: '80px', overflow: 'hidden' }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') {
-                      handleCancel()
-                    }
-                  }}
-                />
-              </div>
-            ) : (
-              item.details ? (
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {item.details}
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-sm text-gray-500 italic">
-                    No description provided
-                  </p>
-                </div>
-              )
-            )}
-          </div>
-          
-          {/* Files Section */}
-          {item.files.length > 0 ? (
-            <div className="p-4">
-              <div className="space-y-1">
+            {/* Files */}
+            {hasFiles && (
+              <div className="p-4">
                 <h4 className="text-sm font-semibold text-gray-900 mb-3">
                   Files ({item.files.length})
                 </h4>
-                <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                  {item.files.map((file, index) => (
-                    <div 
-                      key={file.id} 
-                      className={`relative flex items-center p-4 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-200 ${
-                        index !== item.files.length - 1 ? 'border-b border-gray-100' : ''
-                      }`}
-                    >
-                      {/* File Thumbnail */}
-                      <div className="flex-shrink-0 mr-4">
-                        <div 
-                          className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
-                          onClick={() => handleFileAction('view', file)}
-                        >
-                          {file.fileType === 'image' ? (
-                            <img
-                              src={file.fileUrl}
-                              alt={file.fileName}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              {file.fileType === 'pdf' ? (
-                                <FileText className="h-7 w-7 text-gray-500" />
-                              ) : (
-                                <File className="h-7 w-7 text-gray-500" />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* File Info */}
-                      <div className="flex-1 min-w-0">
-                        <h5 className="text-base font-medium text-gray-900 truncate mb-1">{file.fileName}</h5>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600">
-                            {new Date(file.uploadedAt).toLocaleDateString()} • {file.fileType.toUpperCase()}
-                          </span>
-                          {file.fileSize && (
-                            <span className="text-sm text-gray-500">
-                              • {(file.fileSize / 1024 / 1024).toFixed(1)} MB
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Action Menu Button */}
-                      <div className="flex-shrink-0">
-                        <button
-                          ref={(el) => { fileButtonRefs.current[file.id] = el }}
-                          onClick={(e) => handleFileActionClick(e, file.id)}
-                          className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                          title="More actions"
-                        >
-                          <MoreVertical className="h-5 w-5 text-gray-600" />
-                        </button>
-                      </div>
-
-                      {/* File Action Dropdown */}
-                      <FileActionDropdown file={file} />
-                    </div>
-                  ))}
-                </div>
+                <FilesList
+                  files={item.files}
+                  onFileAction={(action, file) => {
+                    if (action === 'tag') {
+                      onFileAction?.('untag', file)
+                    } else {
+                      onFileAction?.(action, file)
+                    }
+                  }}
+                  emptyStateText="No files tagged to this item"
+                  showThumbnails={true}
+                />
               </div>
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Package className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-900 mb-1">No files attached</h3>
-              <p className="text-xs text-gray-500">Upload files to see them here</p>
-            </div>
-          )}
+            )}
+          </div>
+        )}
+      </div>
 
-          {/* Edit Actions - Save/Cancel buttons */}
-          {isEditing && (
-            <div className="p-4 border-t border-gray-100 bg-gray-50">
-              <div className="flex gap-4">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  loading={isUpdating}
-                  className="flex-1 touch-target-lg"
-                  size="large"
-                  onClick={handleSave}
-                >
-                  {isUpdating ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    'Save Changes'
-                  )}
-                </Button>
-                
-                <Button
-                  type="button"
-                  variant="modern"
-                  onClick={handleCancel}
-                  disabled={isUpdating}
-                  className="flex-1 touch-target-lg"
-                  size="large"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-      {/* Portal-rendered dropdown menus */}
-      <ActionDropdown />
-    </Card>
+      {/* Floating Context Menu */}
+      <FloatingContextMenu />
+
+      {/* Toast Notification */}
+      <Toast message="Changes saved" visible={showToast} />
+    </>
   )
 }

@@ -7,6 +7,8 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   fullWidth?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  mobileOptimized?: boolean;
+  inlineEditing?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -16,6 +18,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     fullWidth = false, 
     leftIcon, 
     rightIcon, 
+    mobileOptimized = false,
+    inlineEditing = false,
     className, 
     ...props 
   }, ref) => {
@@ -27,6 +31,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       fullWidth && styles.fullWidth,
       leftIcon && styles.withIcon,
       rightIcon && styles.withIconRight,
+      mobileOptimized && styles.mobileOptimized,
+      inlineEditing && styles.inlineEditing,
       className
     ].filter(Boolean).join(' ');
 

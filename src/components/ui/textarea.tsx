@@ -6,6 +6,8 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
   state?: 'default' | 'error' | 'success';
   fullWidth?: boolean;
   resize?: 'vertical' | 'horizontal' | 'both' | 'none';
+  mobileOptimized?: boolean;
+  inlineEditing?: boolean;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -14,6 +16,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     state = 'default', 
     fullWidth = false, 
     resize = 'vertical',
+    mobileOptimized = false,
+    inlineEditing = false,
     className, 
     ...props 
   }, ref) => {
@@ -26,6 +30,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       resize === 'none' && styles.noResize,
       resize === 'horizontal' && styles.resizeHorizontal,
       resize === 'both' && styles.resizeBoth,
+      mobileOptimized && styles.mobileOptimized,
+      inlineEditing && styles.inlineEditing,
       className
     ].filter(Boolean).join(' ');
 
