@@ -1,0 +1,558 @@
+/* ============================================================================ */
+/* INFO CARD COMPONENT - Modern glass morphism information cards */
+/* Complete redevelopment using redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Design Tokens */
+:root {
+  --info-card-bg-glass: rgba(255, 255, 255, 0.9);
+  --info-card-bg-hover: rgba(255, 255, 255, 0.95);
+  --info-card-border: rgba(255, 255, 255, 0.6);
+  --info-card-border-hover: rgba(255, 255, 255, 0.8);
+  --info-card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --info-card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --info-card-blur: 8px;
+  --info-card-radius: 12px;
+  --info-card-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Colors */
+  --info-card-text-primary: rgba(17, 24, 39, 1);
+  --info-card-text-secondary: rgba(75, 85, 99, 1);
+  --info-card-text-muted: rgba(107, 114, 128, 1);
+  --info-card-icon-bg: rgba(243, 244, 246, 0.8);
+  --info-card-icon-border: rgba(229, 231, 235, 0.6);
+  --info-card-icon-color: rgba(75, 85, 99, 1);
+  
+  /* Interactive States */
+  --info-card-copy-bg: rgba(243, 244, 246, 0.8);
+  --info-card-copy-hover: rgba(229, 231, 235, 0.9);
+  --info-card-copy-success: rgba(16, 185, 129, 0.1);
+  --info-card-copy-success-border: rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================================================ */
+/* INFO CARD BASE */
+/* ============================================================================ */
+
+.infoCard {
+  position: relative;
+  background: var(--info-card-bg-glass);
+  backdrop-filter: blur(var(--info-card-blur));
+  -webkit-backdrop-filter: blur(var(--info-card-blur));
+  border: 1px solid var(--info-card-border);
+  border-radius: var(--info-card-radius);
+  box-shadow: var(--info-card-shadow);
+  transition: var(--info-card-transition);
+  overflow: hidden;
+  cursor: default;
+}
+
+.infoCard:hover {
+  background: var(--info-card-bg-hover);
+  border-color: var(--info-card-border-hover);
+  box-shadow: var(--info-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Card Variants */
+.infoCard.default {
+  padding: 16px;
+  min-height: 80px;
+}
+
+.infoCard.compact {
+  padding: 12px;
+  min-height: 64px;
+}
+
+.infoCard.detailed {
+  padding: 20px;
+  min-height: 96px;
+}
+
+/* ============================================================================ */
+/* CARD CONTENT */
+/* ============================================================================ */
+
+.cardContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.compact .cardContent {
+  gap: 10px;
+}
+
+.detailed .cardContent {
+  gap: 16px;
+}
+
+/* ============================================================================ */
+/* ICON CONTAINER */
+/* ============================================================================ */
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--info-card-icon-bg);
+  border: 1px solid var(--info-card-icon-border);
+  flex-shrink: 0;
+  transition: var(--info-card-transition);
+}
+
+.compact .iconContainer {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.detailed .iconContainer {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: var(--info-card-icon-color);
+  flex-shrink: 0;
+}
+
+.compact .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.detailed .icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Icon Hover Effect */
+.infoCard:hover .iconContainer {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+}
+
+.infoCard:hover .icon {
+  color: rgba(59, 130, 246, 1);
+}
+
+/* ============================================================================ */
+/* CONTENT CONTAINER */
+/* ============================================================================ */
+
+.contentContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: var(--info-card-transition);
+}
+
+.compact .contentContainer {
+  gap: 1px;
+}
+
+.detailed .contentContainer {
+  gap: 4px;
+}
+
+/* Label */
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--info-card-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  margin: 0;
+  transition: var(--info-card-transition);
+}
+
+.compact .label {
+  font-size: 10px;
+}
+
+.detailed .label {
+  font-size: 12px;
+}
+
+/* Value */
+.value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--info-card-text-primary);
+  line-height: 1.3;
+  margin: 0;
+  word-break: break-word;
+  transition: var(--info-card-transition);
+}
+
+.compact .value {
+  font-size: 12px;
+}
+
+.detailed .value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Sensitive Value */
+.value.sensitive {
+  font-family: monospace;
+  letter-spacing: 2px;
+  user-select: none;
+  cursor: pointer;
+  color: var(--info-card-text-muted);
+}
+
+.value.sensitive:hover {
+  color: var(--info-card-text-secondary);
+}
+
+/* Reveal Hint */
+.revealHint {
+  font-size: 10px;
+  color: var(--info-card-text-muted);
+  font-style: italic;
+  opacity: 0.8;
+  transition: var(--info-card-transition);
+}
+
+.contentContainer:hover .revealHint {
+  opacity: 1;
+  color: rgba(59, 130, 246, 1);
+}
+
+/* ============================================================================ */
+/* COPY BUTTON */
+/* ============================================================================ */
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--info-card-copy-bg);
+  border: 1px solid var(--info-card-icon-border);
+  color: var(--info-card-text-muted);
+  cursor: pointer;
+  transition: var(--info-card-transition);
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.compact .copyButton {
+  width: 28px;
+  height: 28px;
+}
+
+.detailed .copyButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.copyButton:hover {
+  background: var(--info-card-copy-hover);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: rgba(59, 130, 246, 1);
+  transform: scale(1.05);
+}
+
+.copyButton:active {
+  transform: scale(0.95);
+}
+
+.copyButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Copy Button Visibility */
+.infoCard:hover .copyButton,
+.infoCard:focus-within .copyButton {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Copy Button Success State */
+.copyButton.copied {
+  background: var(--info-card-copy-success);
+  border-color: var(--info-card-copy-success-border);
+  color: rgba(16, 185, 129, 1);
+  opacity: 1;
+  transform: scale(1);
+}
+
+.copyButton.copied:hover {
+  background: var(--info-card-copy-success);
+  border-color: var(--info-card-copy-success-border);
+  color: rgba(16, 185, 129, 1);
+}
+
+.copyIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.compact .copyIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.detailed .copyIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ============================================================================ */
+/* HOVER EFFECT */
+/* ============================================================================ */
+
+.hoverEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.05) 0%,
+    rgba(16, 185, 129, 0.05) 100%
+  );
+  border-radius: var(--info-card-radius);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================================ */
+/* INFO CARD GROUP */
+/* ============================================================================ */
+
+.cardGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.groupHeader {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.groupTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--info-card-text-primary);
+  line-height: 1.3;
+  margin: 0 0 8px 0;
+}
+
+.groupDescription {
+  font-size: 14px;
+  color: var(--info-card-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Cards Grid */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 2), 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+/* ============================================================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================================================ */
+
+@media (max-width: 768px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .infoCard.default,
+  .infoCard.detailed {
+    padding: 14px;
+  }
+
+  .cardContent {
+    gap: 10px;
+  }
+
+  .iconContainer {
+    width: 36px;
+    height: 36px;
+  }
+
+  .detailed .iconContainer {
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .detailed .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .copyButton {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .infoCard {
+    padding: 12px;
+  }
+
+  .cardContent {
+    gap: 8px;
+  }
+
+  .iconContainer {
+    width: 32px;
+    height: 32px;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .value {
+    font-size: 13px;
+  }
+
+  .label {
+    font-size: 10px;
+  }
+
+  .copyButton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .copyIcon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .groupTitle {
+    font-size: 18px;
+  }
+
+  .groupDescription {
+    font-size: 13px;
+  }
+}
+
+/* ============================================================================ */
+/* ACCESSIBILITY & PREFERENCES */
+/* ============================================================================ */
+
+/* Focus States */
+.copyButton:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 1);
+  outline-offset: 2px;
+}
+
+.contentContainer:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 1);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .infoCard {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+
+  .iconContainer {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+
+  .copyButton {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .infoCard,
+  .iconContainer,
+  .copyButton,
+  .contentContainer,
+  .label,
+  .value,
+  .revealHint {
+    transition: none;
+  }
+
+  .infoCard:hover {
+    transform: none;
+  }
+
+  .infoCard:hover .iconContainer {
+    transform: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .infoCard {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .copyButton {
+    display: none;
+  }
+
+  .hoverEffect {
+    display: none;
+  }
+
+  .value.sensitive {
+    font-family: inherit;
+    letter-spacing: normal;
+  }
+
+  .revealHint {
+    display: none;
+  }
+}

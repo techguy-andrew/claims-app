@@ -1,0 +1,409 @@
+/* ============================================================================
+   BUTTON COMPONENT - Glass Morphism Professional Design System
+   ============================================================================ */
+
+/* ============================================================================
+   BASE BUTTON STYLES
+   ============================================================================ */
+
+.button {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  position: relative;
+  overflow: hidden;
+  
+  /* Typography */
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  
+  /* Interaction */
+  cursor: pointer;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all var(--transition-normal);
+  
+  /* Mobile optimizations */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  
+  /* Default sizing - Mobile first */
+  padding: var(--mobile-padding);
+  border-radius: var(--radius-lg);
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .button {
+    padding: var(--desktop-padding);
+    font-size: var(--font-size-sm);
+    min-height: var(--touch-target-small);
+    min-width: auto;
+  }
+}
+
+/* ============================================================================
+   BUTTON VARIANTS
+   ============================================================================ */
+
+/* Primary - Gradient with professional styling */
+.primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: var(--color-white);
+  border-color: transparent;
+  box-shadow: var(--shadow-enterprise);
+  font-weight: var(--font-weight-semibold);
+}
+
+.primary:hover:not(.disabled):not(.loading) {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-darker) 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-enterprise-hover);
+}
+
+.primary:active:not(.disabled):not(.loading) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-enterprise);
+}
+
+/* Modern - Glass morphism variant */
+.modern {
+  background: var(--glass-white-95);
+  backdrop-filter: var(--backdrop-blur-md);
+  -webkit-backdrop-filter: var(--backdrop-blur-md);
+  color: var(--color-primary);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-enterprise);
+  font-weight: var(--font-weight-medium);
+}
+
+.modern:hover:not(.disabled):not(.loading) {
+  background: var(--glass-white-95);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-enterprise-hover);
+  color: var(--color-primary-dark);
+}
+
+.modern:active:not(.disabled):not(.loading) {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Floating - Enhanced elevation variant */
+.floating {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: var(--color-white);
+  border-color: transparent;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-floating);
+  font-weight: var(--font-weight-semibold);
+  backdrop-filter: var(--backdrop-blur-sm);
+  -webkit-backdrop-filter: var(--backdrop-blur-sm);
+}
+
+.floating:hover:not(.disabled):not(.loading) {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-darker) 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-floating-hover);
+}
+
+.floating:active:not(.disabled):not(.loading) {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: var(--shadow-floating);
+}
+
+/* Secondary - Subtle glass variant */
+.secondary {
+  background: var(--glass-white-80);
+  backdrop-filter: var(--backdrop-blur-sm);
+  -webkit-backdrop-filter: var(--backdrop-blur-sm);
+  color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-normal);
+}
+
+.secondary:hover:not(.disabled):not(.loading) {
+  background: var(--glass-white-95);
+  color: var(--text-primary);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-enterprise);
+}
+
+.secondary:active:not(.disabled):not(.loading) {
+  transform: translateY(0);
+  background: var(--glass-white-90);
+}
+
+/* Destructive - Error variant */
+.destructive {
+  background: var(--color-error);
+  color: var(--color-white);
+  border-color: var(--color-error);
+  box-shadow: var(--shadow-enterprise);
+  font-weight: var(--font-weight-medium);
+}
+
+.destructive:hover:not(.disabled):not(.loading) {
+  background: #dc2626;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-enterprise-hover);
+}
+
+.destructive:active:not(.disabled):not(.loading) {
+  transform: translateY(0);
+  background: #b91c1c;
+}
+
+/* Ghost - Minimal variant */
+.ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: transparent;
+}
+
+.ghost:hover:not(.disabled):not(.loading) {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.ghost:active:not(.disabled):not(.loading) {
+  background: var(--bg-tertiary);
+}
+
+/* ============================================================================
+   SIZE VARIANTS
+   ============================================================================ */
+
+.small {
+  padding: 8px 16px;
+  font-size: var(--font-size-sm);
+  line-height: 1rem;
+  min-height: var(--touch-target-small);
+  border-radius: var(--radius-md);
+}
+
+.large {
+  padding: 16px 28px;
+  font-size: var(--font-size-lg);
+  line-height: 1.5rem;
+  min-height: var(--touch-target-large);
+  border-radius: var(--radius-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Desktop size adjustments */
+@media (min-width: 768px) {
+  .small {
+    padding: 6px 12px;
+    font-size: var(--font-size-xs);
+    min-height: 28px;
+  }
+
+  .large {
+    padding: 12px 24px;
+    font-size: var(--font-size-base);
+    min-height: 40px;
+  }
+}
+
+/* ============================================================================
+   STATES
+   ============================================================================ */
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+}
+
+.loading {
+  color: transparent;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ============================================================================
+   LOADING SPINNER
+   ============================================================================ */
+
+.loadingSpinner {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  top: 50%;
+  left: 50%;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: buttonSpinner 1s linear infinite;
+}
+
+@keyframes buttonSpinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   ICON STYLING
+   ============================================================================ */
+
+.icon {
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icon-only buttons */
+.iconOnly {
+  aspect-ratio: 1;
+  padding: var(--spacing-sm);
+}
+
+.iconOnly.small {
+  padding: var(--spacing-xs);
+  width: 2rem;
+  height: 2rem;
+}
+
+.iconOnly.large {
+  padding: var(--spacing-md);
+  width: 3rem;
+  height: 3rem;
+}
+
+/* ============================================================================
+   FOCUS STATES
+   ============================================================================ */
+
+.button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.destructive:focus-visible {
+  outline-color: var(--color-error);
+}
+
+/* ============================================================================
+   MOBILE SPECIFIC OPTIMIZATIONS
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  /* Remove hover effects, use active states */
+  .button:hover:not(.disabled):not(.loading) {
+    transform: none;
+  }
+  
+  .button:active:not(.disabled):not(.loading) {
+    scale: 0.98;
+    transition: scale 0.1s ease;
+  }
+  
+  .floating:active:not(.disabled):not(.loading) {
+    scale: 0.96;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   HIGH CONTRAST MODE
+   ============================================================================ */
+
+@media (prefers-contrast: high) {
+  .button {
+    border-width: 2px;
+  }
+  
+  .modern,
+  .secondary {
+    background: var(--bg-primary);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: var(--text-primary);
+  }
+  
+  .primary,
+  .floating {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+  }
+  
+  .button:hover:not(.disabled):not(.loading),
+  .button:active:not(.disabled):not(.loading) {
+    transform: none;
+  }
+  
+  .loadingSpinner {
+    animation: none;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .modern,
+  .secondary {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .modern:hover:not(.disabled):not(.loading),
+  .secondary:hover:not(.disabled):not(.loading) {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .ghost {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .ghost:hover:not(.disabled):not(.loading) {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

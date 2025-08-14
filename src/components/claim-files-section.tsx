@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef } from 'react'
 import { Upload, File, AlertCircle, CheckCircle, Tag } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/redesigned/ui/Button'
 import { ClaimItem, ClaimFile } from './claim-items-section'
 import { SimplePDFModal } from './simple-pdf-modal'
 import { SimpleImageModal } from './simple-image-modal'

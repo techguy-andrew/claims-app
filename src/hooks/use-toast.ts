@@ -1,49 +1,30 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import type { ToastProps } from '@/components/ui/toast'
+import { useToast as useRedesignedToast, type ToastData } from '@/components/redesigned/ui/Toast'
 
-export interface Toast extends Omit<ToastProps, 'onClose'> {
-  id: string
-  type: 'success' | 'error' | 'info'
-  title: string
-  message?: string
-  duration?: number
-}
+// Re-export the redesigned toast types and hook for backward compatibility
+export type { ToastData as Toast, ToastType } from '@/components/redesigned/ui/Toast'
+export type ToastProps = ToastData
 
+// Legacy interface for backward compatibility
 export interface UseToastReturn {
-  toasts: Toast[]
-  showToast: (toast: Omit<Toast, 'id'>) => void
+  toasts: ToastData[]
+  showToast: (toast: Omit<ToastData, 'id'>) => void
+  addToast: (toast: Omit<ToastData, 'id'>) => void
   hideToast: (id: string) => void
+  removeToast: (id: string) => void
   clearAllToasts: () => void
 }
 
 export function useToast(): UseToastReturn {
-  const [toasts, setToasts] = useState<Toast[]>([])
-
-  const showToast = useCallback((toast: Omit<Toast, 'id'>) => {
-    const id = Math.random().toString(36).substring(2, 9)
-    const newToast: Toast = {
-      id,
-      duration: 3000,
-      ...toast,
-    }
-
-    setToasts((prev) => [...prev, newToast])
-  }, [])
-
-  const hideToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter(toast => toast.id !== id))
-  }, [])
-
-  const clearAllToasts = useCallback(() => {
-    setToasts([])
-  }, [])
+  const { toasts, addToast, removeToast, clearAllToasts } = useRedesignedToast()
 
   return {
     toasts,
-    showToast,
-    hideToast,
+    showToast: addToast, // Backward compatibility alias
+    addToast,
+    hideToast: removeToast, // Backward compatibility alias  
+    removeToast,
     clearAllToasts,
   }
 }

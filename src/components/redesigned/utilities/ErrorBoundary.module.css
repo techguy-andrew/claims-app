@@ -1,0 +1,533 @@
+/* ============================================================================ */
+/* ERROR BOUNDARY - Production-ready error handling with Framer Motion */
+/* Complete redevelopment using redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Main Container */
+.errorBoundary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(254, 242, 242, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(252, 165, 165, 0.6);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Level Variants */
+.errorBoundary.page {
+  min-height: 400px;
+  padding: 48px 24px;
+  margin: 20px;
+  background: rgba(254, 242, 242, 0.9);
+  border-radius: 16px;
+}
+
+.errorBoundary.section {
+  min-height: 200px;
+  padding: 32px 24px;
+  margin: 16px 0;
+}
+
+.errorBoundary.component {
+  min-height: 120px;
+  padding: 24px;
+  margin: 8px 0;
+}
+
+/* Severity Variants */
+.errorBoundary.critical {
+  background: rgba(254, 226, 226, 0.9);
+  border-color: rgba(239, 68, 68, 0.8);
+}
+
+.errorBoundary.high {
+  background: rgba(254, 242, 242, 0.9);
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+.errorBoundary.medium {
+  background: rgba(255, 251, 235, 0.9);
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.errorBoundary.low {
+  background: rgba(239, 246, 255, 0.9);
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+/* Error Container */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Error Icon */
+.errorIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.2);
+}
+
+.page .errorIcon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 32px;
+}
+
+.errorIconSvg {
+  width: 32px;
+  height: 32px;
+  color: rgba(239, 68, 68, 1);
+}
+
+.page .errorIconSvg {
+  width: 40px;
+  height: 40px;
+}
+
+/* Severity Icon Colors */
+.critical .errorIcon {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.critical .errorIconSvg {
+  color: rgba(239, 68, 68, 1);
+}
+
+.high .errorIcon {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.high .errorIconSvg {
+  color: rgba(248, 113, 113, 1);
+}
+
+.medium .errorIcon {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.medium .errorIconSvg {
+  color: rgba(245, 158, 11, 1);
+}
+
+.low .errorIcon {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.low .errorIconSvg {
+  color: rgba(59, 130, 246, 1);
+}
+
+/* Error Content */
+.errorContent {
+  width: 100%;
+}
+
+.errorTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(17, 24, 39, 1);
+  line-height: 1.3;
+  margin: 0 0 12px 0;
+}
+
+.section .errorTitle,
+.component .errorTitle {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.errorMessage {
+  font-size: 16px;
+  color: rgba(75, 85, 99, 1);
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section .errorMessage,
+.component .errorMessage {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.errorId {
+  font-size: 12px;
+  color: rgba(107, 114, 128, 1);
+  font-family: monospace;
+  background: rgba(243, 244, 246, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.errorId code {
+  color: rgba(239, 68, 68, 1);
+  font-weight: 600;
+}
+
+/* Error Actions */
+.errorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.section .errorActions,
+.component .errorActions {
+  margin-bottom: 16px;
+}
+
+.primaryAction {
+  order: -1;
+}
+
+/* Error Details */
+.errorDetails {
+  width: 100%;
+  max-width: 500px;
+  margin: 24px auto 0 auto;
+  text-align: left;
+}
+
+.detailsToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(243, 244, 246, 0.8);
+  border: 1px solid rgba(209, 213, 219, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(75, 85, 99, 1);
+}
+
+.detailsToggle:hover {
+  background: rgba(229, 231, 235, 0.8);
+  border-color: rgba(156, 163, 175, 0.8);
+}
+
+.detailsIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.detailsContent {
+  overflow: hidden;
+  border: 1px solid rgba(209, 213, 219, 0.6);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: rgba(249, 250, 251, 0.9);
+}
+
+.errorStack,
+.componentStack {
+  padding: 16px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.errorStack:last-child,
+.componentStack:last-child {
+  border-bottom: none;
+}
+
+.errorStack h4,
+.componentStack h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(55, 65, 81, 1);
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.errorStack pre,
+.componentStack pre {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(75, 85, 99, 1);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  border-radius: 4px;
+  padding: 12px;
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Help Links */
+.helpLinks {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.helpLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  color: rgba(107, 114, 128, 1);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.helpLink:hover {
+  color: rgba(59, 130, 246, 1);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.helpIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Isolated Error */
+.isolatedError {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .errorBoundary.page {
+    min-height: 300px;
+    padding: 32px 20px;
+    margin: 16px;
+  }
+
+  .errorBoundary.section {
+    padding: 24px 20px;
+  }
+
+  .errorBoundary.component {
+    padding: 16px;
+  }
+
+  .errorTitle {
+    font-size: 20px;
+  }
+
+  .section .errorTitle,
+  .component .errorTitle {
+    font-size: 16px;
+  }
+
+  .errorMessage {
+    font-size: 14px;
+  }
+
+  .section .errorMessage,
+  .component .errorMessage {
+    font-size: 13px;
+  }
+
+  .errorIcon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 20px;
+  }
+
+  .page .errorIcon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 24px;
+  }
+
+  .errorIconSvg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .page .errorIconSvg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .errorActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .errorActions > button {
+    width: 100%;
+  }
+
+  .helpLinks {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .errorDetails {
+    margin-top: 16px;
+  }
+
+  .detailsToggle {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .errorStack,
+  .componentStack {
+    padding: 12px;
+  }
+
+  .errorStack pre,
+  .componentStack pre {
+    font-size: 10px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .errorBoundary.page {
+    padding: 24px 16px;
+    margin: 12px;
+  }
+
+  .errorBoundary.section {
+    padding: 20px 16px;
+  }
+
+  .errorBoundary.component {
+    padding: 12px;
+  }
+
+  .errorTitle {
+    font-size: 18px;
+  }
+
+  .section .errorTitle,
+  .component .errorTitle {
+    font-size: 15px;
+  }
+
+  .errorMessage {
+    font-size: 13px;
+  }
+
+  .section .errorMessage,
+  .component .errorMessage {
+    font-size: 12px;
+  }
+
+  .errorIcon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+
+  .errorIconSvg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .errorBoundary {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+
+  .errorIcon {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(239, 68, 68, 1);
+  }
+
+  .detailsToggle {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+
+  .detailsContent {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .detailsToggle,
+  .helpLink {
+    transition: none;
+  }
+}
+
+/* Focus Enhancement */
+.detailsToggle:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 1);
+  outline-offset: 2px;
+}
+
+.helpLink:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 1);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .errorBoundary {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    break-inside: avoid;
+  }
+
+  .errorActions,
+  .helpLinks {
+    display: none;
+  }
+
+  .errorDetails {
+    margin-top: 16px;
+  }
+
+  .detailsContent {
+    display: block;
+    height: auto;
+    opacity: 1;
+  }
+
+  .detailsToggle {
+    display: none;
+  }
+}

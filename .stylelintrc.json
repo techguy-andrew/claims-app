@@ -1,0 +1,62 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "plugins": [
+    "./stylelint-rules/no-root-in-modules.js"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.module.css"],
+      "rules": {
+        "custom/no-root-in-modules": true,
+        "selector-pseudo-class-no-unknown": [
+          true,
+          {
+            "ignorePseudoClasses": ["global", "local"]
+          }
+        ],
+        "selector-type-no-unknown": [
+          true,
+          {
+            "ignore": ["custom-elements"]
+          }
+        ],
+        "selector-class-pattern": [
+          "^[a-z][a-zA-Z0-9]*$",
+          {
+            "message": "CSS Modules classes should use camelCase naming"
+          }
+        ],
+        "property-no-unknown": [
+          true,
+          {
+            "checkPrefixed": true
+          }
+        ],
+        "at-rule-no-unknown": [
+          true,
+          {
+            "ignoreAtRules": ["composes", "value"]
+          }
+        ],
+        "custom-property-pattern": null,
+        "comment-pattern": null
+      },
+      "customSyntax": "postcss-scss"
+    }
+  ],
+  "rules": {
+    "selector-class-pattern": null,
+    "custom-property-pattern": "^([a-z][a-z0-9]*)((-[a-z0-9]+)*)?$",
+    "comment-pattern": null,
+    "no-descending-specificity": null,
+    "font-family-no-missing-generic-family-keyword": null
+  },
+  "ignoreFiles": [
+    "node_modules/**/*",
+    "dist/**/*",
+    ".next/**/*",
+    "out/**/*"
+  ]
+}

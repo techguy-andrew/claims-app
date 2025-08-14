@@ -1,0 +1,449 @@
+/* ============================================================================ */
+/* NAVBAR COMPONENT - Advanced glass morphism navigation bar */
+/* Complete redevelopment using redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Main Navbar */
+.navbar {
+  position: relative;
+  width: 100%;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+  z-index: 40;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar.navbarFixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.navbar.navbarTransparent {
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom-color: rgba(229, 231, 235, 0.4);
+}
+
+/* Navbar Content */
+.navbarContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 16px;
+  max-width: 100%;
+}
+
+/* Left Section */
+.navbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.navbarLogo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.navbarChildren {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mobile Menu Button */
+.mobileMenuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(243, 244, 246, 0.8);
+  color: rgba(107, 114, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobileMenuButton:hover {
+  background: rgba(229, 231, 235, 0.9);
+  color: rgba(55, 65, 81, 1);
+}
+
+.mobileMenuIcon {
+  width: 20px;
+  height: 20px;
+}
+
+@media (min-width: 1024px) {
+  .mobileMenuButton {
+    display: none;
+  }
+}
+
+/* Right Section */
+.navbarRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Search Form */
+.searchForm {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 320px;
+  max-width: 100%;
+  height: 40px;
+  background: rgba(249, 250, 251, 0.9);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  border-radius: 10px;
+  padding: 0 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.searchForm:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(156, 163, 175, 0.8);
+}
+
+.searchForm.searchFocused {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.searchIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(107, 114, 128, 1);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: rgba(17, 24, 39, 1);
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: rgba(156, 163, 175, 1);
+}
+
+@media (max-width: 640px) {
+  .searchForm {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchForm {
+    width: 160px;
+  }
+}
+
+/* Notification Button */
+.notificationButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(243, 244, 246, 0.8);
+  color: rgba(107, 114, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notificationButton:hover {
+  background: rgba(229, 231, 235, 0.9);
+  color: rgba(55, 65, 81, 1);
+}
+
+.notificationIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: rgba(239, 68, 68, 1);
+  color: rgba(255, 255, 255, 1);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9px;
+  line-height: 1;
+  border: 2px solid rgba(255, 255, 255, 1);
+}
+
+/* Theme Toggle */
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(243, 244, 246, 0.8);
+  color: rgba(107, 114, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.themeToggle:hover {
+  background: rgba(229, 231, 235, 0.9);
+  color: rgba(55, 65, 81, 1);
+}
+
+.themeIcon {
+  width: 18px;
+  height: 18px;
+}
+
+/* User Menu */
+.userMenuContainer {
+  position: relative;
+}
+
+.userMenuButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px 6px 6px;
+  background: rgba(243, 244, 246, 0.8);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.userMenuButton:hover {
+  background: rgba(229, 231, 235, 0.9);
+  border-color: rgba(156, 163, 175, 0.8);
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(59, 130, 246, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarInitials {
+  color: rgba(255, 255, 255, 1);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(17, 24, 39, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: rgba(107, 114, 128, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.userMenuChevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chevronIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(107, 114, 128, 1);
+}
+
+/* User Menu Dropdown */
+.userMenuDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 50;
+  padding: 8px;
+}
+
+.menuActionLink,
+.menuActionButton {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menuAction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgba(17, 24, 39, 1);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.menuAction:hover {
+  background: rgba(243, 244, 246, 0.8);
+}
+
+.menuAction.menuActionDanger {
+  color: rgba(239, 68, 68, 1);
+}
+
+.menuAction.menuActionDanger:hover {
+  background: rgba(254, 242, 242, 0.8);
+}
+
+.menuActionIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.menuActionLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.menuSeparator {
+  height: 1px;
+  background: rgba(229, 231, 235, 0.6);
+  margin: 4px 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .navbarContent {
+    padding: 0 12px;
+  }
+  
+  .navbarRight {
+    gap: 8px;
+  }
+  
+  .userInfo {
+    display: none;
+  }
+  
+  .userMenuButton {
+    padding: 6px;
+    gap: 0;
+  }
+  
+  .searchForm {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .themeToggle {
+    display: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .navbar {
+    background: rgba(255, 255, 255, 1);
+    border-bottom: 2px solid rgba(0, 0, 0, 1);
+  }
+  
+  .searchForm {
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+  
+  .userMenuDropdown {
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  .searchForm,
+  .notificationButton,
+  .themeToggle,
+  .userMenuButton,
+  .menuAction {
+    transition: none;
+  }
+}

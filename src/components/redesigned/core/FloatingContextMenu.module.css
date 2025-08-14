@@ -1,0 +1,288 @@
+/* ============================================================================
+   FLOATING CONTEXT MENU - Glass Morphism Professional Menu System
+   ============================================================================ */
+
+/* ============================================================================
+   MENU CONTAINER
+   ============================================================================ */
+
+.floatingMenu {
+  /* Positioning */
+  position: fixed;
+  z-index: var(--z-popover);
+  
+  /* Glass morphism styling */
+  background: var(--glass-white-95);
+  backdrop-filter: var(--backdrop-blur-md);
+  -webkit-backdrop-filter: var(--backdrop-blur-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-enterprise-hover);
+  
+  /* Layout */
+  padding: var(--spacing-xs);
+  min-width: 160px;
+  max-width: 280px;
+  
+  /* Animation */
+  opacity: 1;
+  scale: 1;
+  transform-origin: top right;
+  transition: all var(--transition-fast);
+  
+  /* Mobile optimizations */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Menu entrance animation */
+.floatingMenu {
+  animation: menuSlideIn var(--transition-fast) var(--ease-out);
+}
+
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    scale: 0.95;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   MENU ITEMS
+   ============================================================================ */
+
+.menuItem {
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  
+  /* Layout */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  
+  /* Typography */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  text-align: left;
+  
+  /* Interaction */
+  transition: all var(--transition-fast);
+  outline: none;
+  
+  /* Mobile touch targets */
+  min-height: var(--touch-target-small);
+}
+
+.menuItem:hover:not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.menuItem:active:not(.disabled) {
+  background-color: rgba(0, 0, 0, 0.06);
+  transform: translateY(0);
+}
+
+.menuItem:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* ============================================================================
+   MENU ITEM VARIANTS
+   ============================================================================ */
+
+.destructive {
+  color: var(--color-error);
+}
+
+.destructive:hover:not(.disabled) {
+  background-color: rgba(239, 68, 68, 0.08);
+  color: var(--color-error);
+}
+
+.destructive:active:not(.disabled) {
+  background-color: rgba(239, 68, 68, 0.12);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   MENU ITEM ELEMENTS
+   ============================================================================ */
+
+.menuIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.menuItem:hover:not(.disabled) .menuIcon {
+  color: var(--text-primary);
+}
+
+.destructive .menuIcon {
+  color: var(--color-error);
+}
+
+.menuLabel {
+  flex: 1;
+  line-height: var(--line-height-tight);
+}
+
+.menuShortcut {
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-normal);
+  opacity: 0.7;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* ============================================================================
+   MOBILE OPTIMIZATIONS
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  .floatingMenu {
+    /* Larger padding for touch */
+    padding: var(--spacing-sm);
+    min-width: 180px;
+    
+    /* Better positioning on mobile */
+    max-width: calc(100vw - 40px);
+  }
+  
+  .menuItem {
+    /* Larger touch targets */
+    padding: var(--spacing-md) var(--spacing-lg);
+    min-height: var(--touch-target-min);
+    font-size: var(--font-size-base);
+  }
+  
+  .menuIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Remove hover effects on mobile */
+  .menuItem:hover:not(.disabled) {
+    transform: none;
+    background-color: transparent;
+  }
+  
+  /* Enhanced active states for mobile */
+  .menuItem:active:not(.disabled) {
+    background-color: rgba(0, 0, 0, 0.08);
+    scale: 0.98;
+  }
+}
+
+/* ============================================================================
+   DESKTOP REFINEMENTS
+   ============================================================================ */
+
+@media (min-width: 768px) {
+  .floatingMenu {
+    min-width: 160px;
+  }
+  
+  .menuItem {
+    min-height: var(--touch-target-small);
+  }
+}
+
+/* ============================================================================
+   HIGH CONTRAST MODE
+   ============================================================================ */
+
+@media (prefers-contrast: high) {
+  .floatingMenu {
+    border: 2px solid var(--text-primary);
+    background: var(--bg-primary);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .menuItem:hover:not(.disabled) {
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
+  }
+  
+  .menuItem:hover:not(.disabled) .menuIcon {
+    color: var(--bg-primary);
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .floatingMenu {
+    animation: none;
+    transition: opacity var(--transition-fast);
+  }
+  
+  .menuItem {
+    transition: background-color var(--transition-fast);
+  }
+  
+  .menuItem:hover:not(.disabled) {
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .floatingMenu {
+    background: rgba(0, 0, 0, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.4),
+      0 8px 24px rgba(0, 0, 0, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  }
+  
+  .menuItem {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .menuItem:hover:not(.disabled) {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .menuIcon {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .menuItem:hover:not(.disabled) .menuIcon {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}

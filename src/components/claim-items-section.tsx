@@ -2,10 +2,10 @@
 
 import React, { useState, useCallback, useRef } from 'react'
 import { Plus, Package, Edit, Trash2, Eye, MoreVertical, AlertCircle, CheckCircle, File, FileText, Download, Tag, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Field } from '@/components/ui/label'
+import { Button } from '@/components/redesigned/ui/Button'
+import { Input } from '@/components/redesigned/forms/Input'
+import { Textarea } from '@/components/redesigned/forms/Textarea'
+import { Label as Field } from '@/components/redesigned/forms/Label'
 import { SimpleImageModal } from './simple-image-modal'
 import { SimplePDFModal } from './simple-pdf-modal'
 

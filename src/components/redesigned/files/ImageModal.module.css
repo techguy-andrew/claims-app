@@ -1,0 +1,184 @@
+/* ============================================================================
+   IMAGE MODAL - Exact SimpleImageModal styling with CSS Modules + Glass Morphism
+   ============================================================================ */
+
+/* ============================================================================
+   MODAL OVERLAY - Exact match to SimpleImageModal
+   ============================================================================ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.8); /* Exact same background */
+}
+
+/* ============================================================================
+   HEADER - Exact match with subtle glass morphism enhancement
+   ============================================================================ */
+
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: white;
+  border-bottom: 1px solid #e5e7eb; /* Exact same border */
+  padding: 1rem; /* Exact same padding */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Exact same shadow */
+  
+  /* Subtle glass morphism enhancement */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* 12px - exact match */
+}
+
+.title {
+  font-size: 0.875rem; /* 14px - exact match */
+  font-weight: 500; /* exact match */
+  color: #111827; /* exact match */
+  margin: 0;
+}
+
+/* ============================================================================
+   ACTION BUTTONS - Exact match with consistency
+   ============================================================================ */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px - exact match */
+}
+
+.actionButton {
+  /* Reset */
+  background: none;
+  border: none;
+  padding: 0.5rem; /* 8px - exact match */
+  margin: 0;
+  cursor: pointer;
+  
+  /* Styling - exact match */
+  border-radius: 0.5rem; /* 8px - exact match */
+  transition: background-color 200ms; /* exact match */
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Focus */
+  outline: none;
+}
+
+.actionButton:hover {
+  background-color: #f3f4f6; /* exact match */
+}
+
+.actionButton:focus {
+  outline: 2px solid #3b82f6; /* exact match focus ring */
+  outline-offset: 2px;
+}
+
+.actionIcon {
+  width: 1rem; /* 16px - exact match */
+  height: 1rem; /* 16px - exact match */
+  color: #374151; /* exact match */
+}
+
+/* ============================================================================
+   IMAGE DISPLAY - Exact match to SimpleImageModal
+   ============================================================================ */
+
+.imageContainer {
+  padding-top: 4rem; /* 64px - exact match (pt-16) */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1rem; /* exact match */
+  padding-right: 1rem; /* exact match */
+}
+
+.image {
+  max-width: 100%; /* exact match */
+  max-height: 100%; /* exact match */
+  object-fit: contain; /* exact match */
+  border-radius: 0.5rem; /* 8px - exact match */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* exact match */
+  max-height: calc(100vh - 6rem); /* exact match to inline style */
+}
+
+/* ============================================================================
+   CLICK OUTSIDE - Exact functionality match
+   ============================================================================ */
+
+.clickOutside {
+  position: absolute;
+  inset: 0;
+  z-index: -10; /* exact match to -z-10 */
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVENESS - Same as original
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  .header {
+    padding: 0.75rem; /* Slightly smaller padding on mobile */
+  }
+  
+  .title {
+    font-size: 0.8125rem; /* Slightly smaller on mobile */
+  }
+  
+  .imageContainer {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* ============================================================================
+   ACCESSIBILITY - Same focus management
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .actionButton {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT - Enhanced version
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .header {
+    background: #1f2937;
+    border-bottom-color: #374151;
+  }
+  
+  .title {
+    color: #f9fafb;
+  }
+  
+  .actionButton:hover {
+    background-color: #374151;
+  }
+  
+  .actionIcon {
+    color: #d1d5db;
+  }
+}

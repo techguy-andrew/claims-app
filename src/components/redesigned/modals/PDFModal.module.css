@@ -1,0 +1,473 @@
+/* ============================================================================ */
+/* PDF MODAL - Advanced PDF viewer with Framer Motion animations */
+/* Complete redevelopment using redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Main Container */
+.pdfModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.pdfModal.fullscreen {
+  background: rgba(0, 0, 0, 1);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pdfIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  flex-shrink: 0;
+}
+
+.pdfIconSvg {
+  width: 20px;
+  height: 20px;
+  color: rgba(239, 68, 68, 1);
+}
+
+.headerContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.pdfTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(243, 244, 246, 1);
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdfMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(156, 163, 175, 1);
+}
+
+.pdfSize,
+.pageInfo,
+.zoomInfo {
+  font-weight: 500;
+}
+
+.metaSeparator {
+  color: rgba(75, 85, 99, 1);
+}
+
+.navControls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 8px;
+  padding-right: 8px;
+  border-right: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+/* PDF Container */
+.pdfContainer {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* PDF Display */
+.pdfDisplay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(55, 65, 81, 0.5);
+}
+
+.pdfFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.fullscreen .pdfFrame {
+  border-radius: 0;
+}
+
+/* Loading & Error States */
+.pdfLoading,
+.pdfError {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: rgba(156, 163, 175, 1);
+  font-size: 16px;
+  font-weight: 500;
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(75, 85, 99, 1);
+  border-top: 3px solid rgba(239, 68, 68, 1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pdfError h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(243, 244, 246, 1);
+  margin: 0;
+}
+
+.pdfError p {
+  font-size: 14px;
+  color: rgba(156, 163, 175, 1);
+  margin: 8px 0 16px 0;
+  text-align: center;
+}
+
+.errorIcon {
+  width: 48px;
+  height: 48px;
+  color: rgba(239, 68, 68, 1);
+}
+
+.errorActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* PDF Info Panel */
+.pdfInfo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-left: 1px solid rgba(75, 85, 99, 0.3);
+  padding: 24px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.infoTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(243, 244, 246, 1);
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(156, 163, 175, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.infoValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(243, 244, 246, 1);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .headerLeft {
+    gap: 8px;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .headerRight {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pdfIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pdfIconSvg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .pdfTitle {
+    font-size: 14px;
+  }
+
+  .pdfMeta {
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+
+  .pdfInfo {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-left: none;
+    border-top: 1px solid rgba(75, 85, 99, 0.3);
+    max-height: 40%;
+  }
+
+  .navControls,
+  .actionButtons,
+  .zoomControls {
+    gap: 2px;
+  }
+
+  .navControls {
+    margin-right: 4px;
+    padding-right: 4px;
+  }
+
+  .zoomControls {
+    margin-left: 4px;
+    padding-left: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .headerLeft {
+    justify-content: flex-start;
+    min-width: auto;
+  }
+
+  .headerRight {
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .pdfTitle {
+    font-size: 13px;
+  }
+
+  .pdfMeta {
+    font-size: 10px;
+  }
+
+  .pdfInfo {
+    padding: 16px;
+  }
+
+  .infoTitle {
+    font-size: 16px;
+  }
+
+  .pdfError {
+    margin: 12px;
+    padding: 20px;
+  }
+
+  .errorActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .errorActions > button {
+    width: 100%;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .header {
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .headerRight {
+    margin-top: 0;
+  }
+
+  .pdfInfo {
+    width: 250px;
+    height: 100%;
+    position: absolute;
+    border-left: 1px solid rgba(75, 85, 99, 0.3);
+    border-top: none;
+    max-height: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .pdfModal {
+    background: rgba(0, 0, 0, 1);
+  }
+
+  .header {
+    background: rgba(0, 0, 0, 1);
+    border-bottom: 2px solid rgba(255, 255, 255, 1);
+  }
+
+  .pdfInfo {
+    background: rgba(0, 0, 0, 1);
+    border-left: 2px solid rgba(255, 255, 255, 1);
+  }
+
+  .infoTitle {
+    border-bottom: 2px solid rgba(255, 255, 255, 1);
+  }
+
+  .pdfFrame {
+    border: 2px solid rgba(255, 255, 255, 1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .pdfFrame,
+  .loadingSpinner {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Focus Enhancement */
+.pdfFrame:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 1);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .pdfModal {
+    position: relative;
+    background: white;
+    inset: auto;
+  }
+
+  .header,
+  .pdfInfo {
+    display: none;
+  }
+
+  .pdfContainer {
+    background: white;
+  }
+
+  .pdfFrame {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}

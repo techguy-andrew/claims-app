@@ -1,0 +1,474 @@
+/* ============================================================================
+   CARD COMPONENT - Items-Card Inspired Glass Morphism Design
+   ============================================================================ */
+
+/* ============================================================================
+   BASE CARD STYLES
+   ============================================================================ */
+
+.card {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  
+  /* Glass morphism base */
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  
+  /* Transitions */
+  transition: all var(--transition-normal);
+  
+  /* Mobile optimizations */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================================
+   CARD VARIANTS
+   ============================================================================ */
+
+.default {
+  background: var(--bg-primary);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-enterprise);
+}
+
+.glass {
+  background: var(--glass-white-95);
+  backdrop-filter: var(--backdrop-blur-md);
+  -webkit-backdrop-filter: var(--backdrop-blur-md);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-enterprise);
+}
+
+.elevated {
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-enterprise-hover);
+  transform: translateY(-1px);
+}
+
+.flat {
+  background: var(--bg-primary);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: none;
+}
+
+/* ============================================================================
+   INTERACTIVE STATES
+   ============================================================================ */
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  border: none;
+  font: inherit;
+  text-align: left;
+  padding: 0;
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.hoverable:hover:not(.disabled) {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-enterprise-hover);
+  transform: translateY(-1px);
+}
+
+.clickable:hover:not(.disabled) {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-enterprise-hover);
+  transform: translateY(-1px);
+}
+
+.clickable:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-enterprise);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   PADDING VARIANTS
+   ============================================================================ */
+
+.padding-none {
+  padding: 0;
+}
+
+.padding-small {
+  padding: var(--spacing-md);
+}
+
+.padding-default {
+  padding: var(--spacing-lg);
+}
+
+.padding-large {
+  padding: var(--spacing-xl);
+}
+
+/* ============================================================================
+   CARD HEADER - Items-Card Inspired
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-gray-100);
+  min-height: 64px;
+  transition: background-color var(--transition-fast);
+}
+
+.header.expandable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.header.expandable:hover {
+  background-color: var(--color-gray-50);
+}
+
+.header.expandable:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* Header Icon - Inspired by items-card icon styling */
+.headerIcon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-gray-100) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-lg);
+}
+
+.icon {
+  color: var(--color-primary);
+}
+
+/* Header Content */
+.headerContent {
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+/* Header Actions */
+.headerActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-left: var(--spacing-lg);
+}
+
+.expandIcon {
+  color: var(--text-tertiary);
+  transition: transform var(--transition-normal), color var(--transition-fast);
+}
+
+.expandIcon.expanded {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+/* ============================================================================
+   CARD TITLE & DESCRIPTION
+   ============================================================================ */
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.description {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+/* ============================================================================
+   CARD CONTENT
+   ============================================================================ */
+
+.content {
+  flex: 1;
+  padding: var(--spacing-lg);
+}
+
+.content-padding-none {
+  padding: 0;
+}
+
+.content-padding-small {
+  padding: var(--spacing-md);
+}
+
+.content-padding-large {
+  padding: var(--spacing-xl);
+}
+
+/* ============================================================================
+   CARD FOOTER
+   ============================================================================ */
+
+.footer {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--color-gray-100);
+  background-color: var(--color-gray-50);
+}
+
+.footer-left {
+  justify-content: flex-start;
+}
+
+.footer-center {
+  justify-content: center;
+}
+
+.footer-right {
+  justify-content: flex-end;
+}
+
+.footer-spaceBetween {
+  justify-content: space-between;
+}
+
+/* ============================================================================
+   EXPANDABLE CARD
+   ============================================================================ */
+
+.expandableCard {
+  overflow: visible;
+}
+
+.expandableContent {
+  border-top: 1px solid var(--color-gray-100);
+  animation: expandContent var(--transition-normal) var(--ease-out);
+  transform-origin: top;
+}
+
+@keyframes expandContent {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px; /* Large enough value */
+    transform: scaleY(1);
+  }
+}
+
+/* ============================================================================
+   CARD GRID
+   ============================================================================ */
+
+.cardGrid {
+  display: grid;
+  width: 100%;
+}
+
+/* Grid Columns */
+.grid-columns-1 {
+  grid-template-columns: 1fr;
+}
+
+.grid-columns-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-columns-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-columns-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-columns-auto {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Grid Gaps */
+.grid-gap-small {
+  gap: var(--spacing-md);
+}
+
+.grid-gap-default {
+  gap: var(--spacing-lg);
+}
+
+.grid-gap-large {
+  gap: var(--spacing-xl);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .header {
+    padding: var(--spacing-md);
+    min-height: 56px;
+  }
+  
+  .headerIcon {
+    width: 40px;
+    height: 40px;
+    margin-right: var(--spacing-md);
+  }
+  
+  .content {
+    padding: var(--spacing-md);
+  }
+  
+  .footer {
+    padding: var(--spacing-md);
+  }
+  
+  /* Force single column on mobile for auto grid */
+  .grid-columns-auto {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Reduce columns on small screens */
+  .grid-columns-3,
+  .grid-columns-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Remove hover effects on mobile */
+  .hoverable:hover:not(.disabled),
+  .clickable:hover:not(.disabled) {
+    transform: none;
+  }
+  
+  /* Enhanced active states for mobile */
+  .clickable:active:not(.disabled) {
+    scale: 0.98;
+    transition: scale 0.1s ease;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid-columns-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1024px) {
+  .grid-columns-auto {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+/* ============================================================================
+   HIGH CONTRAST MODE
+   ============================================================================ */
+
+@media (prefers-contrast: high) {
+  .card {
+    border-width: 2px;
+  }
+  
+  .glass {
+    background: var(--bg-primary);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: var(--text-primary);
+  }
+  
+  .header {
+    border-bottom-width: 2px;
+  }
+  
+  .footer {
+    border-top-width: 2px;
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  }
+  
+  .hoverable:hover:not(.disabled),
+  .clickable:hover:not(.disabled) {
+    transform: none;
+  }
+  
+  .expandableContent {
+    animation: none;
+  }
+  
+  .expandIcon {
+    transition: color var(--transition-fast);
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .default {
+    background: #1a1a1a;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .header.expandable:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+  
+  .headerIcon {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+  }
+}

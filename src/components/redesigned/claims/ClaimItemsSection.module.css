@@ -1,0 +1,635 @@
+/* ============================================================================ */
+/* CLAIM ITEMS SECTION - Advanced items management with inline editing */
+/* Complete redevelopment using redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Main Container */
+.claimItemsSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.claimItemsSection.compact {
+  gap: 20px;
+}
+
+/* Section Header */
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.headerContent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.headerLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.headerRight {
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(17, 24, 39, 1);
+  line-height: 1.3;
+  margin: 0 0 4px 0;
+}
+
+.sectionDescription {
+  font-size: 14px;
+  color: rgba(107, 114, 128, 1);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Search Container */
+.searchContainer {
+  display: flex;
+  justify-content: flex-start;
+  max-width: 400px;
+}
+
+.searchInput {
+  width: 100%;
+}
+
+/* Add Form Container */
+.addFormContainer {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Item Form */
+.itemForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fieldContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.buttonIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Items List */
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Item Card */
+.itemCard {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.itemCard:hover {
+  border-color: rgba(156, 163, 175, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Item Header */
+.itemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.itemHeader:hover {
+  background: rgba(249, 250, 251, 0.8);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Item Icon */
+.itemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
+}
+
+.itemIconSvg {
+  width: 20px;
+  height: 20px;
+  color: rgba(59, 130, 246, 1);
+}
+
+/* Item Info */
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 1);
+  line-height: 1.3;
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: rgba(107, 114, 128, 1);
+}
+
+.itemDate {
+  white-space: nowrap;
+}
+
+.fileCount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.fileCountIcon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Expand Button */
+.expandButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.expandIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(107, 114, 128, 1);
+}
+
+/* Actions Button */
+.actionsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(107, 114, 128, 1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionsButton:hover {
+  background: rgba(243, 244, 246, 0.8);
+  color: rgba(55, 65, 81, 1);
+}
+
+.actionsIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Item Details */
+.itemDetails {
+  padding: 0 20px 16px 20px;
+  border-top: 1px solid rgba(229, 231, 235, 0.6);
+  margin-top: -1px;
+}
+
+.itemDetailsText {
+  font-size: 14px;
+  color: rgba(75, 85, 99, 1);
+  line-height: 1.5;
+  margin: 16px 0 0 0;
+}
+
+/* Edit Form Container */
+.editFormContainer {
+  padding: 20px;
+  border-top: 1px solid rgba(229, 231, 235, 0.6);
+  background: rgba(249, 250, 251, 0.5);
+}
+
+/* Files Section */
+.filesSection {
+  padding: 20px;
+  border-top: 1px solid rgba(229, 231, 235, 0.6);
+  background: rgba(249, 250, 251, 0.5);
+  overflow: hidden;
+}
+
+.filesSectionHeader {
+  margin-bottom: 16px;
+}
+
+.filesSectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 1);
+  margin: 0;
+}
+
+.filesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* File Item */
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.fileItem:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(156, 163, 175, 0.8);
+}
+
+.fileIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(243, 244, 246, 0.8);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.fileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fileIconSvg {
+  width: 16px;
+  height: 16px;
+  color: rgba(107, 114, 128, 1);
+}
+
+.fileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(17, 24, 39, 1);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: rgba(107, 114, 128, 1);
+}
+
+.fileActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Actions Menu */
+.actionsMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+  padding: 4px;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  color: rgba(17, 24, 39, 1);
+  text-align: left;
+  width: 100%;
+}
+
+.actionItem:hover {
+  background: rgba(243, 244, 246, 0.8);
+}
+
+.actionItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionItem.actionPrimary:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: rgba(59, 130, 246, 1);
+}
+
+.actionItem.actionDanger {
+  color: rgba(239, 68, 68, 1);
+}
+
+.actionItem.actionDanger:hover {
+  background: rgba(254, 242, 242, 0.8);
+}
+
+.actionIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.actionLabel {
+  flex: 1;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  background: rgba(249, 250, 251, 0.5);
+  border: 2px dashed rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+}
+
+.emptyStateIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(243, 244, 246, 0.8);
+  margin-bottom: 16px;
+}
+
+.emptyStateIconSvg {
+  width: 32px;
+  height: 32px;
+  color: rgba(107, 114, 128, 1);
+}
+
+.emptyStateTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 1);
+  margin: 0 0 8px 0;
+}
+
+.emptyStateDescription {
+  font-size: 14px;
+  color: rgba(107, 114, 128, 1);
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+  max-width: 400px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .claimItemsSection {
+    gap: 20px;
+  }
+  
+  .headerContent {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .headerRight {
+    align-self: flex-start;
+  }
+  
+  .searchContainer {
+    max-width: none;
+  }
+  
+  .itemHeader {
+    padding: 14px 16px;
+  }
+  
+  .headerLeft {
+    gap: 10px;
+  }
+  
+  .itemIcon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .itemIconSvg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .itemName {
+    font-size: 15px;
+  }
+  
+  .itemMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .itemDetails {
+    padding: 0 16px 14px 16px;
+  }
+  
+  .filesSection,
+  .editFormContainer {
+    padding: 16px;
+  }
+  
+  .addFormContainer {
+    padding: 16px;
+  }
+  
+  .formActions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .formActions > button {
+    width: 100%;
+  }
+  
+  .fileItem {
+    padding: 10px;
+  }
+  
+  .emptyState {
+    padding: 32px 20px;
+  }
+  
+  .emptyStateIcon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+  }
+  
+  .emptyStateIconSvg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .emptyStateTitle {
+    font-size: 16px;
+  }
+  
+  .emptyStateDescription {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Compact Variant */
+.compact .sectionTitle {
+  font-size: 18px;
+}
+
+.compact .itemCard {
+  border-radius: 10px;
+}
+
+.compact .itemHeader {
+  padding: 12px 16px;
+}
+
+.compact .itemIcon {
+  width: 36px;
+  height: 36px;
+}
+
+.compact .itemIconSvg {
+  width: 18px;
+  height: 18px;
+}
+
+.compact .filesSection,
+.compact .editFormContainer,
+.compact .addFormContainer {
+  padding: 16px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .itemCard,
+  .addFormContainer {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+  
+  .emptyState {
+    border: 3px dashed rgba(0, 0, 0, 1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .itemCard,
+  .itemHeader,
+  .actionItem,
+  .fileItem,
+  .expandButton {
+    transition: none;
+  }
+}

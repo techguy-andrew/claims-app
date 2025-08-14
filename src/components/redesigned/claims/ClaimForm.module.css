@@ -1,0 +1,468 @@
+/* ============================================================================ */
+/* CLAIM FORM COMPONENT - Advanced React Hook Form + Zod integration */
+/* Complete redevelopment using redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Main Form Container */
+.claimForm {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.claimForm.compact {
+  max-width: 600px;
+}
+
+/* Form Header */
+.formHeader {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.headerContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
+}
+
+.headerIconSvg {
+  width: 24px;
+  height: 24px;
+  color: rgba(59, 130, 246, 1);
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.headerTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(17, 24, 39, 1);
+  line-height: 1.2;
+  margin: 0 0 8px 0;
+}
+
+.headerDescription {
+  font-size: 16px;
+  color: rgba(107, 114, 128, 1);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Form Section */
+.formSection {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.formSection:hover {
+  border-color: rgba(156, 163, 175, 0.8);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.sectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
+}
+
+.sectionIconSvg {
+  width: 20px;
+  height: 20px;
+  color: rgba(59, 130, 246, 1);
+}
+
+.sectionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 1);
+  line-height: 1.3;
+  margin: 0 0 4px 0;
+}
+
+.sectionDescription {
+  font-size: 14px;
+  color: rgba(107, 114, 128, 1);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Section Fields */
+.sectionFields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .fieldGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.fieldContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Special Field Layouts */
+.claimNumberField {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.claimNumberField > :first-child {
+  flex: 1;
+}
+
+.generateButton {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
+.dollarSign {
+  font-weight: 600;
+  color: rgba(107, 114, 128, 1);
+}
+
+/* Form Actions */
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  background: rgba(249, 250, 251, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  border-radius: 12px;
+  margin-top: 8px;
+}
+
+.actionsLeft {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.actionsRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Dirty Indicator */
+.dirtyIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.dirtyIcon {
+  width: 16px;
+  height: 16px;
+  color: rgba(245, 158, 11, 1);
+  flex-shrink: 0;
+}
+
+.dirtyText {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(245, 158, 11, 1);
+  white-space: nowrap;
+}
+
+/* Button Icons */
+.buttonIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Compact Variant */
+.compact .formSection {
+  padding: 20px;
+}
+
+.compact .sectionHeader {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+}
+
+.compact .sectionFields {
+  gap: 16px;
+}
+
+.compact .fieldGrid {
+  gap: 16px;
+}
+
+.compact .formActions {
+  padding: 20px;
+}
+
+.compact .headerTitle {
+  font-size: 20px;
+}
+
+.compact .headerDescription {
+  font-size: 14px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .claimForm {
+    margin: 0;
+  }
+  
+  .formHeader {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+  }
+  
+  .headerContent {
+    gap: 12px;
+  }
+  
+  .headerIcon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .headerIconSvg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .headerTitle {
+    font-size: 20px;
+  }
+  
+  .headerDescription {
+    font-size: 14px;
+  }
+  
+  .form {
+    gap: 24px;
+  }
+  
+  .formSection {
+    padding: 20px;
+  }
+  
+  .sectionHeader {
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+  
+  .sectionIcon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .sectionIconSvg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .sectionTitle {
+    font-size: 16px;
+  }
+  
+  .sectionDescription {
+    font-size: 13px;
+  }
+  
+  .sectionFields {
+    gap: 16px;
+  }
+  
+  .formActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 20px;
+  }
+  
+  .actionsLeft {
+    justify-content: center;
+  }
+  
+  .actionsRight {
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .claimNumberField {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .generateButton {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .formSection {
+    padding: 16px;
+  }
+  
+  .sectionHeader {
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+  
+  .sectionIcon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .sectionIconSvg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .sectionTitle {
+    font-size: 15px;
+  }
+  
+  .sectionFields {
+    gap: 14px;
+  }
+  
+  .formActions {
+    padding: 16px;
+  }
+  
+  .actionsRight {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .actionsRight > button {
+    width: 100%;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .formSection {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+  
+  .sectionHeader {
+    border-bottom: 2px solid rgba(0, 0, 0, 1);
+  }
+  
+  .formActions {
+    background: rgba(248, 248, 248, 1);
+    border: 2px solid rgba(0, 0, 0, 1);
+  }
+  
+  .dirtyIndicator {
+    border: 2px solid rgba(245, 158, 11, 1);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .formSection,
+  .formActions,
+  .dirtyIndicator {
+    transition: none;
+  }
+}
+
+/* Focus Enhancement */
+.formSection:focus-within {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Loading State */
+.form:has([disabled]) .formSection {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Print Styles */
+@media print {
+  .formActions {
+    display: none;
+  }
+  
+  .formSection {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+  }
+}

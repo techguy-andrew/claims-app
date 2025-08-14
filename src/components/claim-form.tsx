@@ -2,11 +2,11 @@
 
 import { useState, useCallback } from 'react'
 import { RefreshCw, Wand2, FileText } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
-import { Field } from '@/components/ui/label'
+import { Input } from '@/components/redesigned/forms/Input'
+import { Select } from '@/components/redesigned/forms/Select'
+import { Textarea } from '@/components/redesigned/forms/Textarea'
+import { Button } from '@/components/redesigned/ui/Button'
+import { Label as Field } from '@/components/redesigned/forms/Label'
 import { 
   ClaimFormData, 
   ClaimFormErrors, 

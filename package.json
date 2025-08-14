@@ -7,13 +7,16 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "lint:css": "echo 'Note: Install stylelint and stylelint-config-standard for CSS linting'",
+    "postinstall": "prisma generate",
+    "seed:components": "tsx prisma/seed-components.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.25.4",
-    "@hookform/resolvers": "^5.1.1",
+    "@hookform/resolvers": "^5.2.1",
     "@prisma/client": "^6.12.0",
     "cloudinary": "^2.7.0",
+    "framer-motion": "^12.23.12",
     "lucide-react": "^0.526.0",
     "next": "15.2.3",
     "next-cloudinary": "^6.16.0",
@@ -21,8 +24,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.8",
-    "react-hook-form": "^7.60.0",
-    "zod": "^4.0.5"
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -33,6 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
     "tailwindcss": "^4",
+    "tsx": "^4.20.3",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5"
   }

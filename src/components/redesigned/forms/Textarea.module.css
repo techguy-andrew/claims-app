@@ -1,0 +1,259 @@
+/* ============================================================================ */
+/* TEXTAREA COMPONENT - Modern form textarea with glass morphism */
+/* Following redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Container */
+.textareaContainer {
+  position: relative;
+  display: inline-block;
+  width: auto;
+}
+
+.textareaContainer.fullWidth {
+  width: 100%;
+}
+
+/* Base Textarea Styles */
+.textarea {
+  width: 100%;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(17, 24, 39, 1);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.textarea:focus {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 1);
+}
+
+.textarea:hover:not(:focus):not(:disabled) {
+  border-color: rgba(156, 163, 175, 0.8);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.textarea::placeholder {
+  color: rgba(156, 163, 175, 1);
+}
+
+/* Size Variants */
+.size-small {
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: 8px;
+}
+
+.size-default {
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.size-large {
+  padding: 14px 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  border-radius: 14px;
+}
+
+/* Variant Styles */
+.variant-default {
+  /* Already applied in base styles */
+}
+
+.variant-outline {
+  background: transparent;
+  border: 2px solid rgba(229, 231, 235, 0.8);
+}
+
+.variant-outline:focus {
+  border-color: rgba(59, 130, 246, 1);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.variant-filled {
+  background: rgba(249, 250, 251, 0.9);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.variant-filled:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+.variant-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.variant-ghost:hover:not(:focus):not(:disabled) {
+  background: rgba(249, 250, 251, 0.8);
+  border-color: rgba(229, 231, 235, 0.5);
+}
+
+.variant-ghost:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+/* State Variants */
+.state-error {
+  border-color: rgba(239, 68, 68, 0.8);
+  background: rgba(254, 242, 242, 0.9);
+}
+
+.state-error:focus {
+  border-color: rgba(239, 68, 68, 1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.state-success {
+  border-color: rgba(34, 197, 94, 0.8);
+  background: rgba(240, 253, 244, 0.9);
+}
+
+.state-success:focus {
+  border-color: rgba(34, 197, 94, 1);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.state-warning {
+  border-color: rgba(245, 158, 11, 0.8);
+  background: rgba(255, 251, 235, 0.9);
+}
+
+.state-warning:focus {
+  border-color: rgba(245, 158, 11, 1);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Resize Options */
+.resize-none {
+  resize: none;
+}
+
+.resize-vertical {
+  resize: vertical;
+}
+
+.resize-horizontal {
+  resize: horizontal;
+}
+
+.resize-both {
+  resize: both;
+}
+
+/* Auto Resize */
+.autoResize {
+  resize: none;
+  overflow: hidden;
+  min-height: auto;
+}
+
+/* Disabled State */
+.disabled {
+  background: rgba(249, 250, 251, 0.7);
+  border-color: rgba(229, 231, 235, 0.5);
+  color: rgba(156, 163, 175, 1);
+  cursor: not-allowed;
+  resize: none;
+}
+
+.disabled::placeholder {
+  color: rgba(203, 213, 225, 1);
+}
+
+/* Loading State */
+.loading .textarea {
+  cursor: wait;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.loadingSpinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(107, 114, 128, 0.3);
+  border-top: 2px solid rgba(107, 114, 128, 1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Full Width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Mobile Optimizations */
+.mobileOptimized {
+  min-height: 44px; /* iOS minimum touch target */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Inline Editing */
+.inlineEditing {
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+  min-height: auto;
+}
+
+.inlineEditing:hover:not(:focus) {
+  background: rgba(249, 250, 251, 0.8);
+  border-color: rgba(229, 231, 235, 0.6);
+}
+
+.inlineEditing:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .mobileOptimized.size-default {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+  
+  .mobileOptimized.size-small {
+    font-size: 14px;
+    padding: 10px 12px;
+    min-height: 40px;
+  }
+  
+  .mobileOptimized.size-large {
+    font-size: 18px;
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+}

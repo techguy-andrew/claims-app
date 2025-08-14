@@ -1,33 +1,33 @@
 'use client'
 
-import React, { createContext, useContext } from 'react'
-import { useToast, type UseToastReturn } from '@/hooks/use-toast'
-import { ToastContainer } from '@/components/ui/toast'
-
-const ToastContext = createContext<UseToastReturn | null>(null)
+import React from 'react'
+import { ToastProvider as RedesignedToastProvider, useToast } from '@/components/redesigned/ui/Toast'
+import { type UseToastReturn } from '@/hooks/use-toast'
 
 export interface ToastProviderProps {
   children: React.ReactNode
+  maxToasts?: number
+  defaultDuration?: number
 }
 
-export function ToastProvider({ children }: ToastProviderProps) {
-  const toastState = useToast()
-
+// Re-export the redesigned ToastProvider with same interface for compatibility
+export function ToastProvider({ children, maxToasts, defaultDuration }: ToastProviderProps) {
   return (
-    <ToastContext.Provider value={toastState}>
+    <RedesignedToastProvider maxToasts={maxToasts} defaultDuration={defaultDuration}>
       {children}
-      <ToastContainer 
-        toasts={toastState.toasts.map(toast => ({ ...toast, onClose: toastState.hideToast }))}
-        onClose={toastState.hideToast}
-      />
-    </ToastContext.Provider>
+    </RedesignedToastProvider>
   )
 }
 
+// Re-export useToast as useToastContext for backward compatibility
 export function useToastContext(): UseToastReturn {
-  const context = useContext(ToastContext)
-  if (!context) {
-    throw new Error('useToastContext must be used within a ToastProvider')
+  const context = useToast()
+  return {
+    toasts: context.toasts,
+    showToast: context.addToast,
+    addToast: context.addToast,
+    hideToast: context.removeToast,
+    removeToast: context.removeToast,
+    clearAllToasts: context.clearAllToasts,
   }
-  return context
 }

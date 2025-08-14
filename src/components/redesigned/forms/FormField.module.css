@@ -1,0 +1,368 @@
+/* ============================================================================
+   FORM FIELD COMPONENTS - React Hook Form + InvisibleInput Integration
+   ============================================================================ */
+
+/* ============================================================================
+   FORM FIELD BASE
+   ============================================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.hasError .input,
+.hasError .standardInput,
+.hasError .standardTextarea {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+/* ============================================================================
+   FORM LABEL
+   ============================================================================ */
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-xs);
+  cursor: pointer;
+}
+
+.required {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+/* ============================================================================
+   FORM DESCRIPTION
+   ============================================================================ */
+
+.description {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* ============================================================================
+   INPUT WRAPPER
+   ============================================================================ */
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ============================================================================
+   INVISIBLE INPUT STYLING (for InvisibleInput integration)
+   ============================================================================ */
+
+.input {
+  /* Override InvisibleInput styles for form context */
+  min-height: var(--touch-target-min);
+  padding: var(--spacing-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-white-95);
+  backdrop-filter: var(--backdrop-blur-sm);
+  -webkit-backdrop-filter: var(--backdrop-blur-sm);
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.input:hover:not([disabled]) {
+  border-color: var(--glass-border-hover);
+  background: var(--glass-white-95);
+}
+
+.input:focus,
+.input[contenteditable="true"] {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+  background: var(--bg-primary);
+}
+
+/* ============================================================================
+   STANDARD INPUT STYLING (fallback)
+   ============================================================================ */
+
+.standardInput,
+.standardTextarea {
+  /* Reset */
+  margin: 0;
+  font: inherit;
+  outline: none;
+  
+  /* Styling */
+  min-height: var(--touch-target-min);
+  padding: var(--spacing-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-white-95);
+  backdrop-filter: var(--backdrop-blur-sm);
+  -webkit-backdrop-filter: var(--backdrop-blur-sm);
+  
+  /* Typography */
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: var(--line-height-normal);
+  
+  /* Interaction */
+  transition: all var(--transition-fast);
+  width: 100%;
+  
+  /* Mobile optimization */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.standardInput::placeholder,
+.standardTextarea::placeholder {
+  color: var(--text-placeholder);
+  opacity: 1;
+}
+
+.standardInput:hover:not(:disabled),
+.standardTextarea:hover:not(:disabled) {
+  border-color: var(--glass-border-hover);
+  background: var(--bg-primary);
+}
+
+.standardInput:focus,
+.standardTextarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+  background: var(--bg-primary);
+}
+
+.standardInput:disabled,
+.standardTextarea:disabled {
+  opacity: 0.6;
+  background-color: var(--color-gray-100);
+  cursor: not-allowed;
+}
+
+/* Textarea specific */
+.standardTextarea {
+  min-height: calc(var(--touch-target-min) * 2);
+  font-family: inherit;
+}
+
+/* ============================================================================
+   ERROR STATES
+   ============================================================================ */
+
+.inputError {
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 1px var(--color-error) !important;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  color: var(--color-error);
+}
+
+.errorMessage {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  line-height: var(--line-height-normal);
+}
+
+/* ============================================================================
+   FORM SECTION
+   ============================================================================ */
+
+.section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionHeader {
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.sectionDescription {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ============================================================================
+   MOBILE OPTIMIZATIONS
+   ============================================================================ */
+
+@media (max-width: 767px) {
+  .standardInput,
+  .standardTextarea {
+    /* Prevent zoom on mobile */
+    font-size: max(var(--font-size-base), 16px);
+  }
+  
+  .field {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .sectionContent {
+    gap: var(--spacing-md);
+  }
+  
+  .section {
+    margin-bottom: var(--spacing-xl);
+  }
+}
+
+/* ============================================================================
+   DESKTOP REFINEMENTS
+   ============================================================================ */
+
+@media (min-width: 768px) {
+  .standardInput {
+    min-height: var(--touch-target-small);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .standardTextarea {
+    min-height: calc(var(--touch-target-small) * 2);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* ============================================================================
+   HIGH CONTRAST MODE
+   ============================================================================ */
+
+@media (prefers-contrast: high) {
+  .input,
+  .standardInput,
+  .standardTextarea {
+    background: var(--bg-primary);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid var(--text-primary);
+  }
+  
+  .input:focus,
+  .standardInput:focus,
+  .standardTextarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+  
+  .inputError {
+    border-color: var(--color-error) !important;
+    box-shadow: 0 0 0 2px var(--color-error) !important;
+  }
+  
+  .sectionHeader {
+    border-bottom-width: 2px;
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .standardInput,
+  .standardTextarea {
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .input,
+  .standardInput,
+  .standardTextarea {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .input:hover:not(:disabled),
+  .standardInput:hover:not(:disabled),
+  .standardTextarea:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .input:focus,
+  .standardInput:focus,
+  .standardTextarea:focus {
+    background: #000;
+    border-color: var(--color-primary);
+  }
+  
+  .standardInput::placeholder,
+  .standardTextarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .standardInput:disabled,
+  .standardTextarea:disabled {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .sectionHeader {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .sectionTitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .sectionDescription {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}

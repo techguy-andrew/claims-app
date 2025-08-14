@@ -1,0 +1,305 @@
+/* ============================================================================ */
+/* INPUT COMPONENT - Modern form input with glass morphism */
+/* Following redesigned architecture patterns */
+/* ============================================================================ */
+
+/* Container */
+.inputContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+}
+
+.inputContainer.fullWidth {
+  width: 100%;
+}
+
+.inputContainer.withIcons {
+  position: relative;
+}
+
+/* Base Input Styles */
+.input {
+  width: 100%;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(17, 24, 39, 1);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 1);
+}
+
+.input:hover:not(:focus):not(:disabled) {
+  border-color: rgba(156, 163, 175, 0.8);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.input::placeholder {
+  color: rgba(156, 163, 175, 1);
+}
+
+/* Size Variants */
+.size-small {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.size-default {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.size-large {
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* With Icons - Adjust padding */
+.withLeftIcon.size-small {
+  padding-left: 36px;
+}
+
+.withLeftIcon.size-default {
+  padding-left: 40px;
+}
+
+.withLeftIcon.size-large {
+  padding-left: 44px;
+}
+
+.withRightIcon.size-small {
+  padding-right: 36px;
+}
+
+.withRightIcon.size-default {
+  padding-right: 40px;
+}
+
+.withRightIcon.size-large {
+  padding-right: 44px;
+}
+
+/* Variant Styles */
+.variant-default {
+  /* Already applied in base styles */
+}
+
+.variant-outline {
+  background: transparent;
+  border: 2px solid rgba(229, 231, 235, 0.8);
+}
+
+.variant-outline:focus {
+  border-color: rgba(59, 130, 246, 1);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.variant-filled {
+  background: rgba(249, 250, 251, 0.9);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.variant-filled:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+.variant-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.variant-ghost:hover:not(:focus):not(:disabled) {
+  background: rgba(249, 250, 251, 0.8);
+  border-color: rgba(229, 231, 235, 0.5);
+}
+
+.variant-ghost:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+/* State Variants */
+.state-error {
+  border-color: rgba(239, 68, 68, 0.8);
+  background: rgba(254, 242, 242, 0.9);
+}
+
+.state-error:focus {
+  border-color: rgba(239, 68, 68, 1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.state-success {
+  border-color: rgba(34, 197, 94, 0.8);
+  background: rgba(240, 253, 244, 0.9);
+}
+
+.state-success:focus {
+  border-color: rgba(34, 197, 94, 1);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.state-warning {
+  border-color: rgba(245, 158, 11, 0.8);
+  background: rgba(255, 251, 235, 0.9);
+}
+
+.state-warning:focus {
+  border-color: rgba(245, 158, 11, 1);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Disabled State */
+.disabled {
+  background: rgba(249, 250, 251, 0.7);
+  border-color: rgba(229, 231, 235, 0.5);
+  color: rgba(156, 163, 175, 1);
+  cursor: not-allowed;
+}
+
+.disabled::placeholder {
+  color: rgba(203, 213, 225, 1);
+}
+
+/* Loading State */
+.loading {
+  cursor: wait;
+}
+
+/* Full Width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Icon Containers */
+.iconLeft,
+.iconRight {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(107, 114, 128, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.iconLeft {
+  left: 12px;
+}
+
+.iconRight {
+  right: 12px;
+}
+
+/* Icon sizes */
+.size-small .iconLeft {
+  left: 10px;
+}
+
+.size-small .iconRight {
+  right: 10px;
+}
+
+.size-large .iconLeft {
+  left: 14px;
+}
+
+.size-large .iconRight {
+  right: 14px;
+}
+
+/* Icon SVG Styling */
+.iconLeft svg,
+.iconRight svg {
+  width: 16px;
+  height: 16px;
+}
+
+.size-small .iconLeft svg,
+.size-small .iconRight svg {
+  width: 14px;
+  height: 14px;
+}
+
+.size-large .iconLeft svg,
+.size-large .iconRight svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Loading Spinner */
+.loadingSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(107, 114, 128, 0.3);
+  border-top: 2px solid rgba(107, 114, 128, 1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Optimizations */
+.mobileOptimized {
+  min-height: 44px; /* iOS minimum touch target */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Inline Editing */
+.inlineEditing {
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.inlineEditing:hover:not(:focus) {
+  background: rgba(249, 250, 251, 0.8);
+  border-color: rgba(229, 231, 235, 0.6);
+}
+
+.inlineEditing:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .mobileOptimized.size-default {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+  
+  .mobileOptimized.size-small {
+    font-size: 14px;
+    padding: 10px 12px;
+    min-height: 40px;
+  }
+  
+  .mobileOptimized.size-large {
+    font-size: 18px;
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+}

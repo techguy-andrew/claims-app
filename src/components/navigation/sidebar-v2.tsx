@@ -5,18 +5,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   Home, 
-  FileText, 
   Settings, 
   User, 
   ChevronDown, 
   ChevronRight,
   LogOut,
-  X
+  X,
+  Package2
 } from 'lucide-react';
 import { createVariants, cn, type VariantProps } from './utils';
 import styles from './navigation.module.css';
 import { useNavigation } from './navigation-provider';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/redesigned/ui/Button';
 
 // Base style utilities for consistency - mobile-first approach
 const baseItemStyles = "flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[44px] md:min-h-[36px]";
@@ -445,8 +445,7 @@ SidebarProfileV2.displayName = 'SidebarProfileV2';
 
 // Default navigation data
 const DEFAULT_NAVIGATION: NavigationItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
-  { id: 'claims', label: 'Claims', href: '/claims', icon: FileText },
+  { id: 'components', label: 'Components', href: '/components', icon: Package2 },
 ];
 
 const DEFAULT_USER_INFO: UserInfo = {
