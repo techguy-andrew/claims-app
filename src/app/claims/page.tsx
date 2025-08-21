@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, FileText, Search, X } from "lucide-react"
-import { ClaimCard } from "@/components/claim-card"
+import { ClaimCard } from "@/components/claims"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ErrorBoundary } from '@/components/error-boundary'
+import { ErrorBoundary } from '@/components/shared'
 
 interface Claim {
   id: string

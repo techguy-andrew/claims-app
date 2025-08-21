@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field } from '@/components/ui/label'
-import { ClaimItem, ClaimFile } from './claim-items-section'
+import { ClaimItem } from '../claims/claim-items-section'
+import { ClaimFile } from '../files/files-list'
 
 interface ItemTagModalProps {
   isOpen: boolean

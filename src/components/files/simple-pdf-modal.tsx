@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { X, Download, ExternalLink } from 'lucide-react'
 // import { Button } from '@/components/ui/button'
-import { ClaimFile } from './claim-items-section'
+import { ClaimFile } from './files-list'
 
 interface SimplePDFModalProps {
   file: ClaimFile | null

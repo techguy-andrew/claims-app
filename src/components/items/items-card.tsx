@@ -10,7 +10,7 @@ import {
   Edit,
   Trash2
 } from 'lucide-react'
-import { FilesList } from './files-list'
+import { FilesList } from '../files/files-list'
 
 // ============================================================================
 // TYPES

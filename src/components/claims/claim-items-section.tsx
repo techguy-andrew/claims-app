@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field } from '@/components/ui/label'
-import { SimpleImageModal } from './simple-image-modal'
-import { SimplePDFModal } from './simple-pdf-modal'
+import { SimpleImageModal } from '../files/simple-image-modal'
+import { SimplePDFModal } from '../files/simple-pdf-modal'
 
 export interface ClaimItem {
   id: string

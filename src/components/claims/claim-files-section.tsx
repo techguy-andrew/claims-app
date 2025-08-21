@@ -4,10 +4,10 @@ import React, { useState, useCallback, useRef } from 'react'
 import { Upload, File, AlertCircle, CheckCircle, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ClaimItem, ClaimFile } from './claim-items-section'
-import { SimplePDFModal } from './simple-pdf-modal'
-import { SimpleImageModal } from './simple-image-modal'
-import { ItemTagModal } from './item-tag-modal'
-import { FilesList } from './files-list'
+import { SimplePDFModal } from '../files/simple-pdf-modal'
+import { SimpleImageModal } from '../files/simple-image-modal'
+import { ItemTagModal } from '../items/item-tag-modal'
+import { FilesList } from '../files/files-list'
 
 // Re-export for external usage
 export type { ClaimFile }

@@ -23,6 +23,11 @@ export {
 } from './sidebar';
 
 export {
+  SidebarV2,
+  type SidebarV2Props,
+} from './sidebar-v2';
+
+export {
   TopBar,
   TopbarBreadcrumbs,
   TopbarSearch,

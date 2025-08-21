@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle, AlertCircle } from "lucide-react"
-import { ClaimForm } from "@/components/claim-form"
+import { ClaimForm } from "@/components/claims"
 import { ClaimFormData } from "@/lib/form-validation"
 
 export default function NewClaimPage() {

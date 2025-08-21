@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { X, Download, ExternalLink } from 'lucide-react'
-import { ClaimFile } from './claim-items-section'
+import { ClaimFile } from './files-list'
 
 interface SimpleImageModalProps {
   file: ClaimFile | null

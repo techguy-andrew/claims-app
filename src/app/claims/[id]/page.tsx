@@ -13,14 +13,13 @@ import {
   Plus,
   Package
 } from 'lucide-react'
-import { InfoCard } from '@/components/info-card'
-import { ClaimForm } from '@/components/claim-form'
+import { InfoCard } from '@/components/shared'
+import { ClaimForm } from '@/components/claims'
 import { ClaimFormData } from '@/lib/form-validation'
-import { ClaimItem } from '@/components/claim-items-section'
-import { ItemsCard } from '@/components/items-card'
-import { ClaimFilesSection, ClaimFile } from '@/components/claim-files-section'
-import { SimpleImageModal } from '@/components/simple-image-modal'
-import { SimplePDFModal } from '@/components/simple-pdf-modal'
+import { ClaimItem } from '@/components/claims'
+import { ItemsCard } from '@/components/items'
+import { ClaimFilesSection } from '@/components/claims'
+import { SimpleImageModal, SimplePDFModal, type ClaimFile } from '@/components/files'
 import { Button } from '@/components/ui/button'
 
 interface ClaimData {

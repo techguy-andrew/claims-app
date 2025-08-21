@@ -3,9 +3,9 @@
 import { 
   NavigationProvider, 
   useSidebar, 
-  useTheme 
+  useTheme,
+  SidebarV2
 } from "@/components/navigation";
-import { SidebarV2 } from "@/components/navigation/sidebar-v2";
 import { ToastProvider } from "@/context/toast-context";
 import { Menu } from "lucide-react";
 
