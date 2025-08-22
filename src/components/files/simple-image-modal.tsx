@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { X, Download, ExternalLink } from 'lucide-react'
+import Image from 'next/image'
 import { ClaimFile } from './files-list'
 
 interface SimpleImageModalProps {
@@ -86,11 +87,13 @@ export function SimpleImageModal({ file, isOpen, onClose }: SimpleImageModalProp
       </div>
 
       {/* Image Display */}
-      <div className="pt-16 h-full flex items-center justify-center p-4">
-        <img
+      <div className="pt-16 h-full flex items-center justify-center p-4 relative">
+        <Image
           src={file.fileUrl}
           alt={file.fileName}
-          className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+          fill
+          sizes="100vw"
+          className="object-contain rounded-lg shadow-lg"
           style={{ maxHeight: 'calc(100vh - 6rem)' }}
         />
       </div>

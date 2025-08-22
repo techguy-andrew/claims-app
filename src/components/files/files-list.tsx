@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef } from 'react'
 import { MoreVertical, Eye, Download, Tag, Trash2, FileText, File } from 'lucide-react'
+import Image from 'next/image'
 
 // Types
 export interface ClaimFile {
@@ -195,13 +196,15 @@ export function FilesList({
             {/* File Thumbnail */}
             {showThumbnails && (
               <div className="flex-shrink-0 mr-4">
-                <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors duration-200 relative"
                      onClick={() => handleViewFile(file)}>
                   {file.fileType === 'image' ? (
-                    <img
+                    <Image
                       src={file.fileUrl}
                       alt={file.fileName}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="56px"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

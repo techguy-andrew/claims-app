@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef } from 'react'
 import { Plus, Package, Edit, Trash2, Eye, MoreVertical, AlertCircle, CheckCircle, File, FileText, Download, Tag, ChevronDown } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -759,10 +760,12 @@ export function ClaimItemsSection({ claimId, items, onItemsChange }: ClaimItemsS
                         <div key={file.id} className="bg-white rounded-lg border border-gray-200/60 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group">
                           <div className="aspect-video relative overflow-hidden bg-gray-50">
                             {file.fileType === 'image' ? (
-                              <img
+                              <Image
                                 src={file.fileUrl}
                                 alt={file.fileName}
-                                className="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-200"
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-cover cursor-pointer group-hover:scale-105 transition-transform duration-200"
                                 onClick={() => handleViewImage(file)}
                               />
                             ) : (
