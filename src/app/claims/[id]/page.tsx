@@ -1,88 +1,43 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from 'react'
+import { Library001ItemsCard, type Library001ClaimItem, type Library001ClaimFile } from '@/components-library001'
 import { 
-  Building2, 
-  User, 
-  Phone, 
-  Mail,
-  MapPin,
-  Plus,
-  Package,
-  Edit,
-  Copy,
-  Check,
-  Printer
-} from 'lucide-react'
-import { InvisibleInput } from '@/components/shared'
-import { FloatingContextMenu, type MenuAction } from '@/components/shared/floating-context-menu'
-import { SaveCancelButtons } from '@/components/shared/save-cancel-buttons'
-import { ClaimItem } from '@/components/claims'
-import { ItemsCard } from '@/components/items'
-import { ClaimFilesSection } from '@/components/claims'
-import { SimpleImageModal, SimplePDFModal, type ClaimFile } from '@/components/files'
-import { Button } from '@/components/ui/button'
+  Library001ClaimInformation,
+  type Library001ClaimData,
+  type Library001ClaimFieldValues,
+  type Library001ClaimFieldErrors
+} from '@/components-library001'
 
-interface ClaimData {
-  id: string
-  claimNumber: string
-  status: 'OPEN' | 'IN_PROGRESS' | 'UNDER_REVIEW' | 'APPROVED' | 'DENIED' | 'CLOSED'
-  insuranceCompany: string
-  adjustorName: string
-  adjustorEmail: string
-  clientName: string
-  clientPhone: string
-  clientAddress: string
-  claimDate: string
-  createdBy: {
-    firstName: string | null
-    lastName: string | null
-    email: string
-  }
-  organization: {
-    name: string
-  }
-}
+// Using Library001ClaimData type instead of local ClaimData
+type ClaimData = Library001ClaimData
 
-// const statusGradients = {
-//   OPEN: 'from-blue-400 to-blue-500',
-//   IN_PROGRESS: 'from-amber-400 to-orange-500',
-//   UNDER_REVIEW: 'from-purple-400 to-purple-500',
-//   APPROVED: 'from-green-400 to-emerald-500',
-//   DENIED: 'from-red-400 to-red-500',
-//   CLOSED: 'from-gray-400 to-gray-500'
-// }
-
-const statusLabels = {
-  OPEN: 'OPEN',
-  IN_PROGRESS: 'IN PROGRESS',
-  UNDER_REVIEW: 'UNDER REVIEW',
-  APPROVED: 'APPROVED',
-  DENIED: 'DENIED',
-  CLOSED: 'CLOSED'
-}
-
-export default function ClaimDetailsPage({
-  params
-}: {
+interface ClaimDetailsPageProps {
   params: Promise<{ id: string }>
-}) {
-  const [claim, setClaim] = useState<ClaimData | null>(null)
-  const [items, setItems] = useState<ClaimItem[]>([])
-  const [files, setFiles] = useState<ClaimFile[]>([])
+}
+
+export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
+  const [claimId, setClaimId] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const [claim, setClaim] = useState<ClaimData | null>(null)
+  const [items, setItems] = useState<Library001ClaimItem[]>([])
+  const [, setFiles] = useState<Library001ClaimFile[]>([])
+  
+  // Claim information editing state
   const [isEditing, setIsEditing] = useState(false)
-  const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
+  const [fieldValues, setFieldValues] = useState<Library001ClaimFieldValues>({
+    insuranceCompany: '',
+    adjustorName: '',
+    adjustorEmail: '',
+    clientName: '',
+    clientPhone: '',
+    clientAddress: ''
+  })
   const [isSaving, setIsSaving] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({})
-  const [showToast, setShowToast] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Library001ClaimFieldErrors>({})
   
   // Store scroll position to prevent jumping during edit mode transitions
   const scrollPosRef = useRef(0)
-  const [viewingImage, setViewingImage] = useState<ClaimFile | null>(null)
-  const [viewingPDF, setViewingPDF] = useState<ClaimFile | null>(null)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [claimId, setClaimId] = useState<string>('')
 
   useEffect(() => {
     params.then(({ id }) => {
@@ -100,13 +55,8 @@ export default function ClaimDetailsPage({
         fetch(`/api/claims/${id}/files`)
       ])
 
-      const [claimData, itemsData, filesData] = await Promise.all([
-        claimRes.json(),
-        itemsRes.json(),
-        filesRes.json()
-      ])
-      
       if (claimRes.ok) {
+        const claimData = await claimRes.json()
         setClaim(claimData)
         // Initialize field values
         setFieldValues({
@@ -118,19 +68,79 @@ export default function ClaimDetailsPage({
           clientAddress: claimData.clientAddress
         })
       } else {
-        console.error("Failed to fetch claim:", claimData.error)
+        console.error("Failed to fetch claim")
       }
 
       if (itemsRes.ok) {
-        setItems(itemsData.items || [])
+        const itemsData = await itemsRes.json()
+        // Transform items to Library001 format
+        const transformedItems: Library001ClaimItem[] = (itemsData.items || []).map((item: {
+          id: string;
+          itemName: string;
+          details: string | null;
+          createdAt: string;
+          updatedAt: string;
+          files: {
+            id: string;
+            fileName: string;
+            fileUrl: string;
+            fileType: string;
+            fileSize: number | null;
+            uploadedAt: string;
+          }[];
+        }) => ({
+          id: item.id,
+          itemName: item.itemName,
+          details: item.details,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          files: item.files.map((file) => ({
+            id: file.id,
+            fileName: file.fileName,
+            fileUrl: file.fileUrl,
+            fileType: file.fileType,
+            fileSize: file.fileSize,
+            uploadedAt: file.uploadedAt,
+            item: {
+              id: item.id,
+              itemName: item.itemName
+            }
+          }))
+        }))
+        setItems(transformedItems)
       } else {
-        console.error("Failed to fetch items:", itemsData.error)
+        console.error("Failed to fetch items")
       }
 
       if (filesRes.ok) {
-        setFiles(filesData.files || [])
+        const filesData = await filesRes.json()
+        // Transform files to Library001 format
+        const transformedFiles: Library001ClaimFile[] = (filesData.files || []).map((file: {
+          id: string;
+          fileName: string;
+          fileUrl: string;
+          fileType: string;
+          fileSize: number | null;
+          uploadedAt: string;
+          item?: {
+            id: string;
+            itemName: string;
+          } | null;
+        }) => ({
+          id: file.id,
+          fileName: file.fileName,
+          fileUrl: file.fileUrl,
+          fileType: file.fileType,
+          fileSize: file.fileSize,
+          uploadedAt: file.uploadedAt,
+          item: file.item ? {
+            id: file.item.id,
+            itemName: file.item.itemName
+          } : null
+        }))
+        setFiles(transformedFiles)
       } else {
-        console.error("Failed to fetch files:", filesData.error)
+        console.error("Failed to fetch files")
       }
     } catch (error) {
       console.error("Error fetching claim data:", error)
@@ -138,8 +148,6 @@ export default function ClaimDetailsPage({
       setLoading(false)
     }
   }
-
-
 
   const handleEditMode = () => {
     // Store scroll position before any state changes to prevent screen jumping
@@ -207,8 +215,6 @@ export default function ClaimDetailsPage({
       const updatedClaim = await response.json()
       setClaim(updatedClaim)
       setIsEditing(false)
-      setShowToast(true)
-      setTimeout(() => setShowToast(false), 2500)
       
       // Restore scroll position after successful save
       requestAnimationFrame(() => {
@@ -224,46 +230,25 @@ export default function ClaimDetailsPage({
     }
   }
 
-  // Create claim menu actions
-  const claimMenuActions: MenuAction[] = [
-    {
-      id: 'edit',
-      label: 'Edit Claim Details',
-      icon: <Edit className="h-4 w-4" />,
-      onClick: handleEditMode
-    },
-    {
-      id: 'copy',
-      label: 'Copy Claim Info',
-      icon: <Copy className="h-4 w-4" />,
-      onClick: () => {
-        const claimInfo = `Claim: ${claim?.claimNumber}\nInsurance: ${claim?.insuranceCompany}\nAdjustor: ${claim?.adjustorName}\nClient: ${claim?.clientName}`
-        navigator.clipboard.writeText(claimInfo)
-      }
-    },
-    {
-      id: 'print',
-      label: 'Print Details',
-      icon: <Printer className="h-4 w-4" />,
-      onClick: () => window.print()
-    }
-  ]
-
-
-  // Items handlers
-  const handleEditItem = (item: ClaimItem) => {
-    // TODO: Implement edit item functionality
-    console.log('Edit item:', item)
+  const handleFieldChange = (field: string, value: string) => {
+    setFieldValues((prev: Library001ClaimFieldValues) => ({ ...prev, [field]: value }))
   }
 
-  const handleDeleteItem = async (itemId: string) => {
+  const handleItemUpdate = (updatedItem: Library001ClaimItem) => {
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === updatedItem.id ? updatedItem : item
+      )
+    )
+  }
+
+  const handleItemDelete = async (itemId: string) => {
     if (!confirm('Are you sure you want to delete this item? Associated files will become unassigned.')) {
       return
     }
 
-
     try {
-      const response = await fetch(`/api/claims/${claim?.id}/items/${itemId}`, {
+      const response = await fetch(`/api/claims/${claimId}/items/${itemId}`, {
         method: 'DELETE'
       })
 
@@ -272,101 +257,93 @@ export default function ClaimDetailsPage({
         throw new Error(errorData.error || 'Failed to delete item')
       }
 
-      setItems(items.filter(item => item.id !== itemId))
+      setItems(prevItems => prevItems.filter(item => item.id !== itemId))
     } catch (err) {
       console.error('Failed to delete item:', err)
       alert('Failed to delete item')
-    } finally {
     }
   }
 
-  const handleViewFile = (file: ClaimFile) => {
-    if (file.fileType === 'image') {
-      setViewingImage(file)
-    } else if (file.fileType === 'pdf') {
-      setViewingPDF(file)
-    } else {
-      window.open(file.fileUrl, '_blank')
+  const handleFileAction = async (action: string, file: Library001ClaimFile) => {
+    switch (action) {
+      case 'view':
+        if (file.fileType === 'image') {
+          // Could implement image modal here or handle differently
+          window.open(file.fileUrl, '_blank')
+        } else if (file.fileType === 'pdf') {
+          // Could implement PDF modal here or handle differently
+          window.open(file.fileUrl, '_blank')
+        } else {
+          window.open(file.fileUrl, '_blank')
+        }
+        break
+      case 'download':
+        try {
+          const link = document.createElement('a')
+          link.href = `/api/download/${file.id}`
+          link.download = file.fileName
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        } catch (error) {
+          console.error('Download failed:', error)
+          alert('Failed to download file')
+        }
+        break
+      case 'untag':
+        try {
+          const response = await fetch(`/api/claims/${claimId}/files/${file.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId: null })
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to untag file')
+          }
+
+          // Remove file from items
+          setItems(prevItems => 
+            prevItems.map(item => ({
+              ...item,
+              files: item.files.filter(f => f.id !== file.id)
+            }))
+          )
+        } catch (err) {
+          console.error('Failed to untag file:', err)
+          alert('Failed to untag file')
+        }
+        break
+      case 'delete':
+        if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+          return
+        }
+
+        try {
+          const response = await fetch(`/api/claims/${claimId}/files/${file.id}`, {
+            method: 'DELETE'
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Failed to delete file')
+          }
+
+          // Remove file from items
+          setItems(prevItems => 
+            prevItems.map(item => ({
+              ...item,
+              files: item.files.filter(f => f.id !== file.id)
+            }))
+          )
+        } catch (err) {
+          console.error('Failed to delete file:', err)
+          alert('Failed to delete file')
+        }
+        break
     }
   }
-
-  const handleDownloadFile = async (file: ClaimFile) => {
-    try {
-      const link = document.createElement('a')
-      link.href = `/api/download/${file.id}`
-      link.download = file.fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    } catch (error) {
-      console.error('Download failed:', error)
-      alert('Failed to download file')
-    }
-  }
-
-  const handleUntagFile = async (fileId: string) => {
-    if (!claim) return
-    
-    
-    try {
-      const response = await fetch(`/api/claims/${claim.id}/files/${fileId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId: null })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to untag file')
-      }
-
-      // Remove file from all items
-      const updatedItems = items.map(item => ({
-        ...item,
-        files: item.files.filter(f => f.id !== fileId)
-      }))
-      setItems(updatedItems)
-    } catch (err) {
-      console.error('Failed to untag file:', err)
-      alert('Failed to untag file')
-    } finally {
-    }
-  }
-
-  const handleDeleteFile = async (fileId: string) => {
-    if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-      return
-    }
-
-    if (!claim) return
-    
-
-    try {
-      const response = await fetch(`/api/claims/${claim.id}/files/${fileId}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to delete file')
-      }
-
-      // Remove file from all items
-      const updatedItems = items.map(item => ({
-        ...item,
-        files: item.files.filter(f => f.id !== fileId)
-      }))
-      setItems(updatedItems)
-      
-      // Also update files list if we're displaying it separately
-      setFiles(files.filter(f => f.id !== fileId))
-    } catch (err) {
-      console.error('Failed to delete file:', err)
-      alert('Failed to delete file')
-    } finally {
-    }
-  }
-
 
   if (loading || !claim) {
     return (
@@ -380,329 +357,73 @@ export default function ClaimDetailsPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Main content */}
       <main className="px-4 sm:px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Header Section */}
+          {/* Claim Information using Library001 Component */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
+            <Library001ClaimInformation
+              claim={claim}
+              isEditing={isEditing}
+              fieldValues={fieldValues}
+              fieldErrors={fieldErrors}
+              isSaving={isSaving}
+              onEditMode={handleEditMode}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onFieldChange={handleFieldChange}
+            />
+          </div>
+
+          {/* Items Section using Library001 Components */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-lg font-semibold text-gray-900 mb-1">{claim.claimNumber}</h1>
-                <p className="text-sm text-gray-600">Claim Details</p>
+                <h2 className="text-lg font-semibold text-gray-900">Items</h2>
+                <p className="text-sm text-gray-600">
+                  {items.length} item{items.length !== 1 ? 's' : ''} documented
+                </p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className={`
-                  inline-flex items-center px-3 py-2 rounded-lg text-xs font-medium
-                  ${claim.status === 'OPEN' ? 'bg-blue-50 text-blue-700' :
-                    claim.status === 'IN_PROGRESS' ? 'bg-yellow-50 text-yellow-700' :
-                    claim.status === 'UNDER_REVIEW' ? 'bg-purple-50 text-purple-700' :
-                    claim.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
-                    claim.status === 'DENIED' ? 'bg-red-50 text-red-700' :
-                    'bg-gray-50 text-gray-700'}
-                `}>
-                  {statusLabels[claim.status]}
-                </div>
-                {!isEditing ? (
-                  <FloatingContextMenu actions={claimMenuActions} />
-                ) : (
-                  <SaveCancelButtons
-                    onSave={handleSave}
-                    onCancel={handleCancel}
-                    isSaving={isSaving}
+            </div>
+
+            {items.length > 0 ? (
+              <div className="space-y-4">
+                {items.map((item) => (
+                  <Library001ItemsCard
+                    key={item.id}
+                    item={item}
+                    claimId={claimId}
+                    onUpdate={handleItemUpdate}
+                    onDelete={handleItemDelete}
+                    onFileAction={handleFileAction}
                   />
-                )}
+                ))}
               </div>
+            ) : (
+              <div className="text-center py-12 px-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">No items added yet</h3>
+                  <p className="text-sm text-gray-600 mb-4">Start documenting damaged or claimed items</p>
+                </div>
+              </div>
+            )}
+
+            {/* Component Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                📚 Library001 Component Features
+              </h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Seamless inline editing with database integration</li>
+                <li>• Floating context menus with intelligent positioning</li>
+                <li>• File thumbnails and management</li>
+                <li>• Expandable/collapsible interface</li>
+                <li>• Toast notifications for user feedback</li>
+                <li>• Professional naming convention for reusability</li>
+              </ul>
             </div>
           </div>
-
-          {/* General Error Display */}
-          {fieldErrors.general && (
-            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600">{fieldErrors.general}</p>
-            </div>
-          )}
-
-          {/* Information Sections - Flat Design */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Insurance Section */}
-            <div className="space-y-6">
-              <h2 className="text-xs font-medium text-gray-600 uppercase tracking-wider">
-                Insurance Information
-              </h2>
-              
-              {/* Insurance Company */}
-              <div className="group">
-                <div className="flex items-center gap-3 p-3 rounded-lg">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Building2 className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Company</p>
-                    <InvisibleInput
-                      value={fieldValues.insuranceCompany || ''}
-                      onChange={(v) => setFieldValues(prev => ({ ...prev, insuranceCompany: v }))}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      isEditing={isEditing}
-                      className="text-sm text-gray-900 font-medium"
-                      placeholder="Insurance company"
-                    />
-                    {fieldErrors.insuranceCompany && (
-                      <p className="text-xs text-red-600 mt-1">{fieldErrors.insuranceCompany}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Adjustor Name */}
-              <div className="group">
-                <div className="flex items-center gap-3 p-3 rounded-lg">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <User className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Adjustor</p>
-                    <InvisibleInput
-                      value={fieldValues.adjustorName || ''}
-                      onChange={(v) => setFieldValues(prev => ({ ...prev, adjustorName: v }))}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      isEditing={isEditing}
-                      className="text-sm text-gray-900 font-medium"
-                      placeholder="Adjustor name"
-                    />
-                    {fieldErrors.adjustorName && (
-                      <p className="text-xs text-red-600 mt-1">{fieldErrors.adjustorName}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Adjustor Email */}
-              <div className="group">
-                <div className="flex items-center gap-3 p-3 rounded-lg">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Mail className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Adjustor Email</p>
-                    <InvisibleInput
-                      value={fieldValues.adjustorEmail || ''}
-                      onChange={(v) => setFieldValues(prev => ({ ...prev, adjustorEmail: v }))}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      isEditing={isEditing}
-                      className="text-sm text-gray-900 font-medium"
-                      placeholder="adjustor@email.com"
-                    />
-                    {fieldErrors.adjustorEmail && (
-                      <p className="text-xs text-red-600 mt-1">{fieldErrors.adjustorEmail}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Client Section */}
-            <div className="space-y-6">
-              <h2 className="text-xs font-medium text-gray-600 uppercase tracking-wider">
-                Client Information
-              </h2>
-              
-              {/* Client Name */}
-              <div className="group">
-                <div className="flex items-center gap-3 p-3 rounded-lg">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <User className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Name</p>
-                    <InvisibleInput
-                      value={fieldValues.clientName || ''}
-                      onChange={(v) => setFieldValues(prev => ({ ...prev, clientName: v }))}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      isEditing={isEditing}
-                      className="text-sm text-gray-900 font-medium"
-                      placeholder="Client name"
-                    />
-                    {fieldErrors.clientName && (
-                      <p className="text-xs text-red-600 mt-1">{fieldErrors.clientName}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Client Phone */}
-              <div className="group">
-                <div className="flex items-center gap-3 p-3 rounded-lg">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Phone className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Phone</p>
-                    <InvisibleInput
-                      value={fieldValues.clientPhone || ''}
-                      onChange={(v) => setFieldValues(prev => ({ ...prev, clientPhone: v }))}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      isEditing={isEditing}
-                      className="text-sm text-gray-900 font-medium"
-                      placeholder="Phone number"
-                    />
-                    {fieldErrors.clientPhone && (
-                      <p className="text-xs text-red-600 mt-1">{fieldErrors.clientPhone}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Client Address */}
-              <div className="group">
-                <div className="flex items-start gap-3 p-3 rounded-lg">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <MapPin className="h-4 w-4 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Address</p>
-                    <InvisibleInput
-                      value={fieldValues.clientAddress || ''}
-                      onChange={(v) => setFieldValues(prev => ({ ...prev, clientAddress: v }))}
-                      onSave={handleSave}
-                      onCancel={handleCancel}
-                      isEditing={isEditing}
-                      className="text-sm text-gray-900 font-medium"
-                      placeholder="Client address"
-                      multiline
-                    />
-                    {fieldErrors.clientAddress && (
-                      <p className="text-xs text-red-600 mt-1">{fieldErrors.clientAddress}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-            {/* Items Section */}
-            <div className="mb-8">
-              <div className="space-y-6">
-                {/* Section Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-50 rounded-lg">
-                      <Package className="h-4 w-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-medium text-gray-900">Items & Inventory</h2>
-                      <p className="text-xs text-gray-600">
-                        {items.length} items documented
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => setShowAddForm(true)}
-                      variant="modern"
-                      size="small"
-                      disabled={showAddForm}
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add Item
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Items List */}
-                {items.length > 0 ? (
-                  <div className="space-y-4">
-                    {items.map((item) => (
-                      <ItemsCard
-                        key={item.id}
-                        item={item}
-                        claimId={claimId}
-                        onUpdate={handleEditItem}
-                        onDelete={handleDeleteItem}
-                        onFileAction={(action, file) => {
-                          switch (action) {
-                            case 'view':
-                              handleViewFile(file)
-                              break
-                            case 'download':
-                              handleDownloadFile(file)
-                              break
-                            case 'untag':
-                              handleUntagFile(file.id)
-                              break
-                            case 'delete':
-                              handleDeleteFile(file.id)
-                              break
-                          }
-                        }}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 px-4">
-                    <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
-                      <div className="p-3 bg-gray-50 rounded-lg w-fit mx-auto mb-4">
-                        <Package className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <h3 className="text-sm font-medium text-gray-900 mb-2">No items added yet</h3>
-                      <p className="text-sm text-gray-600 mb-4">Start documenting damaged or claimed items</p>
-                      <Button
-                        onClick={() => setShowAddForm(true)}
-                        variant="modern"
-                        size="small"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add Your First Item
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Files Section */}
-            <div className="mb-8">
-              <ClaimFilesSection
-                claimId={claim.id}
-                files={files}
-                items={items}
-                onFilesChange={setFiles}
-                onItemsChange={setItems}
-              />
-            </div>
-          </div>
-      </main>
-
-      {/* Image Modal */}
-      <SimpleImageModal
-        file={viewingImage}
-        isOpen={!!viewingImage}
-        onClose={() => setViewingImage(null)}
-      />
-
-      {/* PDF Modal */}
-      <SimplePDFModal
-        file={viewingPDF}
-        isOpen={!!viewingPDF}
-        onClose={() => setViewingPDF(null)}
-      />
-
-      {/* Success Toast */}
-      <div
-        className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 z-50 ${
-          showToast ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-        }`}
-      >
-        <div className="flex items-center space-x-2">
-          <Check className="h-4 w-4" />
-          <span className="text-sm font-medium">Claim details updated successfully</span>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
