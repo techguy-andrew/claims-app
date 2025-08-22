@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useCallback, useRef } from 'react'
-import { MoreVertical, Eye, Download, Tag, Trash2, FileText, File } from 'lucide-react'
+import React from 'react'
+import { Eye, Download, Tag, Trash2, FileText, File } from 'lucide-react'
 import Image from 'next/image'
+import { FloatingContextMenu, type MenuAction } from '../shared/floating-context-menu'
 
 // Types
 export interface ClaimFile {
@@ -35,133 +36,38 @@ export function FilesList({
   showThumbnails = true,
   className = ""
 }: FilesListProps) {
-  const [activeActionMenu, setActiveActionMenu] = useState<string | null>(null)
-  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null)
-  const menuButtonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
 
   // Sort files by most recent first
   const sortedFiles = [...files].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())
 
-  // Toggle floating menu and calculate position
-  const toggleFloatingMenu = useCallback((fileId: string, event: React.MouseEvent<HTMLButtonElement>) => {
-    if (activeActionMenu === fileId) {
-      setActiveActionMenu(null)
-      setMenuPosition(null)
-      return
+  // Create menu actions for each file
+  const createFileMenuActions = (file: ClaimFile): MenuAction[] => [
+    {
+      id: 'view',
+      label: 'View',
+      icon: <Eye className="h-4 w-4" />,
+      onClick: () => handleViewFile(file)
+    },
+    {
+      id: 'tag',
+      label: 'Tag Item',
+      icon: <Tag className="h-4 w-4" />,
+      onClick: () => onFileAction?.('tag', file)
+    },
+    {
+      id: 'download',
+      label: 'Download',
+      icon: <Download className="h-4 w-4" />,
+      onClick: () => onFileAction?.('download', file)
+    },
+    {
+      id: 'delete',
+      label: 'Delete',
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: () => onFileAction?.('delete', file),
+      variant: 'danger' as const
     }
-
-    const button = event.currentTarget
-    const rect = button.getBoundingClientRect()
-    const menuWidth = 160
-    const menuHeight = 140 // Approximate height for 3 menu items
-    
-    let top = rect.bottom + 8
-    let right = window.innerWidth - rect.right
-    
-    // Flip vertically if too close to bottom
-    if (top + menuHeight > window.innerHeight - 20) {
-      top = rect.top - menuHeight - 8
-    }
-    
-    // Flip horizontally if too close to left edge
-    if (right + menuWidth > window.innerWidth - 20) {
-      right = 20
-    }
-    
-    setMenuPosition({ top, right })
-    setActiveActionMenu(fileId)
-  }, [activeActionMenu])
-
-  // Handle action menu actions
-  const handleActionMenuAction = useCallback((action: string, file: ClaimFile) => {
-    setActiveActionMenu(null)
-    setMenuPosition(null)
-    
-    switch (action) {
-      case 'view':
-        if (file.fileType === 'image') {
-          onFileAction?.('view', file)
-        } else if (file.fileType === 'pdf') {
-          onFileAction?.('view', file)
-        } else {
-          window.open(file.fileUrl, '_blank')
-        }
-        break
-      case 'tag':
-        onFileAction?.('tag', file)
-        break
-      case 'download':
-        onFileAction?.('download', file)
-        break
-      case 'delete':
-        onFileAction?.('delete', file)
-        break
-    }
-  }, [onFileAction])
-
-  // Close floating menu when clicking outside
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    const target = event.target as Element
-    if (!target.closest('.floating-menu') && !target.closest('.menu-button')) {
-      setActiveActionMenu(null)
-      setMenuPosition(null)
-    }
-  }, [])
-
-  // Setup click outside listener
-  React.useEffect(() => {
-    if (activeActionMenu) {
-      document.addEventListener('click', handleClickOutside)
-      return () => document.removeEventListener('click', handleClickOutside)
-    }
-  }, [activeActionMenu, handleClickOutside])
-
-  // Floating Context Menu Component
-  const FloatingContextMenu = ({ file }: { file: ClaimFile }) => {
-    if (!menuPosition || activeActionMenu !== file.id) return null
-
-    return (
-      <div 
-        className="floating-menu fixed z-50 bg-white/95 backdrop-blur-md border border-gray-200/80 rounded-xl shadow-lg min-w-[160px] p-1 transition-all duration-200 opacity-100 scale-100"
-        style={{
-          top: `${menuPosition.top}px`,
-          right: `${menuPosition.right}px`
-        }}
-      >
-        <button
-          onClick={() => handleActionMenuAction('view', file)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
-        >
-          <Eye className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium">View</span>
-        </button>
-        
-        <button
-          onClick={() => handleActionMenuAction('tag', file)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
-        >
-          <Tag className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium">Tag Item</span>
-        </button>
-        
-        <button
-          onClick={() => handleActionMenuAction('download', file)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100/80 transition-colors duration-150 text-left text-gray-900"
-        >
-          <Download className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium">Download</span>
-        </button>
-        
-        <button
-          onClick={() => handleActionMenuAction('delete', file)}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-50/80 transition-colors duration-150 text-left text-red-600"
-        >
-          <Trash2 className="h-4 w-4 text-red-500" />
-          <span className="text-sm font-medium">Delete</span>
-        </button>
-      </div>
-    )
-  }
+  ]
 
   // Handle file view action
   const handleViewFile = (file: ClaimFile) => {
@@ -237,23 +143,12 @@ export function FilesList({
 
             {/* Menu Button */}
             <div className="flex-shrink-0">
-              <button
-                ref={(el) => { menuButtonRefs.current[file.id] = el }}
-                onClick={(e) => toggleFloatingMenu(file.id, e)}
+              <FloatingContextMenu 
+                actions={createFileMenuActions(file)}
                 disabled={loading === file.id}
-                className="menu-button w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                title="More actions"
-              >
-                {loading === file.id ? (
-                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
-                ) : (
-                  <MoreVertical className="h-5 w-5 text-gray-600" />
-                )}
-              </button>
+                loading={loading === file.id}
+              />
             </div>
-
-            {/* Floating Context Menu */}
-            <FloatingContextMenu file={file} />
           </div>
         ))}
       </div>

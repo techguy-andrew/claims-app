@@ -1,21 +1,22 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { 
   Building2, 
   User, 
   Phone, 
   Mail,
   MapPin,
-  Edit,
-  CheckCircle,
-  AlertCircle,
   Plus,
-  Package
+  Package,
+  Edit,
+  Copy,
+  Check,
+  Printer
 } from 'lucide-react'
-import { InfoCard } from '@/components/shared'
-import { ClaimForm } from '@/components/claims'
-import { ClaimFormData } from '@/lib/form-validation'
+import { InvisibleInput } from '@/components/shared'
+import { FloatingContextMenu, type MenuAction } from '@/components/shared/floating-context-menu'
+import { SaveCancelButtons } from '@/components/shared/save-cancel-buttons'
 import { ClaimItem } from '@/components/claims'
 import { ItemsCard } from '@/components/items'
 import { ClaimFilesSection } from '@/components/claims'
@@ -70,10 +71,14 @@ export default function ClaimDetailsPage({
   const [items, setItems] = useState<ClaimItem[]>([])
   const [files, setFiles] = useState<ClaimFile[]>([])
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false)
-  const [updating, setUpdating] = useState(false)
-  const [updateSuccess, setUpdateSuccess] = useState(false)
-  const [updateError, setUpdateError] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
+  const [isSaving, setIsSaving] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | null>>({})
+  const [showToast, setShowToast] = useState(false)
+  
+  // Store scroll position to prevent jumping during edit mode transitions
+  const scrollPosRef = useRef(0)
   const [viewingImage, setViewingImage] = useState<ClaimFile | null>(null)
   const [viewingPDF, setViewingPDF] = useState<ClaimFile | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -103,6 +108,15 @@ export default function ClaimDetailsPage({
       
       if (claimRes.ok) {
         setClaim(claimData)
+        // Initialize field values
+        setFieldValues({
+          insuranceCompany: claimData.insuranceCompany,
+          adjustorName: claimData.adjustorName,
+          adjustorEmail: claimData.adjustorEmail,
+          clientName: claimData.clientName,
+          clientPhone: claimData.clientPhone,
+          clientAddress: claimData.clientAddress
+        })
       } else {
         console.error("Failed to fetch claim:", claimData.error)
       }
@@ -126,58 +140,115 @@ export default function ClaimDetailsPage({
   }
 
 
-  const handleCopy = (value: string) => {
-    navigator.clipboard.writeText(value)
+
+  const handleEditMode = () => {
+    // Store scroll position before any state changes to prevent screen jumping
+    scrollPosRef.current = window.scrollY
+    setIsEditing(true)
+    setFieldErrors({})
   }
 
-  const handleEdit = () => {
-    setEditing(true)
-    setUpdateError(null)
-    setUpdateSuccess(false)
-  }
-
-  const handleCancelEdit = () => {
-    setEditing(false)
-    setUpdateError(null)
-    setUpdateSuccess(false)
-  }
-
-  const handleUpdateSubmit = async (data: ClaimFormData & { organizationId: string; createdById: string }) => {
+  const handleCancel = () => {
     if (!claim) return
+    setIsEditing(false)
+    // Reset all field values to original claim data
+    setFieldValues({
+      insuranceCompany: claim.insuranceCompany,
+      adjustorName: claim.adjustorName,
+      adjustorEmail: claim.adjustorEmail,
+      clientName: claim.clientName,
+      clientPhone: claim.clientPhone,
+      clientAddress: claim.clientAddress
+    })
+    setFieldErrors({})
+    
+    // Restore scroll position to prevent screen jumping
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosRef.current)
+    })
+  }
 
-    setUpdating(true)
-    setUpdateError(null)
-
+  const handleSave = async () => {
+    if (!claim) return
+    
+    // Validate required fields
+    const errors: Record<string, string> = {}
+    if (!fieldValues.insuranceCompany?.trim()) errors.insuranceCompany = 'Insurance company is required'
+    if (!fieldValues.adjustorName?.trim()) errors.adjustorName = 'Adjustor name is required'
+    if (!fieldValues.clientName?.trim()) errors.clientName = 'Client name is required'
+    
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+    
+    setIsSaving(true)
+    setFieldErrors({})
+    
     try {
       const response = await fetch(`/api/claims/${claim.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          insuranceCompany: fieldValues.insuranceCompany.trim(),
+          adjustorName: fieldValues.adjustorName.trim(),
+          adjustorEmail: fieldValues.adjustorEmail.trim(),
+          clientName: fieldValues.clientName.trim(),
+          clientPhone: fieldValues.clientPhone.trim(),
+          clientAddress: fieldValues.clientAddress.trim()
+        })
       })
-
+      
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to update claim')
       }
-
+      
       const updatedClaim = await response.json()
       setClaim(updatedClaim)
-      setEditing(false)
-      setUpdateSuccess(true)
+      setIsEditing(false)
+      setShowToast(true)
+      setTimeout(() => setShowToast(false), 2500)
       
-      // Hide success message after 3 seconds
-      setTimeout(() => {
-        setUpdateSuccess(false)
-      }, 3000)
+      // Restore scroll position after successful save
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosRef.current)
+      })
     } catch (err) {
-      console.error('Error updating claim:', err)
-      setUpdateError(err instanceof Error ? err.message : 'Failed to update claim')
+      console.error('Save failed:', err)
+      setFieldErrors({ 
+        general: err instanceof Error ? err.message : 'Failed to update claim'
+      })
     } finally {
-      setUpdating(false)
+      setIsSaving(false)
     }
   }
+
+  // Create claim menu actions
+  const claimMenuActions: MenuAction[] = [
+    {
+      id: 'edit',
+      label: 'Edit Claim Details',
+      icon: <Edit className="h-4 w-4" />,
+      onClick: handleEditMode
+    },
+    {
+      id: 'copy',
+      label: 'Copy Claim Info',
+      icon: <Copy className="h-4 w-4" />,
+      onClick: () => {
+        const claimInfo = `Claim: ${claim?.claimNumber}\nInsurance: ${claim?.insuranceCompany}\nAdjustor: ${claim?.adjustorName}\nClient: ${claim?.clientName}`
+        navigator.clipboard.writeText(claimInfo)
+      }
+    },
+    {
+      id: 'print',
+      label: 'Print Details',
+      icon: <Printer className="h-4 w-4" />,
+      onClick: () => window.print()
+    }
+  ]
+
 
   // Items handlers
   const handleEditItem = (item: ClaimItem) => {
@@ -311,146 +382,207 @@ export default function ClaimDetailsPage({
     <div className="min-h-screen bg-gray-50">
       {/* Main content */}
       <main className="px-4 sm:px-6 py-8">
-        {editing ? (
-          // Edit Mode
-          <div>
-            {/* Edit Header */}
-            <div className="max-w-2xl mx-auto mb-6">
-              <h1 className="text-lg font-semibold text-gray-900 mb-1">Edit Claim</h1>
-              <p className="text-sm text-gray-600">{claim.claimNumber}</p>
-            </div>
-
-            {/* Update Error Message */}
-            {updateError && (
-              <div className="max-w-2xl mx-auto mb-6">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                  <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="text-sm font-medium text-red-800">Error Updating Claim</h3>
-                    <p className="text-sm text-red-700 mt-1">{updateError}</p>
-                  </div>
-                </div>
+        <div className="max-w-4xl mx-auto">
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900 mb-1">{claim.claimNumber}</h1>
+                <p className="text-sm text-gray-600">Claim Details</p>
               </div>
-            )}
-
-            {/* Edit Form */}
-            <div className="max-w-2xl mx-auto">
-              <ClaimForm
-                initialData={claim}
-                isEditing={true}
-                onSubmit={handleUpdateSubmit}
-                onCancel={handleCancelEdit}
-                loading={updating}
-                submitText="Save Changes"
-                cancelText="Cancel"
-              />
+              <div className="flex items-center gap-3">
+                <div className={`
+                  inline-flex items-center px-3 py-2 rounded-lg text-xs font-medium
+                  ${claim.status === 'OPEN' ? 'bg-blue-50 text-blue-700' :
+                    claim.status === 'IN_PROGRESS' ? 'bg-yellow-50 text-yellow-700' :
+                    claim.status === 'UNDER_REVIEW' ? 'bg-purple-50 text-purple-700' :
+                    claim.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
+                    claim.status === 'DENIED' ? 'bg-red-50 text-red-700' :
+                    'bg-gray-50 text-gray-700'}
+                `}>
+                  {statusLabels[claim.status]}
+                </div>
+                {!isEditing ? (
+                  <FloatingContextMenu actions={claimMenuActions} />
+                ) : (
+                  <SaveCancelButtons
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    isSaving={isSaving}
+                  />
+                )}
+              </div>
             </div>
           </div>
-        ) : (
-          // View Mode
-          <div className="max-w-4xl mx-auto">
-            {/* Header Section */}
-            <div className="mb-8">
-              <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-lg font-semibold text-gray-900 mb-1">{claim.claimNumber}</h1>
-                    <p className="text-sm text-gray-600">Claim Details</p>
+
+          {/* General Error Display */}
+          {fieldErrors.general && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-600">{fieldErrors.general}</p>
+            </div>
+          )}
+
+          {/* Information Sections - Flat Design */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Insurance Section */}
+            <div className="space-y-6">
+              <h2 className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                Insurance Information
+              </h2>
+              
+              {/* Insurance Company */}
+              <div className="group">
+                <div className="flex items-center gap-3 p-3 rounded-lg">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Building2 className="h-4 w-4 text-gray-600" />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className={`
-                      inline-flex items-center px-3 py-2 rounded-lg text-xs font-medium
-                      ${claim.status === 'OPEN' ? 'bg-blue-50 text-blue-700' :
-                        claim.status === 'IN_PROGRESS' ? 'bg-yellow-50 text-yellow-700' :
-                        claim.status === 'UNDER_REVIEW' ? 'bg-purple-50 text-purple-700' :
-                        claim.status === 'APPROVED' ? 'bg-green-50 text-green-700' :
-                        claim.status === 'DENIED' ? 'bg-red-50 text-red-700' :
-                        'bg-gray-50 text-gray-700'}
-                    `}>
-                      {statusLabels[claim.status]}
-                    </div>
-                    <Button 
-                      onClick={handleEdit}
-                      variant="modern"
-                      size="small"
-                    >
-                      <Edit className="h-4 w-4" />
-                      Edit Claim
-                    </Button>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Company</p>
+                    <InvisibleInput
+                      value={fieldValues.insuranceCompany || ''}
+                      onChange={(v) => setFieldValues(prev => ({ ...prev, insuranceCompany: v }))}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      isEditing={isEditing}
+                      className="text-sm text-gray-900 font-medium"
+                      placeholder="Insurance company"
+                    />
+                    {fieldErrors.insuranceCompany && (
+                      <p className="text-xs text-red-600 mt-1">{fieldErrors.insuranceCompany}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Adjustor Name */}
+              <div className="group">
+                <div className="flex items-center gap-3 p-3 rounded-lg">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <User className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Adjustor</p>
+                    <InvisibleInput
+                      value={fieldValues.adjustorName || ''}
+                      onChange={(v) => setFieldValues(prev => ({ ...prev, adjustorName: v }))}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      isEditing={isEditing}
+                      className="text-sm text-gray-900 font-medium"
+                      placeholder="Adjustor name"
+                    />
+                    {fieldErrors.adjustorName && (
+                      <p className="text-xs text-red-600 mt-1">{fieldErrors.adjustorName}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Adjustor Email */}
+              <div className="group">
+                <div className="flex items-center gap-3 p-3 rounded-lg">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Mail className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Adjustor Email</p>
+                    <InvisibleInput
+                      value={fieldValues.adjustorEmail || ''}
+                      onChange={(v) => setFieldValues(prev => ({ ...prev, adjustorEmail: v }))}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      isEditing={isEditing}
+                      className="text-sm text-gray-900 font-medium"
+                      placeholder="adjustor@email.com"
+                    />
+                    {fieldErrors.adjustorEmail && (
+                      <p className="text-xs text-red-600 mt-1">{fieldErrors.adjustorEmail}</p>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Success Message */}
-            {updateSuccess && (
-              <div className="mb-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="text-sm font-medium text-green-800">Claim Updated Successfully</h3>
-                    <p className="text-sm text-green-700 mt-1">Your changes have been saved.</p>
+            {/* Client Section */}
+            <div className="space-y-6">
+              <h2 className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                Client Information
+              </h2>
+              
+              {/* Client Name */}
+              <div className="group">
+                <div className="flex items-center gap-3 p-3 rounded-lg">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <User className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Name</p>
+                    <InvisibleInput
+                      value={fieldValues.clientName || ''}
+                      onChange={(v) => setFieldValues(prev => ({ ...prev, clientName: v }))}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      isEditing={isEditing}
+                      className="text-sm text-gray-900 font-medium"
+                      placeholder="Client name"
+                    />
+                    {fieldErrors.clientName && (
+                      <p className="text-xs text-red-600 mt-1">{fieldErrors.clientName}</p>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
-
-            {/* Information Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {/* Insurance Section */}
-              <div>
-                <h2 className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-4">
-                  Insurance Information
-                </h2>
-                <div className="space-y-4">
-                  <InfoCard 
-                    icon={Building2}
-                    label="Company" 
-                    value={claim.insuranceCompany}
-                    onCopy={handleCopy}
-                  />
-                  <InfoCard 
-                    icon={User}
-                    label="Adjustor" 
-                    value={claim.adjustorName}
-                    onCopy={handleCopy}
-                  />
-                  <InfoCard 
-                    icon={Mail}
-                    label="Adjustor Email" 
-                    value={claim.adjustorEmail}
-                    onCopy={handleCopy}
-                  />
+              
+              {/* Client Phone */}
+              <div className="group">
+                <div className="flex items-center gap-3 p-3 rounded-lg">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <Phone className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Phone</p>
+                    <InvisibleInput
+                      value={fieldValues.clientPhone || ''}
+                      onChange={(v) => setFieldValues(prev => ({ ...prev, clientPhone: v }))}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      isEditing={isEditing}
+                      className="text-sm text-gray-900 font-medium"
+                      placeholder="Phone number"
+                    />
+                    {fieldErrors.clientPhone && (
+                      <p className="text-xs text-red-600 mt-1">{fieldErrors.clientPhone}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-
-              {/* Client Section */}
-              <div>
-                <h2 className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-4">
-                  Client Information
-                </h2>
-                <div className="space-y-4">
-                  <InfoCard 
-                    icon={User}
-                    label="Name" 
-                    value={claim.clientName}
-                    onCopy={handleCopy}
-                  />
-                  <InfoCard 
-                    icon={Phone}
-                    label="Phone" 
-                    value={claim.clientPhone}
-                    onCopy={handleCopy}
-                  />
-                  <InfoCard 
-                    icon={MapPin}
-                    label="Address" 
-                    value={claim.clientAddress}
-                    onCopy={handleCopy}
-                  />
+              
+              {/* Client Address */}
+              <div className="group">
+                <div className="flex items-start gap-3 p-3 rounded-lg">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <MapPin className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-1">Address</p>
+                    <InvisibleInput
+                      value={fieldValues.clientAddress || ''}
+                      onChange={(v) => setFieldValues(prev => ({ ...prev, clientAddress: v }))}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                      isEditing={isEditing}
+                      className="text-sm text-gray-900 font-medium"
+                      placeholder="Client address"
+                      multiline
+                    />
+                    {fieldErrors.clientAddress && (
+                      <p className="text-xs text-red-600 mt-1">{fieldErrors.clientAddress}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
             {/* Items Section */}
             <div className="mb-8">
@@ -544,7 +676,6 @@ export default function ClaimDetailsPage({
               />
             </div>
           </div>
-        )}
       </main>
 
       {/* Image Modal */}
@@ -560,6 +691,18 @@ export default function ClaimDetailsPage({
         isOpen={!!viewingPDF}
         onClose={() => setViewingPDF(null)}
       />
+
+      {/* Success Toast */}
+      <div
+        className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 z-50 ${
+          showToast ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+        }`}
+      >
+        <div className="flex items-center space-x-2">
+          <Check className="h-4 w-4" />
+          <span className="text-sm font-medium">Claim details updated successfully</span>
+        </div>
+      </div>
     </div>
   )
 }
