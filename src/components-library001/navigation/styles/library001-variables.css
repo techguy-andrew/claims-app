@@ -1,0 +1,153 @@
+/* Library001 Navigation Package CSS Variables */
+/* This file contains all CSS variables needed for the navigation package to be self-contained */
+
+:root {
+  /* Colors */
+  --library001-nav-color-primary: #2563eb;
+  --library001-nav-color-primary-hover: #1d4ed8;
+  --library001-nav-color-secondary: #64748b;
+  --library001-nav-color-secondary-hover: #475569;
+  --library001-nav-color-success: #059669;
+  --library001-nav-color-warning: #d97706;
+  --library001-nav-color-error: #dc2626;
+  --library001-nav-color-white: #ffffff;
+  --library001-nav-color-gray-50: #f9fafb;
+  --library001-nav-color-gray-100: #f3f4f6;
+  --library001-nav-color-gray-200: #e5e7eb;
+  --library001-nav-color-gray-300: #d1d5db;
+  --library001-nav-color-gray-400: #9ca3af;
+  --library001-nav-color-gray-500: #6b7280;
+  --library001-nav-color-gray-600: #4b5563;
+  --library001-nav-color-gray-700: #374151;
+  --library001-nav-color-gray-800: #1f2937;
+  --library001-nav-color-gray-900: #111827;
+
+  /* Text Colors */
+  --library001-nav-text-primary: var(--library001-nav-color-gray-900);
+  --library001-nav-text-secondary: var(--library001-nav-color-gray-600);
+  --library001-nav-text-muted: var(--library001-nav-color-gray-500);
+  --library001-nav-text-inverse: var(--library001-nav-color-white);
+
+  /* Background Colors */
+  --library001-nav-bg-primary: var(--library001-nav-color-white);
+  --library001-nav-bg-secondary: var(--library001-nav-color-gray-50);
+  --library001-nav-bg-tertiary: var(--library001-nav-color-gray-100);
+
+  /* Border Colors */
+  --library001-nav-border-color: var(--library001-nav-color-gray-200);
+  --library001-nav-border-color-strong: var(--library001-nav-color-gray-300);
+
+  /* Spacing */
+  --library001-nav-spacing-xs: 0.25rem;
+  --library001-nav-spacing-sm: 0.5rem;
+  --library001-nav-spacing-md: 1rem;
+  --library001-nav-spacing-lg: 1.5rem;
+  --library001-nav-spacing-xl: 2rem;
+  --library001-nav-spacing-2xl: 3rem;
+  --library001-nav-spacing-touch: 12px;
+
+  /* Border Radius */
+  --library001-nav-radius-sm: 0.25rem;
+  --library001-nav-radius-md: 0.375rem;
+  --library001-nav-radius-lg: 0.5rem;
+  --library001-nav-radius-xl: 0.75rem;
+
+  /* Shadows */
+  --library001-nav-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --library001-nav-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --library001-nav-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --library001-nav-shadow-enterprise: 0 8px 30px rgb(0 0 0 / 0.06);
+  --library001-nav-shadow-enterprise-hover: 0 8px 40px rgb(0 0 0 / 0.12);
+  --library001-nav-shadow-floating-menu: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+
+  /* Glass Effects */
+  --library001-nav-glass-white-95: rgba(255, 255, 255, 0.95);
+  --library001-nav-glass-white-80: rgba(255, 255, 255, 0.80);
+  --library001-nav-glass-border: rgba(229, 231, 235, 0.8);
+  --library001-nav-glass-border-hover: rgba(209, 213, 219, 0.8);
+
+  /* Transitions */
+  --library001-nav-transition-fast: 150ms ease-in-out;
+  --library001-nav-transition-normal: 200ms ease-in-out;
+  --library001-nav-transition-slow: 300ms ease-in-out;
+
+  /* Text Sizes - Mobile First */
+  --library001-nav-text-xs: 0.75rem;
+  --library001-nav-text-sm: 0.8125rem;
+  --library001-nav-text-base: 0.9375rem;
+  --library001-nav-text-lg: 1.0625rem;
+  --library001-nav-text-xl: 1.1875rem;
+  --library001-nav-text-2xl: 1.375rem;
+  --library001-nav-text-3xl: 1.625rem;
+  --library001-nav-text-4xl: 2rem;
+}
+
+/* Desktop Text Sizes */
+@media (min-width: 768px) {
+  :root {
+    --library001-nav-text-xs: 0.75rem;
+    --library001-nav-text-sm: 0.75rem;
+    --library001-nav-text-base: 0.875rem;
+    --library001-nav-text-lg: 1rem;
+    --library001-nav-text-xl: 1.125rem;
+    --library001-nav-text-2xl: 1.25rem;
+    --library001-nav-text-3xl: 1.5rem;
+    --library001-nav-text-4xl: 1.875rem;
+  }
+}
+
+/* Dark Mode Variables */
+.dark {
+  --library001-nav-text-primary: var(--library001-nav-color-gray-100);
+  --library001-nav-text-secondary: var(--library001-nav-color-gray-300);
+  --library001-nav-text-muted: var(--library001-nav-color-gray-400);
+  --library001-nav-text-inverse: var(--library001-nav-color-gray-900);
+  
+  --library001-nav-bg-primary: var(--library001-nav-color-gray-900);
+  --library001-nav-bg-secondary: var(--library001-nav-color-gray-800);
+  --library001-nav-bg-tertiary: var(--library001-nav-color-gray-700);
+  
+  --library001-nav-border-color: var(--library001-nav-color-gray-700);
+  --library001-nav-border-color-strong: var(--library001-nav-color-gray-600);
+}
+
+/* Map to existing CSS variable names for compatibility */
+:root {
+  --color-primary: var(--library001-nav-color-primary);
+  --color-primary-hover: var(--library001-nav-color-primary-hover);
+  --color-secondary: var(--library001-nav-color-secondary);
+  --color-secondary-hover: var(--library001-nav-color-secondary-hover);
+  --color-error: var(--library001-nav-color-error);
+  --color-white: var(--library001-nav-color-white);
+  
+  --text-primary: var(--library001-nav-text-primary);
+  --text-secondary: var(--library001-nav-text-secondary);
+  
+  --bg-primary: var(--library001-nav-bg-primary);
+  --bg-secondary: var(--library001-nav-bg-secondary);
+  
+  --spacing-xs: var(--library001-nav-spacing-xs);
+  --spacing-sm: var(--library001-nav-spacing-sm);
+  --spacing-md: var(--library001-nav-spacing-md);
+  --spacing-lg: var(--library001-nav-spacing-lg);
+  --spacing-xl: var(--library001-nav-spacing-xl);
+  --spacing-touch: var(--library001-nav-spacing-touch);
+  
+  --radius-sm: var(--library001-nav-radius-sm);
+  --radius-md: var(--library001-nav-radius-md);
+  --radius-lg: var(--library001-nav-radius-lg);
+  
+  --shadow-sm: var(--library001-nav-shadow-sm);
+  --shadow-md: var(--library001-nav-shadow-md);
+  --shadow-enterprise: var(--library001-nav-shadow-enterprise);
+  --shadow-enterprise-hover: var(--library001-nav-shadow-enterprise-hover);
+  
+  --glass-white-95: var(--library001-nav-glass-white-95);
+  --glass-white-80: var(--library001-nav-glass-white-80);
+  --glass-border: var(--library001-nav-glass-border);
+  --glass-border-hover: var(--library001-nav-glass-border-hover);
+  
+  --transition-fast: var(--library001-nav-transition-fast);
+  --transition-normal: var(--library001-nav-transition-normal);
+  --transition-slow: var(--library001-nav-transition-slow);
+}

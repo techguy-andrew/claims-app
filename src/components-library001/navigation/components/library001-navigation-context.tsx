@@ -1,16 +1,16 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useReducer } from 'react';
-import { getScreenSize, type ScreenSize } from './utils';
+import { getLibrary001ScreenSize, type Library001ScreenSize } from '../utils';
 
-export interface NavigationState {
+export interface Library001NavigationState {
   // Sidebar state
   sidebarOpen: boolean;
   sidebarCollapsed: boolean;
   sidebarLayout: 'overlay' | 'push' | 'static';
   
   // Screen size
-  screenSize: ScreenSize;
+  screenSize: Library001ScreenSize;
   isMobile: boolean;
   isTablet: boolean;
   isDesktop: boolean;
@@ -29,7 +29,7 @@ export interface NavigationState {
   autoCollapseOnMobile: boolean;
 }
 
-export interface NavigationActions {
+export interface Library001NavigationActions {
   // Sidebar actions
   openSidebar: () => void;
   closeSidebar: () => void;
@@ -58,33 +58,33 @@ export interface NavigationActions {
   setActiveItem: (itemId: string) => void;
   
   // Settings actions
-  updateSettings: (settings: Partial<NavigationSettings>) => void;
+  updateSettings: (settings: Partial<Library001NavigationSettings>) => void;
 }
 
-export interface NavigationSettings {
+export interface Library001NavigationSettings {
   persistCollapsedState: boolean;
   autoCollapseOnMobile: boolean;
   defaultSidebarLayout: 'overlay' | 'push' | 'static';
   defaultTheme: 'light' | 'dark';
 }
 
-export type NavigationContextType = NavigationState & NavigationActions;
+export type Library001NavigationContextType = Library001NavigationState & Library001NavigationActions;
 
-const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
+const Library001NavigationContext = createContext<Library001NavigationContextType | undefined>(undefined);
 
 // Action types for reducer
-type NavigationActionType =
+type Library001NavigationActionType =
   | { type: 'SET_SIDEBAR_OPEN'; payload: boolean }
   | { type: 'SET_SIDEBAR_COLLAPSED'; payload: boolean }
   | { type: 'SET_SIDEBAR_LAYOUT'; payload: 'overlay' | 'push' | 'static' }
-  | { type: 'SET_SCREEN_SIZE'; payload: ScreenSize }
+  | { type: 'SET_SCREEN_SIZE'; payload: Library001ScreenSize }
   | { type: 'SET_THEME'; payload: 'light' | 'dark' }
   | { type: 'SET_MOBILE_MENU_OPEN'; payload: boolean }
   | { type: 'SET_ACTIVE_ITEM'; payload: string }
-  | { type: 'UPDATE_SETTINGS'; payload: Partial<NavigationSettings> };
+  | { type: 'UPDATE_SETTINGS'; payload: Partial<Library001NavigationSettings> };
 
 // Reducer function
-const navigationReducer = (state: NavigationState, action: NavigationActionType): NavigationState => {
+const library001NavigationReducer = (state: Library001NavigationState, action: Library001NavigationActionType): Library001NavigationState => {
   switch (action.type) {
     case 'SET_SIDEBAR_OPEN':
       return { ...state, sidebarOpen: action.payload };
@@ -126,20 +126,20 @@ const navigationReducer = (state: NavigationState, action: NavigationActionType)
 };
 
 // Local storage keys
-const STORAGE_KEYS = {
-  SIDEBAR_COLLAPSED: 'navigation-sidebar-collapsed',
-  THEME: 'navigation-theme',
-  SIDEBAR_LAYOUT: 'navigation-sidebar-layout',
+const LIBRARY001_STORAGE_KEYS = {
+  SIDEBAR_COLLAPSED: 'library001-navigation-sidebar-collapsed',
+  THEME: 'library001-navigation-theme',
+  SIDEBAR_LAYOUT: 'library001-navigation-sidebar-layout',
 } as const;
 
-export interface NavigationProviderProps {
+export interface Library001NavigationProviderProps {
   children: React.ReactNode;
-  defaultSettings?: Partial<NavigationSettings>;
+  defaultSettings?: Partial<Library001NavigationSettings>;
   initialTheme?: 'light' | 'dark';
   initialSidebarLayout?: 'overlay' | 'push' | 'static';
 }
 
-export const NavigationProvider: React.FC<NavigationProviderProps> = ({ 
+export const Library001NavigationProvider: React.FC<Library001NavigationProviderProps> = ({ 
   children,
   defaultSettings = {},
   initialTheme = 'light',
@@ -148,7 +148,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   const [mounted, setMounted] = useState(false);
   
   // Default settings
-  const settings: NavigationSettings = {
+  const settings: Library001NavigationSettings = {
     persistCollapsedState: true,
     autoCollapseOnMobile: true,
     defaultSidebarLayout: initialSidebarLayout,
@@ -157,7 +157,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   };
 
   // Get initial state
-  const getInitialState = (): NavigationState => {
+  const getInitialState = (): Library001NavigationState => {
     // Always start with desktop as default for SSR consistency
     const screenSize = 'desktop';
     
@@ -183,14 +183,14 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     };
   };
 
-  const [state, dispatch] = useReducer(navigationReducer, getInitialState());
+  const [state, dispatch] = useReducer(library001NavigationReducer, getInitialState());
 
   // Handle screen size changes
   useEffect(() => {
     if (!mounted) return;
 
     const handleResize = () => {
-      const newScreenSize = getScreenSize(window.innerWidth);
+      const newScreenSize = getLibrary001ScreenSize(window.innerWidth);
       dispatch({ type: 'SET_SCREEN_SIZE', payload: newScreenSize });
       
       // Auto-adjust sidebar based on screen size
@@ -213,18 +213,18 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     if (!mounted) return;
 
     if (settings.persistCollapsedState) {
-      localStorage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, JSON.stringify(state.sidebarCollapsed));
+      localStorage.setItem(LIBRARY001_STORAGE_KEYS.SIDEBAR_COLLAPSED, JSON.stringify(state.sidebarCollapsed));
     }
   }, [state.sidebarCollapsed, settings.persistCollapsedState, mounted]);
 
   useEffect(() => {
     if (!mounted) return;
-    localStorage.setItem(STORAGE_KEYS.THEME, state.theme);
+    localStorage.setItem(LIBRARY001_STORAGE_KEYS.THEME, state.theme);
   }, [state.theme, mounted]);
 
   useEffect(() => {
     if (!mounted) return;
-    localStorage.setItem(STORAGE_KEYS.SIDEBAR_LAYOUT, state.sidebarLayout);
+    localStorage.setItem(LIBRARY001_STORAGE_KEYS.SIDEBAR_LAYOUT, state.sidebarLayout);
   }, [state.sidebarLayout, mounted]);
 
   // Handle keyboard shortcuts
@@ -261,7 +261,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     setMounted(true);
     
     // Initialize client-side state after mount to prevent hydration mismatch
-    const screenSize = getScreenSize(window.innerWidth);
+    const screenSize = getLibrary001ScreenSize(window.innerWidth);
     dispatch({ type: 'SET_SCREEN_SIZE', payload: screenSize });
     
     // Load saved settings from localStorage
@@ -270,18 +270,18 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     let actualSidebarLayout = settings.defaultSidebarLayout;
     
     if (settings.persistCollapsedState) {
-      const savedCollapsed = localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED);
+      const savedCollapsed = localStorage.getItem(LIBRARY001_STORAGE_KEYS.SIDEBAR_COLLAPSED);
       if (savedCollapsed !== null) {
         sidebarCollapsed = JSON.parse(savedCollapsed);
       }
     }
     
-    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
+    const savedTheme = localStorage.getItem(LIBRARY001_STORAGE_KEYS.THEME);
     if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
       actualTheme = savedTheme;
     }
     
-    const savedLayout = localStorage.getItem(STORAGE_KEYS.SIDEBAR_LAYOUT);
+    const savedLayout = localStorage.getItem(LIBRARY001_STORAGE_KEYS.SIDEBAR_LAYOUT);
     if (savedLayout && ['overlay', 'push', 'static'].includes(savedLayout)) {
       actualSidebarLayout = savedLayout as 'overlay' | 'push' | 'static';
     }
@@ -302,7 +302,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   }, [settings.defaultTheme, settings.persistCollapsedState, settings.defaultSidebarLayout, settings.autoCollapseOnMobile]);
 
   // Action creators
-  const actions: NavigationActions = {
+  const actions: Library001NavigationActions = {
     // Sidebar actions
     openSidebar: useCallback(() => {
       dispatch({ type: 'SET_SIDEBAR_OPEN', payload: true });
@@ -370,34 +370,34 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
     }, []),
 
     // Settings actions
-    updateSettings: useCallback((newSettings: Partial<NavigationSettings>) => {
+    updateSettings: useCallback((newSettings: Partial<Library001NavigationSettings>) => {
       dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
     }, []),
   };
 
-  const contextValue: NavigationContextType = {
+  const contextValue: Library001NavigationContextType = {
     ...state,
     ...actions,
   };
 
   return (
-    <NavigationContext.Provider value={contextValue}>
+    <Library001NavigationContext.Provider value={contextValue}>
       {children}
-    </NavigationContext.Provider>
+    </Library001NavigationContext.Provider>
   );
 };
 
 // Hook to use navigation context
-export const useNavigation = (): NavigationContextType => {
-  const context = useContext(NavigationContext);
+export const useLibrary001Navigation = (): Library001NavigationContextType => {
+  const context = useContext(Library001NavigationContext);
   if (context === undefined) {
-    throw new Error('useNavigation must be used within a NavigationProvider');
+    throw new Error('useLibrary001Navigation must be used within a Library001NavigationProvider');
   }
   return context;
 };
 
 // Convenience hooks for specific navigation features
-export const useSidebar = () => {
+export const useLibrary001Sidebar = () => {
   const {
     sidebarOpen,
     sidebarCollapsed,
@@ -414,7 +414,7 @@ export const useSidebar = () => {
     isMobile,
     isTablet,
     isDesktop,
-  } = useNavigation();
+  } = useLibrary001Navigation();
 
   return {
     isOpen: sidebarOpen,
@@ -435,8 +435,8 @@ export const useSidebar = () => {
   };
 };
 
-export const useTheme = () => {
-  const { theme, setTheme, toggleTheme } = useNavigation();
+export const useLibrary001Theme = () => {
+  const { theme, setTheme, toggleTheme } = useLibrary001Navigation();
   
   return {
     theme,
@@ -447,7 +447,7 @@ export const useTheme = () => {
   };
 };
 
-export const useMobileMenu = () => {
+export const useLibrary001MobileMenu = () => {
   const {
     mobileMenuOpen,
     openMobileMenu,
@@ -455,7 +455,7 @@ export const useMobileMenu = () => {
     toggleMobileMenu,
     isMobile,
     isTablet,
-  } = useNavigation();
+  } = useLibrary001Navigation();
 
   return {
     isOpen: mobileMenuOpen,
@@ -467,3 +467,6 @@ export const useMobileMenu = () => {
     shouldShow: isMobile || isTablet,
   };
 };
+
+// Export default for convenience
+export default Library001NavigationProvider;

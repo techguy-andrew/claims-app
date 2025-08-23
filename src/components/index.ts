@@ -4,9 +4,6 @@
 // UI Foundation Components
 export * from './ui';
 
-// Navigation System
-export * from './navigation';
-
 // Claims Management
 export * from './claims';
 

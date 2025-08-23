@@ -13,17 +13,17 @@ import {
   LogOut,
   X
 } from 'lucide-react';
-import { createVariants, cn, type VariantProps } from './utils';
-import styles from './navigation.module.css';
-import { useNavigation } from './navigation-provider';
-import { Button } from '@/components/ui/button';
+import { createLibrary001Variants, library001Cn, type Library001VariantProps } from '../utils';
+import styles from '../styles/library001-navigation.module.css';
+import { useLibrary001Navigation } from './library001-navigation-context';
+import { Library001Button } from '../ui/library001-button';
 
 // Base style utilities for consistency - mobile-first approach
 const baseItemStyles = "flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[44px] md:min-h-[36px]";
 const baseButtonStyles = "p-3 md:p-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[44px] md:min-h-[36px]";
 
 // Types and Interfaces
-const sidebarVariants = {
+const library001SidebarVariants = {
   layout: {
     overlay: styles.overlay,
     push: styles.push,
@@ -40,52 +40,52 @@ const sidebarVariants = {
   },
 } as const;
 
-const getSidebarClasses = createVariants(sidebarVariants);
+const getLibrary001SidebarClasses = createLibrary001Variants(library001SidebarVariants);
 
-export interface NavigationItem {
+export interface Library001NavigationItem {
   id: string;
   label: string;
   href?: string;
   icon?: React.ComponentType<{ className?: string }>;
   badge?: string | number;
-  children?: NavigationItem[];
+  children?: Library001NavigationItem[];
   onClick?: () => void;
   disabled?: boolean;
   external?: boolean;
 }
 
-export interface UserInfo {
+export interface Library001UserInfo {
   name: string;
   email?: string;
   avatar?: string;
   initials?: string;
 }
 
-export interface SidebarV2Props extends VariantProps<typeof sidebarVariants> {
+export interface Library001AppSidebarProps extends Library001VariantProps<typeof library001SidebarVariants> {
   isOpen?: boolean;
   isCollapsed?: boolean;
   onClose?: () => void;
   onToggle?: () => void;
   onToggleCollapse?: () => void;
-  navigation?: NavigationItem[];
+  navigation?: Library001NavigationItem[];
   showProfile?: boolean;
-  userInfo?: UserInfo;
+  userInfo?: Library001UserInfo;
   className?: string;
   children?: React.ReactNode;
   'aria-label'?: string;
 }
 
-export interface SidebarItemProps extends Omit<React.ComponentProps<'div'>, 'children'> {
-  item: NavigationItem;
+export interface Library001SidebarItemProps extends Omit<React.ComponentProps<'div'>, 'children'> {
+  item: Library001NavigationItem;
   isActive?: boolean;
   isCollapsed?: boolean;
   level?: number;
   theme?: 'light' | 'dark';
-  onItemClick?: (item: NavigationItem) => void;
-  isItemActive?: (item: NavigationItem) => boolean;
+  onItemClick?: (item: Library001NavigationItem) => void;
+  isItemActive?: (item: Library001NavigationItem) => boolean;
 }
 
-export interface SidebarSectionProps {
+export interface Library001SidebarSectionProps {
   title?: string;
   children: React.ReactNode;
   isCollapsed?: boolean;
@@ -93,7 +93,7 @@ export interface SidebarSectionProps {
 }
 
 // Custom hooks
-const useClickOutside = (
+const useLibrary001ClickOutside = (
   ref: React.RefObject<HTMLElement | null>,
   handler: () => void,
   active: boolean = true
@@ -112,7 +112,7 @@ const useClickOutside = (
   }, [ref, handler, active]);
 };
 
-const useKeyboard = (isOpen: boolean, onClose?: () => void) => {
+const useLibrary001Keyboard = (isOpen: boolean, onClose?: () => void) => {
   useEffect(() => {
     if (!isOpen || !onClose) return;
 
@@ -128,7 +128,7 @@ const useKeyboard = (isOpen: boolean, onClose?: () => void) => {
 };
 
 // Sidebar Item Component with improved accessibility
-export const SidebarItemV2 = memo<SidebarItemProps>(({ 
+export const Library001SidebarItem = memo<Library001SidebarItemProps>(({ 
   item, 
   isActive = false, 
   isCollapsed = false,
@@ -156,7 +156,7 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
     return (
       <details open={isExpanded} className="group">
         <summary 
-          className={cn(
+          className={library001Cn(
             baseItemStyles,
             "cursor-pointer list-none",
             isActive 
@@ -193,7 +193,7 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
             )}
           </div>
           <ChevronRight 
-            className={cn(
+            className={library001Cn(
               "w-5 h-5 md:w-4 md:h-4 transition-transform duration-200",
               isExpanded && "rotate-90"
             )}
@@ -203,7 +203,7 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
         
         <div className="mt-1 space-y-1" role="group" aria-label={`${item.label} submenu`}>
           {item.children!.map((child) => (
-            <SidebarItemV2
+            <Library001SidebarItem
               key={child.id}
               item={child}
               isActive={isItemActive ? isItemActive(child) : false}
@@ -243,7 +243,7 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
     </div>
   );
 
-  const itemClasses = cn(
+  const itemClasses = library001Cn(
     baseItemStyles,
     isActive 
       ? "bg-blue-50 text-blue-700 font-medium" 
@@ -283,17 +283,17 @@ export const SidebarItemV2 = memo<SidebarItemProps>(({
   );
 });
 
-SidebarItemV2.displayName = 'SidebarItemV2';
+Library001SidebarItem.displayName = 'Library001SidebarItem';
 
 // Sidebar Section Component
-export const SidebarSectionV2 = memo<SidebarSectionProps>(({ 
+export const Library001SidebarSection = memo<Library001SidebarSectionProps>(({ 
   title, 
   children, 
   isCollapsed = false,
   className 
 }) => {
   return (
-    <div className={cn("space-y-1", className)}>
+    <div className={library001Cn("space-y-1", className)}>
       {title && !isCollapsed && (
         <div className="px-3 py-2">
           <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
@@ -308,11 +308,11 @@ export const SidebarSectionV2 = memo<SidebarSectionProps>(({
   );
 });
 
-SidebarSectionV2.displayName = 'SidebarSectionV2';
+Library001SidebarSection.displayName = 'Library001SidebarSection';
 
 // User Profile Component
-export const SidebarProfileV2 = memo<{
-  userInfo: UserInfo;
+export const Library001SidebarProfile = memo<{
+  userInfo: Library001UserInfo;
   isCollapsed?: boolean;
   theme?: 'light' | 'dark';
   onSignOut?: () => void;
@@ -331,7 +331,7 @@ export const SidebarProfileV2 = memo<{
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
   const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), []);
 
-  useClickOutside(menuRef, closeMenu, isMenuOpen);
+  useLibrary001ClickOutside(menuRef, closeMenu, isMenuOpen);
 
   const handleProfileClick = useCallback(() => {
     closeMenu();
@@ -355,7 +355,7 @@ export const SidebarProfileV2 = memo<{
   if (isCollapsed) {
     return (
       <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-        <Button 
+        <Library001Button 
           variant="modern"
           size="small"
           className="w-8 h-8 rounded-lg text-sm font-medium" 
@@ -364,7 +364,7 @@ export const SidebarProfileV2 = memo<{
           aria-label={`User menu for ${userInfo.name}`}
         >
           {userInitials}
-        </Button>
+        </Library001Button>
       </div>
     );
   }
@@ -395,7 +395,7 @@ export const SidebarProfileV2 = memo<{
             )}
           </div>
           <ChevronDown 
-            className={cn(
+            className={library001Cn(
               "w-5 h-5 md:w-4 md:h-4 transition-transform duration-200 text-gray-500 flex-shrink-0",
               isMenuOpen && "rotate-180"
             )}
@@ -441,22 +441,22 @@ export const SidebarProfileV2 = memo<{
   );
 });
 
-SidebarProfileV2.displayName = 'SidebarProfileV2';
+Library001SidebarProfile.displayName = 'Library001SidebarProfile';
 
 // Default navigation data
-const DEFAULT_NAVIGATION: NavigationItem[] = [
+const DEFAULT_NAVIGATION: Library001NavigationItem[] = [
   { id: 'dashboard', label: 'Dashboard', href: '/', icon: Home },
   { id: 'claims', label: 'Claims', href: '/claims', icon: FileText },
 ];
 
-const DEFAULT_USER_INFO: UserInfo = {
+const DEFAULT_USER_INFO: Library001UserInfo = {
   name: 'John Doe',
   email: 'john@example.com',
   initials: 'JD'
 };
 
 // Main Sidebar Component
-export const SidebarV2 = memo<SidebarV2Props>(({ 
+export const Library001AppSidebar = memo<Library001AppSidebarProps>(({ 
   layout = 'overlay',
   size = 'md',
   theme,
@@ -472,15 +472,15 @@ export const SidebarV2 = memo<SidebarV2Props>(({
   'aria-label': ariaLabel = 'Main navigation',
   ...props
 }) => {
-  const { theme: contextTheme, isMobile, isTablet } = useNavigation();
+  const { theme: contextTheme, isMobile, isTablet } = useLibrary001Navigation();
   const pathname = usePathname();
   
   const currentTheme = theme || contextTheme || 'light';
 
   // Use keyboard hook
-  useKeyboard(isOpen, onClose);
+  useLibrary001Keyboard(isOpen, onClose);
 
-  const isItemActive = useCallback((item: NavigationItem): boolean => {
+  const isItemActive = useCallback((item: Library001NavigationItem): boolean => {
     if (item.href) {
       return pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
     }
@@ -490,7 +490,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
     return false;
   }, [pathname]);
 
-  const handleItemClick = useCallback((item: NavigationItem) => {
+  const handleItemClick = useCallback((item: Library001NavigationItem) => {
     // Only close sidebar on mobile when clicking navigation items with hrefs (actual navigation)
     if (item.href && (layout === 'overlay' || isMobile || isTablet) && onClose) {
       // Small delay to allow navigation to complete before closing
@@ -498,9 +498,9 @@ export const SidebarV2 = memo<SidebarV2Props>(({
     }
   }, [layout, isMobile, isTablet, onClose]);
 
-  const sidebarClasses = cn(
+  const sidebarClasses = library001Cn(
     styles.sidebar,
-    getSidebarClasses({ 
+    getLibrary001SidebarClasses({ 
       layout: layout as 'overlay' | 'push' | 'static', 
       size: size as 'sm' | 'md' | 'lg', 
       theme: currentTheme as 'light' | 'dark' 
@@ -516,10 +516,10 @@ export const SidebarV2 = memo<SidebarV2Props>(({
 
     return (
       <nav className="px-0 space-y-4" aria-label={ariaLabel}>
-        <SidebarSectionV2 isCollapsed={isCollapsed}>
+        <Library001SidebarSection isCollapsed={isCollapsed}>
           <div className="space-y-1">
             {navigation.map((item) => (
-              <SidebarItemV2
+              <Library001SidebarItem
                 key={item.id}
                 item={item}
                 isActive={isItemActive(item)}
@@ -530,7 +530,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
               />
             ))}
           </div>
-        </SidebarSectionV2>
+        </Library001SidebarSection>
       </nav>
     );
   }, [children, ariaLabel, isCollapsed, navigation, isItemActive, currentTheme, handleItemClick]);
@@ -560,7 +560,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
             {onClose && (
               <button
                 onClick={onClose}
-                className={cn(baseButtonStyles, "hover:bg-gray-100")}
+                className={library001Cn(baseButtonStyles, "hover:bg-gray-100")}
                 aria-label="Close navigation menu"
               >
                 <X className="w-6 h-6 md:w-5 md:h-5 text-gray-700" />
@@ -595,7 +595,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
               {onToggleCollapse && !isCollapsed && (
                 <button
                   onClick={onToggleCollapse}
-                  className={cn(baseButtonStyles, "hover:bg-gray-100")}
+                  className={library001Cn(baseButtonStyles, "hover:bg-gray-100")}
                   aria-label="Collapse sidebar"
                   title="Collapse sidebar"
                 >
@@ -606,7 +606,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
               {onClose && layout === 'overlay' && (
                 <button
                   onClick={onClose}
-                  className={cn(baseButtonStyles, "hover:bg-gray-100")}
+                  className={library001Cn(baseButtonStyles, "hover:bg-gray-100")}
                   aria-label="Close sidebar"
                   title="Close sidebar"
                 >
@@ -627,7 +627,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
         {/* User Profile - Always visible at bottom */}
         {showProfile && (
           <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700">
-            <SidebarProfileV2
+            <Library001SidebarProfile
               userInfo={userInfo}
               isCollapsed={isCollapsed}
               theme={currentTheme}
@@ -640,4 +640,7 @@ export const SidebarV2 = memo<SidebarV2Props>(({
   );
 });
 
-SidebarV2.displayName = 'SidebarV2';
+Library001AppSidebar.displayName = 'Library001AppSidebar';
+
+// Export default for convenience
+export default Library001AppSidebar;
