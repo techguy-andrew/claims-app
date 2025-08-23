@@ -1,20 +1,25 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { Package, FileText, Plus } from 'lucide-react'
 import { 
   Library001ItemsCard, 
   Library001FilesSection,
-  type Library001ClaimItem, 
-  type Library001ClaimFile 
-} from '@/components-library001'
-import { 
   Library001ClaimInformation,
+  Library001ClaimPageSkeleton,
+  Library001EmptyItems,
+  Library001SectionCard,
+  Library001PageHeader,
+  Library001StatusBadge,
+  Library001PageAction,
+  type Library001ClaimItem, 
+  type Library001ClaimFile,
   type Library001ClaimData,
   type Library001ClaimFieldValues,
   type Library001ClaimFieldErrors
 } from '@/components-library001'
 
-// Using Library001ClaimData type instead of local ClaimData
+// Using Library001ClaimData type
 type ClaimData = Library001ClaimData
 
 interface ClaimDetailsPageProps {
@@ -298,23 +303,53 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
     }
   }
 
+  const handleAddItem = () => {
+    // Placeholder for adding new item functionality
+    console.log('Add new item')
+  }
 
-  if (loading || !claim) {
+  // Loading state with skeleton
+  if (loading) {
+    return <Library001ClaimPageSkeleton />
+  }
+
+  // Error state
+  if (!claim) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-200 max-w-md mx-auto">
-          <p className="text-sm text-gray-700">{loading ? "Loading claim details..." : "Claim not found"}</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-8 shadow-lg border border-gray-200 max-w-md mx-auto">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-red-50 to-pink-50 flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-8 h-8 text-red-600" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Claim Not Found</h2>
+            <p className="text-sm text-gray-600">The claim you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      {/* Page Header */}
+      <Library001PageHeader
+        breadcrumbs={[
+          { label: 'Claims', href: '/claims' },
+          { label: claim.claimNumber }
+        ]}
+        title={claim.claimNumber}
+        subtitle={`Created on ${new Date(claim.claimDate).toLocaleDateString()}`}
+        badge={<Library001StatusBadge status={claim.status} />}
+        icon={FileText}
+      />
+
+      {/* Main Content */}
       <main className="px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Claim Information using Library001 Component */}
-          <div className="mb-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          
+          {/* Claim Information Section */}
+          <div className="transition-all duration-300 hover:shadow-md rounded-lg">
             <Library001ClaimInformation
               claim={claim}
               isEditing={isEditing}
@@ -328,69 +363,62 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
             />
           </div>
 
-          {/* Items Section using Library001 Components */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Items</h2>
-                <p className="text-sm text-gray-600">
-                  {items.length} item{items.length !== 1 ? 's' : ''} documented
-                </p>
-              </div>
-            </div>
-
+          {/* Items Section */}
+          <Library001SectionCard
+            icon={Package}
+            title="Items"
+            subtitle={`${items.length} item${items.length !== 1 ? 's' : ''} documented`}
+            badge={items.length}
+            action={
+              <Library001PageAction
+                label="Add Item"
+                icon={<Plus className="w-4 h-4" />}
+                onClick={handleAddItem}
+                variant="secondary"
+                size="sm"
+              />
+            }
+            className="transition-all duration-300 hover:shadow-md"
+          >
             {items.length > 0 ? (
               <div className="space-y-4">
                 {items.map((item) => (
-                  <Library001ItemsCard
-                    key={item.id}
-                    item={item}
-                    claimId={claimId}
-                    onUpdate={handleItemUpdate}
-                    onDelete={handleItemDelete}
-                    onFileAction={handleItemFileAction}
-                  />
+                  <div 
+                    key={item.id} 
+                    className="transition-all duration-300 hover:scale-[1.01]"
+                  >
+                    <Library001ItemsCard
+                      item={item}
+                      claimId={claimId}
+                      onUpdate={handleItemUpdate}
+                      onDelete={handleItemDelete}
+                      onFileAction={handleItemFileAction}
+                    />
+                  </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 px-4">
-                <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">No items added yet</h3>
-                  <p className="text-sm text-gray-600 mb-4">Start documenting damaged or claimed items</p>
-                </div>
-              </div>
+              <Library001EmptyItems onAddItem={handleAddItem} />
             )}
+          </Library001SectionCard>
 
-            {/* Files Section using Library001 Components */}
-            <div className="mt-8">
-              <Library001FilesSection
-                claimId={claimId}
-                files={files}
-                items={items}
-                onFilesChange={setFiles}
-                onItemsChange={setItems}
-              />
-            </div>
-
-            {/* Component Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h4 className="text-sm font-semibold text-blue-900 mb-2">
-                📚 Library001 Component Features
-              </h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Seamless inline editing with database integration</li>
-                <li>• Floating context menus with intelligent positioning</li>
-                <li>• File thumbnails and management</li>
-                <li>• Expandable/collapsible interface</li>
-                <li>• Toast notifications for user feedback</li>
-                <li>• Professional naming convention for reusability</li>
-                <li>• Complete file management with drag & drop upload</li>
-                <li>• Modal viewers for images and PDFs</li>
-              </ul>
-            </div>
+          {/* Files Section */}
+          <div className="transition-all duration-300 hover:shadow-md rounded-lg">
+            <Library001FilesSection
+              claimId={claimId}
+              files={files}
+              items={items}
+              onFilesChange={setFiles}
+              onItemsChange={setItems}
+            />
           </div>
+
         </div>
       </main>
+
+      {/* Decorative Background Elements */}
+      <div className="fixed top-20 right-10 w-64 h-64 bg-blue-100 rounded-full filter blur-3xl opacity-20 pointer-events-none animate-pulse" />
+      <div className="fixed bottom-20 left-10 w-96 h-96 bg-purple-100 rounded-full filter blur-3xl opacity-20 pointer-events-none animate-pulse" />
     </div>
   )
 }

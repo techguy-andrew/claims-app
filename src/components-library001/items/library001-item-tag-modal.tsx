@@ -2,12 +2,32 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { X, Search, Plus, Tag, Package } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Field } from '@/components/ui/label'
+import { Library001Button } from '../ui/library001-button'
+import { Library001Input } from '../ui/library001-input'
+import { Library001Textarea } from '../ui/library001-textarea'
+import { Library001Label } from '../ui/library001-label'
 import { Library001ClaimItem } from './library001-items-card'
 import { Library001ClaimFile } from '../files/library001-files-list'
+
+// Field component wrapper for form fields
+interface FieldProps {
+  label: string
+  required?: boolean
+  helperText?: string
+  children: React.ReactNode
+}
+
+const Field: React.FC<FieldProps> = ({ label, required, helperText, children }) => {
+  return (
+    <div className="space-y-2">
+      <Library001Label required={required}>{label}</Library001Label>
+      {children}
+      {helperText && (
+        <p className="text-xs text-gray-500">{helperText}</p>
+      )}
+    </div>
+  )
+}
 
 interface Library001ItemTagModalProps {
   isOpen: boolean
@@ -162,7 +182,7 @@ export function Library001ItemTagModal({
                       <p className="text-sm font-medium text-blue-900 mb-1">Currently tagged to:</p>
                       <p className="text-base md:text-sm text-blue-700 font-medium">{file.item.itemName}</p>
                     </div>
-                    <Button
+                    <Library001Button
                       onClick={() => handleTagToItem(null)}
                       variant="secondary"
                       size="small"
@@ -170,14 +190,14 @@ export function Library001ItemTagModal({
                       className="text-blue-700 hover:text-blue-800 w-full sm:w-auto"
                     >
                       Remove Tag
-                    </Button>
+                    </Library001Button>
                   </div>
                 </div>
               )}
 
               {/* Search Bar - Mobile Optimized */}
               <div className="mb-6 md:mb-4">
-                <Input
+                <Library001Input
                   type="text"
                   placeholder="Search items..."
                   value={searchTerm}
@@ -230,7 +250,7 @@ export function Library001ItemTagModal({
               )}
 
               {/* Create New Item Button - Mobile Optimized */}
-              <Button
+              <Library001Button
                 onClick={() => setShowCreateForm(true)}
                 variant="modern"
                 size="large"
@@ -239,7 +259,7 @@ export function Library001ItemTagModal({
               >
                 <Plus className="h-5 w-5" />
                 Create New Item
-              </Button>
+              </Library001Button>
             </>
           ) : (
             <>
@@ -248,7 +268,7 @@ export function Library001ItemTagModal({
                 <h3 className="text-base font-semibold text-gray-900 mb-4">Create New Item</h3>
                 
                 <Field label="Item Name" required>
-                  <Input
+                  <Library001Input
                     type="text"
                     value={newItemForm.itemName}
                     onChange={(e) => setNewItemForm(prev => ({ ...prev, itemName: e.target.value }))}
@@ -258,7 +278,7 @@ export function Library001ItemTagModal({
                 </Field>
 
                 <Field label="Details" helperText="Optional description or damage notes">
-                  <Textarea
+                  <Library001Textarea
                     value={newItemForm.details}
                     onChange={(e) => setNewItemForm(prev => ({ ...prev, details: e.target.value }))}
                     placeholder="e.g., Water damage on left side, scratched surface..."
@@ -270,7 +290,7 @@ export function Library001ItemTagModal({
 
               {/* Form Actions - Mobile Optimized */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button
+                <Library001Button
                   onClick={handleCreateAndTag}
                   variant="primary"
                   size="large"
@@ -279,8 +299,8 @@ export function Library001ItemTagModal({
                   className="flex-1 w-full sm:w-auto touch-target-lg"
                 >
                   Create & Tag File
-                </Button>
-                <Button
+                </Library001Button>
+                <Library001Button
                   onClick={() => setShowCreateForm(false)}
                   variant="modern"
                   size="large"
@@ -288,7 +308,7 @@ export function Library001ItemTagModal({
                   className="flex-1 w-full sm:w-auto touch-target-lg"
                 >
                   Back to Items
-                </Button>
+                </Library001Button>
               </div>
             </>
           )}

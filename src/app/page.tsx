@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Plus, FileText, BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Library001Button } from '@/components-library001/ui/library001-button';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -19,14 +19,14 @@ export default function Dashboard() {
                   <h1 className="text-lg font-semibold text-gray-900 mb-1">Dashboard</h1>
                   <p className="text-sm text-gray-600">Premium insurance claims platform</p>
                 </div>
-                <Button 
+                <Library001Button 
                   onClick={() => router.push('/claims/new')}
                   variant="modern"
                   size="small"
                 >
                   <Plus className="h-4 w-4" />
                   New Claim
-                </Button>
+                </Library001Button>
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Dashboard() {
                 <p className="text-sm text-gray-600">Common tasks and shortcuts</p>
               </div>
               <div className="space-y-3">
-                <Button 
+                <Library001Button 
                   onClick={() => router.push('/claims/new')}
                   variant="modern"
                   size="small"
@@ -96,8 +96,8 @@ export default function Dashboard() {
                 >
                   <Plus className="h-4 w-4" />
                   Create New Claim
-                </Button>
-                <Button 
+                </Library001Button>
+                <Library001Button 
                   onClick={() => router.push('/claims')}
                   variant="secondary"
                   size="small"
@@ -105,7 +105,7 @@ export default function Dashboard() {
                 >
                   <FileText className="h-4 w-4" />
                   View All Claims
-                </Button>
+                </Library001Button>
               </div>
             </div>
           </div>

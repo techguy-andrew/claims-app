@@ -1,20 +1,7 @@
-// Component barrel exports for the entire components module
-// Organized by domain/feature for better maintainability
+// ============================================================================
+// LEGACY COMPONENTS REDIRECT - Points to Library001 Component System
+// ============================================================================
+// This file maintains backward compatibility by re-exporting Library001 components
+// All components have been migrated to the standardized Library001 system
 
-// UI Foundation Components
-export * from './ui';
-
-// Claims Management
-export * from './claims';
-
-// Item Management  
-export * from './items';
-
-// File Management
-export * from './files';
-
-// Media Upload/Display
-export * from './media';
-
-// Shared Utilities
-export * from './shared';
+export * from '@/components-library001';

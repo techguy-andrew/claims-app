@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext } from 'react'
 import { useToast, type UseToastReturn } from '@/hooks/use-toast'
-import { ToastContainer } from '@/components/ui/toast'
+import { Library001ToastContainer } from '@/components-library001/ui/library001-toast'
 
 const ToastContext = createContext<UseToastReturn | null>(null)
 
@@ -16,7 +16,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   return (
     <ToastContext.Provider value={toastState}>
       {children}
-      <ToastContainer 
+      <Library001ToastContainer 
         toasts={toastState.toasts.map(toast => ({ ...toast, onClose: toastState.hideToast }))}
         onClose={toastState.hideToast}
       />

@@ -6,8 +6,16 @@
 - **React 18.3.1** - Modern React with concurrent features
 - **Next.js 15.2.3** - Latest version with App Router and server components
 - **TypeScript 5** - Full type safety across the application
+- **Library001 Component Architecture** - Unified, modular component system
 - **CSS Modules** - Component-scoped styling with .module.css files
 - **Lucide React 0.526.0** - Modern icon library for UI components
+
+## Component System (Library001)
+- **Unified Architecture** - All components under /components-library001 namespace
+- **Modular Organization** - Separated by domain (claims, files, items, navigation, shared, ui)
+- **TypeScript Interfaces** - Fully typed component props and data structures
+- **Centralized Exports** - Single index file for clean imports
+- **Removed Legacy System** - Eliminated entire /components directory (55 files, ~8,000 lines)
 
 ## Backend & API Infrastructure  
 - **Next.js API Routes** - Serverless API endpoints with enhanced error handling

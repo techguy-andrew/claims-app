@@ -3,8 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle, AlertCircle } from "lucide-react"
-import { ClaimForm } from "@/components/claims"
-import { ClaimFormData } from "@/lib/form-validation"
+import { Library001ClaimForm, Library001Card, type Library001ClaimFormData } from '@/components-library001'
 
 export default function NewClaimPage() {
   const router = useRouter()
@@ -12,7 +11,7 @@ export default function NewClaimPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (data: ClaimFormData & { organizationId: string; createdById: string }) => {
+  const handleSubmit = async (data: Library001ClaimFormData & { organizationId: string; createdById: string }) => {
     setLoading(true)
     setError(null)
 
@@ -55,13 +54,13 @@ export default function NewClaimPage() {
       <div className="min-h-screen bg-gray-50">
         <main className="px-4 sm:px-6 py-8">
           <div className="max-w-md mx-auto text-center">
-            <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-lg">
-              <div className="p-3 bg-green-50 rounded-lg w-fit mx-auto mb-4">
+            <Library001Card variant="enterprise" padding="lg">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 p-3 mx-auto mb-4 flex items-center justify-center">
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <h1 className="text-lg font-semibold text-gray-900 mb-2">Claim Created Successfully!</h1>
               <p className="text-sm text-gray-600">Redirecting to claim details...</p>
-            </div>
+            </Library001Card>
           </div>
         </main>
       </div>
@@ -74,30 +73,32 @@ export default function NewClaimPage() {
         <div className="max-w-2xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
+            <Library001Card variant="enterprise" padding="default">
               <div>
                 <h1 className="text-lg font-semibold text-gray-900 mb-1">Create New Claim</h1>
                 <p className="text-sm text-gray-600">Fill out the form below to create a new insurance claim</p>
               </div>
-            </div>
+            </Library001Card>
           </div>
 
           {/* Error Message */}
           {error && (
             <div className="mb-6">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-sm font-medium text-red-800">Error Creating Claim</h3>
-                  <p className="text-sm text-red-700 mt-1">{error}</p>
+              <Library001Card variant="bordered" padding="sm" className="bg-red-50 border-red-200">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="text-sm font-medium text-red-800">Error Creating Claim</h3>
+                    <p className="text-sm text-red-700 mt-1">{error}</p>
+                  </div>
                 </div>
-              </div>
+              </Library001Card>
             </div>
           )}
 
           {/* Claim Form */}
           <div>
-            <ClaimForm
+            <Library001ClaimForm
               onSubmit={handleSubmit}
               onCancel={handleCancel}
               loading={loading}

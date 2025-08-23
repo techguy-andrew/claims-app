@@ -3,10 +3,13 @@
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, FileText, Search, X } from "lucide-react"
-import { ClaimCard } from "@/components/claims"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { ErrorBoundary } from '@/components/shared'
+import { 
+  Library001ClaimCard, 
+  Library001Input, 
+  Library001Button, 
+  Library001ErrorBoundary,
+  Library001Card
+} from '@/components-library001'
 
 interface Claim {
   id: string
@@ -74,22 +77,23 @@ function useDebounce(value: string, delay: number) {
 // Clean empty state component - Mobile Optimized
 const EmptyState = () => (
   <div className="text-center py-12 px-4">
-    <div className="enterprise-card p-8 md:p-12 max-w-lg mx-auto">
-      <div className="thumbnail-modern p-4 mx-auto mb-6 flex items-center justify-center min-h-[56px] min-w-[56px]">
+    <Library001Card variant="enterprise" padding="lg" className="max-w-lg mx-auto">
+      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 p-4 mx-auto mb-6 flex items-center justify-center">
         <FileText className="h-9 w-9 md:h-8 md:w-8 text-gray-600" />
       </div>
       <h3 className="text-xl font-semibold text-gray-900 mb-4 md:mb-3 leading-tight">No claims yet</h3>
       <p className="text-sm text-gray-600 mb-8 md:mb-6 leading-relaxed">Get started by creating your first claim</p>
-      <Button 
+      <Library001Button 
         onClick={() => window.location.href = '/claims/new'}
         variant="modern"
-        size="large"
-        className="mx-auto touch-target-lg w-full sm:w-auto"
+        size="lg"
+        fullWidth
+        className="mx-auto sm:w-auto"
       >
-        <Plus className="h-5 w-5" />
+        <Plus className="h-5 w-5 mr-2" />
         Create First Claim
-      </Button>
-    </div>
+      </Library001Button>
+    </Library001Card>
   </div>
 )
 
@@ -188,7 +192,7 @@ function ClaimsPageContent() {
         <div className="max-w-6xl mx-auto">
           {/* Page Header - Mobile Optimized */}
           <div className="mb-8">
-            <div className="enterprise-card p-6 md:p-8">
+            <Library001Card variant="enterprise" padding="default">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="thumbnail-modern p-3 flex items-center justify-center min-h-[48px] md:min-h-[44px] min-w-[48px] md:min-w-[44px]">
@@ -199,39 +203,42 @@ function ClaimsPageContent() {
                     <p className="text-sm text-gray-600 leading-relaxed">Manage and track insurance claims</p>
                   </div>
                 </div>
-                <Button 
+                <Library001Button 
                   onClick={() => router.push('/claims/new')}
                   variant="modern"
-                  size="large"
-                  className="touch-target-lg w-full sm:w-auto"
+                  size="lg"
+                  className="w-full sm:w-auto"
                 >
-                  <Plus className="h-5 w-5" />
+                  <Plus className="h-5 w-5 mr-2" />
                   New Claim
-                </Button>
+                </Library001Button>
               </div>
-            </div>
+            </Library001Card>
           </div>
 
           {/* Search Bar - Mobile Optimized */}
           <div className="mb-8">
-            <div className="enterprise-card-sm p-4 md:p-3">
-              <Input
-                type="text"
-                placeholder="Search claims..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                leftIcon={<Search className="h-5 w-5 md:h-4 md:w-4" />}
-                rightIcon={searchTerm && (
+            <Library001Card variant="glass" padding="sm">
+              <div className="relative">
+                <Library001Input
+                  type="text"
+                  placeholder="Search claims..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  icon={<Search className="h-5 w-5 md:h-4 md:w-4" />}
+                  fullWidth
+                  className="bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-xl focus:bg-white/80 transition-all duration-200"
+                />
+                {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="touch-target-lg hover:bg-gray-100 active:bg-gray-200 rounded-xl p-2 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/30 min-h-[44px] min-w-[44px] md:min-h-[32px] md:min-w-[32px]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 hover:bg-gray-100 active:bg-gray-200 rounded-xl p-2 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
                   >
                     <X className="h-5 w-5 md:h-4 md:w-4" />
                   </button>
                 )}
-                className="bg-white/50 backdrop-blur-sm border border-gray-200/60 rounded-xl focus:bg-white/80 transition-all duration-200"
-              />
-            </div>
+              </div>
+            </Library001Card>
           </div>
 
           {/* Filter Buttons - Mobile Optimized */}
@@ -255,28 +262,27 @@ function ClaimsPageContent() {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="enterprise-card p-12 max-w-md mx-auto">
+              <Library001Card variant="enterprise" padding="lg" className="max-w-md mx-auto">
                 <p className="text-sm text-gray-700">Loading claims...</p>
-              </div>
+              </Library001Card>
             </div>
           ) : error ? (
             <div className="text-center py-12">
-              <div className="enterprise-card p-12 max-w-md mx-auto">
+              <Library001Card variant="enterprise" padding="lg" className="max-w-md mx-auto">
                 <p className="text-sm text-red-600 mb-6 leading-relaxed">Error loading claims: {error}</p>
-                <Button
+                <Library001Button
                   onClick={fetchClaims}
                   variant="modern"
-                  className="touch-target-lg"
                 >
                   Try Again
-                </Button>
-              </div>
+                </Library001Button>
+              </Library001Card>
             </div>
         ) : claims.length === 0 ? (
           <EmptyState />
           ) : filteredClaims.length === 0 ? (
             <div className="text-center py-12 px-4">
-              <div className="enterprise-card p-12 max-w-lg mx-auto">
+              <Library001Card variant="enterprise" padding="lg" className="max-w-lg mx-auto">
                 <div className="thumbnail-modern p-4 mx-auto mb-6 flex items-center justify-center">
                   <Search className="h-8 w-8 text-gray-600" />
                 </div>
@@ -291,32 +297,29 @@ function ClaimsPageContent() {
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center">
                   {debouncedSearchTerm && (
-                    <Button 
+                    <Library001Button 
                       onClick={() => setSearchTerm("")}
                       variant="modern"
-                      className="touch-target-lg"
                     >
                       Clear Search
-                    </Button>
+                    </Library001Button>
                   )}
                   {activeStatus !== "All" && (
-                    <Button 
+                    <Library001Button 
                       onClick={() => setActiveStatus("All")}
                       variant={debouncedSearchTerm ? "secondary" : "modern"}
-                      className="touch-target-lg"
                     >
                       Show All Statuses
-                    </Button>
+                    </Library001Button>
                   )}
-                  <Button 
+                  <Library001Button 
                     onClick={() => router.push('/claims/new')}
                     variant="modern"
-                    className="touch-target-lg"
                   >
                     Create New Claim
-                  </Button>
+                  </Library001Button>
                 </div>
-              </div>
+              </Library001Card>
             </div>
           ) : (
             <div>
@@ -330,7 +333,7 @@ function ClaimsPageContent() {
               {/* Claims cards */}
               <div className="space-y-4">
                 {filteredClaims.map((claim) => (
-                  <ClaimCard 
+                  <Library001ClaimCard 
                     key={claim.id}
                     claimNumber={claim.claimNumber}
                     clientName={claim.clientName}
@@ -352,7 +355,7 @@ function ClaimsPageContent() {
 // Main export with error boundary
 export default function ClaimsPage() {
   return (
-    <ErrorBoundary onError={(error, errorInfo) => {
+    <Library001ErrorBoundary onError={(error, errorInfo) => {
       console.error('Claims page error:', error, errorInfo);
     }}>
       <Suspense fallback={
@@ -362,6 +365,6 @@ export default function ClaimsPage() {
       }>
         <ClaimsPageContent />
       </Suspense>
-    </ErrorBoundary>
+    </Library001ErrorBoundary>
   )
 }

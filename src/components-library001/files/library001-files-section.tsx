@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef } from 'react'
 import { Upload, File, AlertCircle, CheckCircle, Tag } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Library001Button } from '../ui/library001-button'
 import { Library001ClaimItem } from '../items/library001-items-card'
 import { Library001ClaimFile } from './library001-files-list'
 import { Library001PDFModal } from './library001-pdf-modal'
@@ -396,7 +396,7 @@ export function Library001FilesSection({ claimId, files, items, onFilesChange, o
             onChange={handleFileInputChange}
             className="hidden"
           />
-          <Button
+          <Library001Button
             onClick={() => fileInputRef.current?.click()}
             variant="modern"
             size="small"
@@ -404,7 +404,7 @@ export function Library001FilesSection({ claimId, files, items, onFilesChange, o
           >
             <Upload className="h-4 w-4" />
             Upload Files
-          </Button>
+          </Library001Button>
         </div>
       </div>
 
@@ -501,14 +501,14 @@ export function Library001FilesSection({ claimId, files, items, onFilesChange, o
             </div>
             <h3 className="text-sm font-medium text-gray-900 mb-2">No files uploaded yet</h3>
             <p className="text-sm text-gray-600 mb-4">Upload images, PDFs, and documents to get started</p>
-            <Button
+            <Library001Button
               onClick={() => fileInputRef.current?.click()}
               variant="modern"
               size="small"
             >
               <Upload className="h-4 w-4" />
               Upload Your First File
-            </Button>
+            </Library001Button>
           </div>
         </div>
       )}
