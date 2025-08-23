@@ -44,7 +44,6 @@ export type {
   Library001NavigationContextType,
   Library001NavigationProviderProps,
   Library001MenuButtonProps,
-  Library001ButtonProps,
   Library001VariantProps,
   Library001ScreenSize
 } from './types';

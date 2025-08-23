@@ -185,7 +185,7 @@ export function Library001ItemTagModal({
                     <Library001Button
                       onClick={() => handleTagToItem(null)}
                       variant="secondary"
-                      size="small"
+                      size="sm"
                       loading={loading}
                       className="text-blue-700 hover:text-blue-800 w-full sm:w-auto"
                     >
@@ -202,7 +202,7 @@ export function Library001ItemTagModal({
                   placeholder="Search items..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  leftIcon={<Search className="h-5 w-5 md:h-4 md:w-4" />}
+                  icon={<Search className="h-5 w-5 md:h-4 md:w-4" />}
                   className="w-full"
                 />
               </div>
@@ -253,7 +253,7 @@ export function Library001ItemTagModal({
               <Library001Button
                 onClick={() => setShowCreateForm(true)}
                 variant="modern"
-                size="large"
+                size="lg"
                 className="w-full touch-target-lg"
                 disabled={loading}
               >
@@ -293,7 +293,7 @@ export function Library001ItemTagModal({
                 <Library001Button
                   onClick={handleCreateAndTag}
                   variant="primary"
-                  size="large"
+                  size="lg"
                   loading={loading}
                   disabled={!newItemForm.itemName.trim()}
                   className="flex-1 w-full sm:w-auto touch-target-lg"
@@ -303,7 +303,7 @@ export function Library001ItemTagModal({
                 <Library001Button
                   onClick={() => setShowCreateForm(false)}
                   variant="modern"
-                  size="large"
+                  size="lg"
                   disabled={loading}
                   className="flex-1 w-full sm:w-auto touch-target-lg"
                 >

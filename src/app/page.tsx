@@ -22,7 +22,7 @@ export default function Dashboard() {
                 <Library001Button 
                   onClick={() => router.push('/claims/new')}
                   variant="modern"
-                  size="small"
+                  size="sm"
                 >
                   <Plus className="h-4 w-4" />
                   New Claim
@@ -91,7 +91,7 @@ export default function Dashboard() {
                 <Library001Button 
                   onClick={() => router.push('/claims/new')}
                   variant="modern"
-                  size="small"
+                  size="sm"
                   className="w-full justify-start"
                 >
                   <Plus className="h-4 w-4" />
@@ -100,7 +100,7 @@ export default function Dashboard() {
                 <Library001Button 
                   onClick={() => router.push('/claims')}
                   variant="secondary"
-                  size="small"
+                  size="sm"
                   className="w-full justify-start"
                 >
                   <FileText className="h-4 w-4" />

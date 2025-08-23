@@ -17,8 +17,11 @@ export function ToastProvider({ children }: ToastProviderProps) {
     <ToastContext.Provider value={toastState}>
       {children}
       <Library001ToastContainer 
-        toasts={toastState.toasts.map(toast => ({ ...toast, onClose: toastState.hideToast }))}
-        onClose={toastState.hideToast}
+        toasts={toastState.toasts.map(toast => ({ 
+          ...toast, 
+          message: toast.message || '',
+          onClose: () => toastState.hideToast(toast.id)
+        }))}
       />
     </ToastContext.Provider>
   )

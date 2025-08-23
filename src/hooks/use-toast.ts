@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import type { ToastProps } from '@/components/ui/toast'
 
-export interface Toast extends Omit<ToastProps, 'onClose'> {
+export interface Toast {
   id: string
   type: 'success' | 'error' | 'info'
   title: string

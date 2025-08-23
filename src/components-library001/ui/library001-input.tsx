@@ -34,7 +34,7 @@ const Library001Input = React.forwardRef<HTMLInputElement, Library001InputProps>
     const inputClasses = library001Cn(
       inputStyles.base,
       error && inputStyles.error,
-      icon && inputStyles.withIcon,
+      !!icon && inputStyles.withIcon,
       !fullWidth && 'w-auto',
       className
     )

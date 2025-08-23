@@ -399,7 +399,7 @@ export function Library001FilesSection({ claimId, files, items, onFilesChange, o
           <Library001Button
             onClick={() => fileInputRef.current?.click()}
             variant="modern"
-            size="small"
+            size="sm"
             disabled={Object.keys(uploadProgress).length > 0}
           >
             <Upload className="h-4 w-4" />
@@ -504,7 +504,7 @@ export function Library001FilesSection({ claimId, files, items, onFilesChange, o
             <Library001Button
               onClick={() => fileInputRef.current?.click()}
               variant="modern"
-              size="small"
+              size="sm"
             >
               <Upload className="h-4 w-4" />
               Upload Your First File
