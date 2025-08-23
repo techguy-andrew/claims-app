@@ -1,7 +1,12 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Library001ItemsCard, type Library001ClaimItem, type Library001ClaimFile } from '@/components-library001'
+import { 
+  Library001ItemsCard, 
+  Library001FilesSection,
+  type Library001ClaimItem, 
+  type Library001ClaimFile 
+} from '@/components-library001'
 import { 
   Library001ClaimInformation,
   type Library001ClaimData,
@@ -21,7 +26,7 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
   const [loading, setLoading] = useState(true)
   const [claim, setClaim] = useState<ClaimData | null>(null)
   const [items, setItems] = useState<Library001ClaimItem[]>([])
-  const [, setFiles] = useState<Library001ClaimFile[]>([])
+  const [files, setFiles] = useState<Library001ClaimFile[]>([])
   
   // Claim information editing state
   const [isEditing, setIsEditing] = useState(false)
@@ -264,86 +269,35 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
     }
   }
 
-  const handleFileAction = async (action: string, file: Library001ClaimFile) => {
-    switch (action) {
-      case 'view':
-        if (file.fileType === 'image') {
-          // Could implement image modal here or handle differently
-          window.open(file.fileUrl, '_blank')
-        } else if (file.fileType === 'pdf') {
-          // Could implement PDF modal here or handle differently
-          window.open(file.fileUrl, '_blank')
-        } else {
-          window.open(file.fileUrl, '_blank')
-        }
-        break
-      case 'download':
-        try {
-          const link = document.createElement('a')
-          link.href = `/api/download/${file.id}`
-          link.download = file.fileName
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        } catch (error) {
-          console.error('Download failed:', error)
-          alert('Failed to download file')
-        }
-        break
-      case 'untag':
-        try {
-          const response = await fetch(`/api/claims/${claimId}/files/${file.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ itemId: null })
-          })
-
-          if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Failed to untag file')
-          }
-
-          // Remove file from items
-          setItems(prevItems => 
-            prevItems.map(item => ({
-              ...item,
-              files: item.files.filter(f => f.id !== file.id)
-            }))
-          )
-        } catch (err) {
-          console.error('Failed to untag file:', err)
-          alert('Failed to untag file')
-        }
-        break
-      case 'delete':
-        if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-          return
-        }
-
-        try {
-          const response = await fetch(`/api/claims/${claimId}/files/${file.id}`, {
-            method: 'DELETE'
-          })
-
-          if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Failed to delete file')
-          }
-
-          // Remove file from items
-          setItems(prevItems => 
-            prevItems.map(item => ({
-              ...item,
-              files: item.files.filter(f => f.id !== file.id)
-            }))
-          )
-        } catch (err) {
-          console.error('Failed to delete file:', err)
-          alert('Failed to delete file')
-        }
-        break
+  // Handle file actions from ItemsCard for state synchronization
+  const handleItemFileAction = (action: string, file: Library001ClaimFile) => {
+    if (action === 'untag') {
+      // Update files to remove item association
+      setFiles(prevFiles => 
+        prevFiles.map(f => 
+          f.id === file.id ? { ...f, item: null } : f
+        )
+      )
+      // Update items to remove file from the item that had it
+      setItems(prevItems => 
+        prevItems.map(item => ({
+          ...item,
+          files: item.files.filter(f => f.id !== file.id)
+        }))
+      )
+    } else if (action === 'delete') {
+      // Remove file from global files list
+      setFiles(prevFiles => prevFiles.filter(f => f.id !== file.id))
+      // Remove file from all items
+      setItems(prevItems => 
+        prevItems.map(item => ({
+          ...item,
+          files: item.files.filter(f => f.id !== file.id)
+        }))
+      )
     }
   }
+
 
   if (loading || !claim) {
     return (
@@ -394,7 +348,7 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
                     claimId={claimId}
                     onUpdate={handleItemUpdate}
                     onDelete={handleItemDelete}
-                    onFileAction={handleFileAction}
+                    onFileAction={handleItemFileAction}
                   />
                 ))}
               </div>
@@ -406,6 +360,17 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
                 </div>
               </div>
             )}
+
+            {/* Files Section using Library001 Components */}
+            <div className="mt-8">
+              <Library001FilesSection
+                claimId={claimId}
+                files={files}
+                items={items}
+                onFilesChange={setFiles}
+                onItemsChange={setItems}
+              />
+            </div>
 
             {/* Component Info */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -419,6 +384,8 @@ export default function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
                 <li>• Expandable/collapsible interface</li>
                 <li>• Toast notifications for user feedback</li>
                 <li>• Professional naming convention for reusability</li>
+                <li>• Complete file management with drag & drop upload</li>
+                <li>• Modal viewers for images and PDFs</li>
               </ul>
             </div>
           </div>

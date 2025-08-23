@@ -9,6 +9,8 @@ import {
   Trash2
 } from 'lucide-react'
 import { Library001FilesList } from '../files/library001-files-list'
+import { Library001ImageModal } from '../files/library001-image-modal'
+import { Library001PDFModal } from '../files/library001-pdf-modal'
 import { Library001InvisibleInput } from '../shared/library001-invisible-input'
 import { Library001FloatingContextMenu, type Library001MenuAction } from '../shared/library001-floating-context-menu'
 import { Library001SaveCancelButtons } from '../shared/library001-save-cancel-buttons'
@@ -79,6 +81,8 @@ export function Library001ItemsCard({ item, claimId, onUpdate, onDelete, onFileA
   })
   const [isSaving, setIsSaving] = useState(false)
   const [showToast, setShowToast] = useState(false)
+  const [viewingImage, setViewingImage] = useState<Library001ClaimFile | null>(null)
+  const [viewingPDF, setViewingPDF] = useState<Library001ClaimFile | null>(null)
   
   // Store scroll position without external dependencies
   const scrollPosRef = useRef(0)
@@ -157,6 +161,94 @@ export function Library001ItemsCard({ item, claimId, onUpdate, onDelete, onFileA
       window.scrollTo(0, scrollPosRef.current)
     })
   }, [item])
+
+  // Handle file actions with integrated modal support
+  const handleInternalFileAction = useCallback(async (action: string, file: Library001ClaimFile) => {
+    switch (action) {
+      case 'view':
+        // Handle view internally with our own modals
+        if (file.fileType === 'image') {
+          setViewingImage(file)
+        } else if (file.fileType === 'pdf') {
+          setViewingPDF(file)
+        } else {
+          window.open(file.fileUrl, '_blank')
+        }
+        break
+        
+      case 'download':
+        // Handle download directly
+        try {
+          const link = document.createElement('a')
+          link.href = `/api/download/${file.id}`
+          link.download = file.fileName
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        } catch (error) {
+          console.error('Download failed:', error)
+        }
+        break
+        
+      case 'untag':
+        // Handle untag with API call and state update
+        try {
+          const response = await fetch(`/api/claims/${claimId}/files/${file.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId: null })
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to untag file')
+          }
+
+          // Update local item files
+          item.files = item.files.filter(f => f.id !== file.id)
+          
+          // Notify parent if handler exists
+          onFileAction?.('untag', file)
+          
+          // Force re-render
+          setIsExpanded(prev => prev)
+        } catch (err) {
+          console.error('Failed to untag file:', err)
+        }
+        break
+        
+      case 'delete':
+        // Handle delete with confirmation
+        if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+          return
+        }
+
+        try {
+          const response = await fetch(`/api/claims/${claimId}/files/${file.id}`, {
+            method: 'DELETE'
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to delete file')
+          }
+
+          // Update local item files
+          item.files = item.files.filter(f => f.id !== file.id)
+          
+          // Notify parent if handler exists
+          onFileAction?.('delete', file)
+          
+          // Force re-render
+          setIsExpanded(prev => prev)
+        } catch (err) {
+          console.error('Failed to delete file:', err)
+        }
+        break
+        
+      default:
+        // Pass through any other actions to parent
+        onFileAction?.(action, file)
+    }
+  }, [claimId, item, onFileAction])
 
   // Menu actions configuration
   const menuActions: Library001MenuAction[] = [
@@ -260,11 +352,9 @@ export function Library001ItemsCard({ item, claimId, onUpdate, onDelete, onFileA
                 <Library001FilesList
                   files={item.files}
                   onFileAction={(action, file) => {
-                    if (action === 'tag') {
-                      onFileAction?.('untag', file)
-                    } else {
-                      onFileAction?.(action, file)
-                    }
+                    // Handle 'tag' as 'untag' since files are already tagged to this item
+                    const actualAction = action === 'tag' ? 'untag' : action
+                    handleInternalFileAction(actualAction, file)
                   }}
                   emptyStateText="No files tagged to this item"
                   showThumbnails={true}
@@ -278,6 +368,20 @@ export function Library001ItemsCard({ item, claimId, onUpdate, onDelete, onFileA
 
       {/* Toast Notification */}
       <Library001Toast message="Changes saved" visible={showToast} />
+
+      {/* Image Modal */}
+      <Library001ImageModal
+        file={viewingImage}
+        isOpen={!!viewingImage}
+        onClose={() => setViewingImage(null)}
+      />
+
+      {/* PDF Modal */}
+      <Library001PDFModal
+        file={viewingPDF}
+        isOpen={!!viewingPDF}
+        onClose={() => setViewingPDF(null)}
+      />
     </>
   )
 }

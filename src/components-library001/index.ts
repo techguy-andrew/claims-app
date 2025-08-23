@@ -13,8 +13,8 @@ export * from './items'
 export * from './claims'
 
 // Main Components for Easy Import
-export { Library001ItemsCard, type Library001ClaimItem, type Library001ClaimFile } from './items'
-export { Library001FilesList } from './files'
+export { Library001ItemsCard, Library001ItemTagModal, type Library001ClaimItem, type Library001ClaimFile } from './items'
+export { Library001FilesList, Library001ImageModal, Library001PDFModal, Library001FilesSection } from './files'
 export { 
   Library001ClaimInformation,
   type Library001ClaimData,
