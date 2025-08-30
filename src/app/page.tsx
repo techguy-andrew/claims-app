@@ -8,8 +8,8 @@ import { ItemCard } from '@/components/custom/ItemCard'
 // In the stack philosophy, this represents the "application layer" that composes our foundation components
 export default function HomePage() {
   return (
-    // PAGE CONTAINER - Setting up the overall page layout
     <div className="container mx-auto py-10">
+      {/* PAGE CONTAINER - Setting up the overall page layout */}
       {/* 
         CONTAINER BREAKDOWN:
         - container: Tailwind utility that sets max-width and centers content responsively
@@ -25,29 +25,23 @@ export default function HomePage() {
       <ItemCard
         // CLASS CUSTOMIZATION - Adding specific styling for this use case
         className="max-w-md"
-        {/* 
-          max-w-md: Tailwind class limiting width to 28rem (448px)
-          This gets merged with ItemCard's default classes via the cn() utility
-          The ItemCard's internal className prop allows per-instance customization
-          while maintaining the base component's core styling and behavior
-        */}
+        // max-w-md: Tailwind class limiting width to 28rem (448px)
+        // This gets merged with ItemCard's default classes via the cn() utility
+        // The ItemCard's internal className prop allows per-instance customization
+        // while maintaining the base component's core styling and behavior
         
         // TITLE PROP - Required content for the card header
         title="Welcome to Your App"
-        {/* 
-          This becomes the <CardTitle> inside ItemCard's <CardHeader>
-          Because we defined title as: title?: string | React.ReactNode
-          We could pass either a string (like here) OR complex JSX like:
-          title={<div className="flex items-center gap-2"><Icon /><span>Title</span></div>}
-        */}
+        // This becomes the <CardTitle> inside ItemCard's <CardHeader>
+        // Because we defined title as: title?: string | React.ReactNode
+        // We could pass either a string (like here) OR complex JSX like:
+        // title={<div className="flex items-center gap-2"><Icon /><span>Title</span></div>}
         
         // DESCRIPTION PROP - Supporting content for context
         description="This is a reusable ItemCard component built with shadcn/ui components as building blocks."
-        {/* 
-          This becomes the <CardDescription> inside ItemCard's <CardHeader>
-          Like title, it accepts string OR React.ReactNode for maximum flexibility
-          The ItemCard component automatically handles the layout and spacing
-        */}
+        // This becomes the <CardDescription> inside ItemCard's <CardHeader>
+        // Like title, it accepts string OR React.ReactNode for maximum flexibility
+        // The ItemCard component automatically handles the layout and spacing
       >
         {/* CHILDREN CONTENT - What goes inside the CardContent section */}
         <p className="text-sm text-muted-foreground">
@@ -83,7 +77,6 @@ export default function HomePage() {
         - HomePage = using that template in a specific context
       */}
     </div>
-    // END PAGE CONTAINER
   )
 }
 
