@@ -597,8 +597,7 @@ When every project follows identical patterns, we achieve:
 
 ## Important Files
 
-- `context/guidelines.md` - Complete development guidelines and standards
-- `context/development-log.md` - Project history and decisions
+- `context/documentation/guidelines.md` - Complete development guidelines and standards
 - `.env.local` - Local environment variables (never commit)
 - `components.json` - shadcn/ui configuration
 
