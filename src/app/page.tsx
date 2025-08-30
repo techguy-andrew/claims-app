@@ -11,17 +11,17 @@ export default function HomePage() {
             title="Welcome to Your App"
             description="This is a reusable ItemCard component built with shadcn/ui components as building blocks."
             editable={true}
-            onSave={(data) => {
-              console.log('Saving:', data)
+            onSave={(_data) => {
+              // Handle save action
             }}
             onEdit={() => {
-              console.log('Edit clicked')
+              // Handle edit action
             }}
             onDuplicate={() => {
-              console.log('Duplicate clicked')
+              // Handle duplicate action
             }}
             onDelete={() => {
-              console.log('Delete clicked')
+              // Handle delete action
             }}
           />
         </div>
