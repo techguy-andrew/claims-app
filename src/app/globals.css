@@ -56,4 +56,18 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Prevent iOS zoom on contentEditable focus */
+  input[contenteditable],
+  div[contenteditable],
+  [contenteditable] {
+    font-size: 16px !important;
+  }
+  
+  /* Ensure consistent text sizing on mobile */
+  @media (max-width: 768px) {
+    [contenteditable] {
+      font-size: 16px !important;
+    }
+  }
 }
