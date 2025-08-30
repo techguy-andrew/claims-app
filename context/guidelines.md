@@ -160,7 +160,9 @@ import { Input } from "@/components/ui/input"
 import Button from '@mui/material/Button'  // Never do this
 ```
 
-#### Feature Components
+#### The ItemCard Gold Standard
+
+Every component MUST follow these exact patterns for consistency:
 
 ```tsx
 // src/components/posts/post-card.tsx
@@ -176,22 +178,53 @@ interface PostCardProps {
 
 export function PostCard({ post, onEdit }: PostCardProps) {
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>{post.title}</CardTitle>
-        <Badge>{post.status}</Badge>
+        <div className="grid grid-cols-[1fr,auto] gap-6 items-start">
+          <div className="flex flex-col gap-3">
+            <CardTitle>{post.title}</CardTitle>
+            <p className="text-muted-foreground">{post.excerpt}</p>
+          </div>
+          <Badge>{post.status}</Badge>
+        </div>
       </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground">{post.excerpt}</p>
-        {onEdit && (
-          <Button onClick={() => onEdit(post.id)} size="sm">
-            Edit
-          </Button>
-        )}
-      </CardContent>
+      {onEdit && (
+        <CardContent>
+          <div className="flex gap-1">
+            <Button onClick={() => onEdit(post.id)} size="sm">
+              Edit
+            </Button>
+          </div>
+        </CardContent>
+      )}
     </Card>
   )
 }
+```
+
+**Required Patterns:**
+- **Container-managed spacing** with `gap-*` utilities
+- **Grid layout** with `grid grid-cols-[1fr,auto] gap-6` for content/actions
+- **Flex stacks** with `flex flex-col gap-3` for vertical content
+- **Full width** with `w-full` for responsive design
+- **State management** with separate editing/display states
+- **Keyboard navigation** with Enter/Escape support
+
+#### Anti-Patterns to Avoid
+
+```tsx
+// ❌ NEVER DO THIS - Avoid these patterns
+<div className="mb-4">           // No margin utilities
+<div className="mt-2">           // No margin utilities
+<div className="space-y-4">      // No space utilities
+<div className="w-[300px]">      // No fixed widths
+<div className="px-4 py-2">      // Padding only for containers
+
+// ✅ ALWAYS DO THIS - Use these patterns
+<div className="flex flex-col gap-4">  // Gap for spacing
+<div className="grid gap-4">            // Gap for spacing
+<div className="w-full">                // Full width
+<div className="p-4">                   // Consistent padding
 ```
 
 ### TypeScript Standards
@@ -251,7 +284,29 @@ const PostSchema = z.object({
 type PostInput = z.infer<typeof PostSchema>
 ```
 
-### Spacing & Formatting
+### Spacing System & Scale
+
+| Class | Pixels | Use Case |
+|-------|--------|----------|
+| gap-1 | 4px | Between action buttons in a group |
+| gap-2 | 8px | Between form fields |
+| gap-3 | 12px | Between related content (title/description) |
+| gap-4 | 16px | Between content sections |
+| gap-6 | 24px | Between major sections |
+| gap-8 | 32px | Between large page sections |
+| p-2 | 8px | Small container padding |
+| p-4 | 16px | Standard container padding |
+| p-6 | 24px | Large container padding |
+
+**Spacing Rules:**
+- **Container gap:** `gap-6` between major sections
+- **Content gap:** `gap-3` between related elements
+- **Action gap:** `gap-1` between grouped buttons
+- **Form gap:** `gap-2` between form fields
+- **Never use margins** - always use gap utilities
+- **Never use space utilities** - always use gap utilities
+
+### Code Formatting
 
 ```tsx
 // Component Structure (2 lines between major sections)
@@ -272,7 +327,7 @@ export function Component({ title }: Props) {
   }
   
   return (
-    <div className="p-4">
+    <div className="flex flex-col gap-4 p-4">
       <h1>{title}</h1>
       <Button onClick={handleClick}>
         Count: {count}
@@ -686,6 +741,43 @@ export async function generateMetadata({ params }) {
 - [ ] Database query optimization
 - [ ] Static generation where possible
 - [ ] Client bundle < 300KB
+
+### Component Development Checklist
+
+Use this checklist for every component you create or review:
+
+#### Architecture & Layout
+- [ ] Using `flex flex-col gap-*` for vertical content stacks
+- [ ] Using `grid grid-cols-[1fr,auto]` for content/actions layout
+- [ ] Using `w-full` for responsive width (no fixed widths)
+- [ ] Container manages ALL spacing with gap utilities
+- [ ] NO `space-y-*` or `space-x-*` utilities used
+- [ ] NO margin utilities (`mb-*`, `mt-*`, `mx-*`, `my-*`) used
+- [ ] NO fixed width values (`w-[300px]`, `w-64`) except for specific UI needs
+
+#### State & Interactivity
+- [ ] Server Component by default (no 'use client' unless needed)
+- [ ] Client Component only when interactivity required
+- [ ] Form uses Server Actions for mutations
+- [ ] Loading states implemented with Suspense
+- [ ] Error boundaries at route group level
+- [ ] Keyboard navigation (Enter/Escape) where appropriate
+
+#### TypeScript & Props
+- [ ] All props have TypeScript interfaces
+- [ ] Using Prisma types for data models
+- [ ] Zod schemas for runtime validation
+- [ ] No `any` types (use `unknown` if type unclear)
+- [ ] Optional props marked with `?`
+- [ ] Readonly props where appropriate
+
+#### Performance
+- [ ] Data fetching in Server Components
+- [ ] Parallel data loading with `Promise.all`
+- [ ] Images optimized with `next/image`
+- [ ] Fonts loaded with `next/font`
+- [ ] Static generation where possible
+- [ ] Revalidation strategy defined
 
 ### Common Gotchas
 
