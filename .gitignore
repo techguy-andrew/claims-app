@@ -55,8 +55,8 @@ Thumbs.db
 /playwright-report/
 /playwright/.cache/
 
-# Logs
-logs
+# Logs (but not context/logs)
+/logs
 *.log
 
 # Runtime data
