@@ -10,6 +10,17 @@
 
 ### Recent Changes
 
+#### 2025-08-30 - Fix JSX Comment Syntax in HomePage Examples
+- **Scope:** Code example corrections in educational documentation
+- **Changes:**
+  - Corrected JSX comment syntax in code examples within `src/app/page.tsx`
+  - Changed from block comments `{/* */}` to inline comments `//` in JSX expressions
+  - Fixed lines 599 and 608 in the educational code examples section
+- **Files Modified:**
+  - `src/app/page.tsx`: Comment syntax corrections in Progressive Enhancement examples
+- **Purpose:** Ensure code examples demonstrate correct JavaScript/JSX syntax
+- **Impact:** Educational examples now show proper comment placement in JSX
+
 #### 2025-08-30 - Comprehensive Educational Documentation for Components
 - **Scope:** Complete rewrite of component documentation with educational comments
 - **Changes:**

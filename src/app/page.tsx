@@ -596,7 +596,7 @@ export default function HomePage() {
        return (
          <>
            <ItemCard title={`Welcome ${user.name}`} />
-           <ItemCardGrid>{/* items */}</ItemCardGrid>
+           <ItemCardGrid>// items placeholder</ItemCardGrid>
          </>
        )
      }
@@ -605,7 +605,7 @@ export default function HomePage() {
      'use client'
      export default function HomePage() {
        const { items } = useRealtimeItems()
-       return <ItemCardGrid>{/* real-time items */}</ItemCardGrid>
+       return <ItemCardGrid>// real-time items</ItemCardGrid>
      }
      
      Same component, growing functionality!
