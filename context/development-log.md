@@ -10,6 +10,19 @@
 
 ### Recent Changes
 
+#### 2025-08-30 - Comprehensive Educational Documentation for Components
+- **Scope:** Complete rewrite of component documentation with educational comments
+- **Changes:**
+  - Rewrote `src/components/custom/ItemCard.tsx` with 850+ lines of educational comments
+  - Rewrote `src/app/page.tsx` with 450+ lines of comprehensive documentation
+  - Added detailed explanations for TypeScript patterns, React concepts, and Tailwind utilities
+  - Included architectural philosophy and business context throughout
+  - Created visual hierarchy diagrams and pattern examples
+- **New Files:**
+  - `context/prompts/comment-rewrite.md`: Advanced commenting guidelines for educational documentation
+- **Purpose:** Transform components into complete learning resources for developers new to the dogmatic stack
+- **Impact:** Components now serve as educational templates that teach architecture, patterns, and philosophy
+
 #### 2025-08-30 - Fix Comment Syntax in HomePage Component
 - **Scope:** Code quality and syntax corrections
 - **Changes:**
