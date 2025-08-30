@@ -597,9 +597,8 @@ When every project follows identical patterns, we achieve:
 
 ## Important Files
 
-- `context/tech-stack.md` - Complete Agency Development Playbook
+- `context/guidelines.md` - Complete development guidelines and standards
 - `context/development-log.md` - Project history and decisions
-- `context/guidelines/agency-development-standards.md` - Comprehensive component and development standards
 - `.env.local` - Local environment variables (never commit)
 - `components.json` - shadcn/ui configuration
 
