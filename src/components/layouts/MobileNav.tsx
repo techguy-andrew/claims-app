@@ -15,7 +15,7 @@ export function MobileNav() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden h-9 w-9"
+          className="h-9 w-9"
           aria-label="Open navigation menu"
           aria-expanded={open}
           aria-controls="mobile-navigation"
