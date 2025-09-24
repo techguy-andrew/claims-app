@@ -1,6 +1,9 @@
 import { ClaimCard, ClaimCardStack } from '@/components/custom/ClaimCard'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering - don't statically generate this page
+export const dynamic = 'force-dynamic'
+
 export default async function ClaimsPage() {
   // Fetch claims from database
   const claims = await prisma.claim.findMany({

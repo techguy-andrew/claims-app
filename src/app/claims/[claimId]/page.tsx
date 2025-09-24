@@ -2,6 +2,9 @@ import { ItemCard, ItemCardStack } from '@/components/custom/ItemCard'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 
+// Force dynamic rendering - don't statically generate this page
+export const dynamic = 'force-dynamic'
+
 interface ClaimDetailsPageProps {
   params: Promise<{
     claimId: string
