@@ -41,9 +41,25 @@ model Claim {
   // Relations
   claimant   User   @relation(fields: [claimantId], references: [id], onDelete: Cascade)
   claimantId String
+  items      Item[]
 
   @@index([claimantId])
   @@index([status, createdAt])
+}
+
+// Items model for claim items
+model Item {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  claim   Claim  @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  claimId String
+
+  @@index([claimId])
 }
 
 enum ClaimStatus {

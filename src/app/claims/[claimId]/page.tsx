@@ -1,4 +1,6 @@
 import { ItemCard, ItemCardStack } from '@/components/custom/ItemCard'
+import { prisma } from '@/lib/prisma'
+import { notFound } from 'next/navigation'
 
 interface ClaimDetailsPageProps {
   params: Promise<{
@@ -9,21 +11,37 @@ interface ClaimDetailsPageProps {
 export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
   const { claimId } = await params
 
+  // Fetch claim data from database
+  const claim = await prisma.claim.findUnique({
+    where: { id: claimId },
+    include: {
+      items: true,
+      claimant: true,
+    },
+  })
+
+  if (!claim) {
+    notFound()
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <h1 className="text-3xl font-bold">{claimId}</h1>
+        <h1 className="text-3xl font-bold">{claim.title}</h1>
         <p className="text-xl text-muted-foreground">
-          Acme Restoration Co.
+          {claim.description}
         </p>
       </div>
 
       <ItemCardStack>
-        <ItemCard
-          title="Water Damaged Carpet"
-          description="Commercial carpet in main lobby - 500 sq ft"
-          editable={true}
-        />
+        {claim.items.map((item) => (
+          <ItemCard
+            key={item.id}
+            title={item.title}
+            description={item.description}
+            editable={true}
+          />
+        ))}
       </ItemCardStack>
     </div>
   )

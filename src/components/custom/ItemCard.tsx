@@ -18,9 +18,9 @@ import { Button } from '@/components/ui/button'
 import { MoreVertical, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export interface ItemCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string
-  description?: string
+export interface ItemCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+  title?: string | null
+  description?: string | null
   editable?: boolean
   onSave?: (data: { title: string; description: string }) => void
   onEdit?: () => void
@@ -29,8 +29,8 @@ export interface ItemCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function ItemCard({
-  title: initialTitle = 'Click to edit title',
-  description: initialDescription = 'Click to edit description',
+  title: initialTitle,
+  description: initialDescription,
   className,
   children,
   editable = false,
@@ -40,16 +40,19 @@ export function ItemCard({
   onDuplicate,
   ...props
 }: ItemCardProps) {
+  // Handle null/undefined values with proper defaults
+  const safeTitle = initialTitle || 'Click to edit title'
+  const safeDescription = initialDescription || 'Click to edit description'
   const [isEditing, setIsEditing] = React.useState(false)
-  const [tempTitle, setTempTitle] = React.useState(initialTitle)
-  const [tempDescription, setTempDescription] = React.useState(initialDescription)
+  const [tempTitle, setTempTitle] = React.useState(safeTitle)
+  const [tempDescription, setTempDescription] = React.useState(safeDescription)
   const titleRef = React.useRef<HTMLDivElement>(null)
   const descriptionRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    setTempTitle(initialTitle)
-    setTempDescription(initialDescription)
-  }, [initialTitle, initialDescription])
+    setTempTitle(safeTitle)
+    setTempDescription(safeDescription)
+  }, [safeTitle, safeDescription])
 
   const handleEdit = () => {
     setIsEditing(true)
@@ -112,7 +115,7 @@ export function ItemCard({
                 isEditing && "cursor-text"
               )}
             >
-              {initialTitle}
+              {safeTitle}
             </CardTitle>
 
             <CardDescription
@@ -127,7 +130,7 @@ export function ItemCard({
                 isEditing && "cursor-text"
               )}
             >
-              {initialDescription}
+              {safeDescription}
             </CardDescription>
           </div>
 
