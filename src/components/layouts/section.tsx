@@ -20,7 +20,7 @@ export function Section({
 
   return (
     <section className={cn(
-      "w-full mx-auto",
+      "w-full",
       widthMap[width],
       className
     )}>

@@ -1,31 +1,17 @@
-'use client'
+export const metadata = {
+  title: 'Claims App - Dashboard',
+  description: 'Dashboard overview and analytics',
+}
 
-import { ItemCard } from '@/components/custom/ItemCard'
-
-export default function HomePage() {
+export default function DashboardPage() {
   return (
-    <main className="min-h-screen">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 lg:py-20">
-        <div className="max-w-6xl mx-auto">
-          <ItemCard
-            title="Welcome to Your App"
-            description="This is a reusable ItemCard component built with shadcn/ui components as building blocks."
-            editable={true}
-            onSave={(_data) => {
-              // Handle save action
-            }}
-            onEdit={() => {
-              // Handle edit action
-            }}
-            onDuplicate={() => {
-              // Handle duplicate action
-            }}
-            onDelete={() => {
-              // Handle delete action
-            }}
-          />
-        </div>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Overview and analytics for your claims management.
+        </p>
       </div>
-    </main>
+    </div>
   )
 }

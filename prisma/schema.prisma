@@ -11,7 +11,7 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-// Example User model - extend as needed
+// User model for claims management
 model User {
   id        String   @id @default(cuid())
   clerkId   String   @unique
@@ -22,25 +22,34 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  posts Post[]
+  claims Claim[]
 
   @@index([clerkId])
   @@index([email])
 }
 
-// Example Post model - replace with your domain models
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?  @db.Text
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Claims model for claims management
+model Claim {
+  id          String      @id @default(cuid())
+  title       String
+  description String?     @db.Text
+  amount      Decimal?
+  status      ClaimStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   // Relations
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId String
+  claimant   User   @relation(fields: [claimantId], references: [id], onDelete: Cascade)
+  claimantId String
 
-  @@index([authorId])
-  @@index([published, createdAt])
+  @@index([claimantId])
+  @@index([status, createdAt])
+}
+
+enum ClaimStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CLOSED
 }

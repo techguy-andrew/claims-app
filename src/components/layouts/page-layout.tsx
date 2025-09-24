@@ -21,7 +21,7 @@ export function PageLayout({
     <main className="min-h-screen flex flex-col">
       <div className={cn(
         "flex-1 flex flex-col",
-        "w-full mx-auto",
+        "w-full",
         "px-4 sm:px-6 lg:px-8",
         "py-12 md:py-16 lg:py-20",
         spacingMap[spacing],
