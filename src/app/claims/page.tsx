@@ -1,6 +1,4 @@
-'use client'
-
-import { ItemCard } from '@/components/custom/ItemCard'
+import { ClaimCard, ClaimCardStack } from '@/components/custom/ClaimCard'
 
 export default function ClaimsPage() {
   return (
@@ -12,23 +10,14 @@ export default function ClaimsPage() {
         </p>
       </div>
 
-      <ItemCard
-        title="Sample Claim"
-        description="This is a sample claim item"
-        editable={true}
-        onSave={(_data) => {
-          // Handle save operation
-        }}
-        onEdit={() => {
-          // Handle edit operation
-        }}
-        onDelete={() => {
-          // Handle delete operation
-        }}
-        onDuplicate={() => {
-          // Handle duplicate operation
-        }}
-      />
+      <ClaimCardStack>
+        <ClaimCard
+          claimNumber="CLAIM-001"
+          clientName="Acme Restoration Co."
+          status="in-progress"
+          href="/claims/CLAIM-001"
+        />
+      </ClaimCardStack>
     </div>
   )
 }

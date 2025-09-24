@@ -100,7 +100,7 @@ export function ItemCard({
           )}
             onDoubleClick={() => editable && !isEditing && handleEdit()}
           >
-            <CardTitle 
+            <CardTitle
               ref={titleRef}
               contentEditable={isEditing}
               suppressContentEditableWarning
@@ -114,7 +114,7 @@ export function ItemCard({
             >
               {initialTitle}
             </CardTitle>
-            
+
             <CardDescription
               ref={descriptionRef}
               contentEditable={isEditing}
@@ -130,7 +130,7 @@ export function ItemCard({
               {initialDescription}
             </CardDescription>
           </div>
-          
+
           {(editable || onEdit || onDelete || onDuplicate) && (
             <div className="flex items-center gap-1 shrink-0">
               {isEditing ? (
@@ -144,7 +144,7 @@ export function ItemCard({
                   >
                     <Check className="h-4 w-4" />
                   </Button>
-                  
+
                   <Button
                     size="icon"
                     variant="ghost"
@@ -167,22 +167,22 @@ export function ItemCard({
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  
+
                   <DropdownMenuContent align="end">
                     {(editable || onEdit) && (
                       <DropdownMenuItem onClick={editable ? handleEdit : onEdit}>
                         Edit
                       </DropdownMenuItem>
                     )}
-                    
+
                     {onDuplicate && (
                       <DropdownMenuItem onClick={onDuplicate}>
                         Duplicate
                       </DropdownMenuItem>
                     )}
-                    
+
                     {onDelete && (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={onDelete}
                         className="text-red-600 focus:text-red-600"
                       >
@@ -196,7 +196,7 @@ export function ItemCard({
           )}
         </div>
       </CardHeader>
-      
+
       {children && (
         <CardContent>
           {children}
@@ -212,11 +212,11 @@ export function ItemCardGrid({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div 
+    <div
       className={cn(
         'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4',
         className
-      )} 
+      )}
       {...props}
     >
       {children}
@@ -241,13 +241,13 @@ export function ItemCardStack({
   }
 
   return (
-    <div 
+    <div
       className={cn(
         'flex w-full',
         direction === 'vertical' ? 'flex-col' : 'flex-row',
         spacingClasses[spacing],
         className
-      )} 
+      )}
       {...props}
     >
       {children}

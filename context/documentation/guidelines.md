@@ -160,46 +160,148 @@ import { Input } from "@/components/ui/input"
 import Button from '@mui/material/Button'  // Never do this
 ```
 
-#### The ItemCard Gold Standard
+#### The Claims App: Definitive Component Gold Standard
 
-Every component MUST follow these exact patterns for consistency:
+**This project's components represent the ULTIMATE REFERENCE for all future development.**
 
+Every component MUST follow these exact patterns from the Claims App implementation:
+
+##### **✅ ItemCard: Perfect Implementation Reference**
 ```tsx
-// src/components/posts/post-card.tsx
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import type { Post } from "@prisma/client"
+// src/components/custom/ItemCard.tsx - THE GOLD STANDARD
+'use client'
 
-interface PostCardProps {
-  post: Post
-  onEdit?: (id: string) => void
+import * as React from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+
+export interface ItemCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string
+  description?: string
+  editable?: boolean
+  onSave?: (data: { title: string; description: string }) => void  // ✅ Optional handlers
+  onEdit?: () => void
+  onDelete?: () => void
+  onDuplicate?: () => void
 }
 
-export function PostCard({ post, onEdit }: PostCardProps) {
+export function ItemCard({
+  title: initialTitle = 'Click to edit title',
+  description: initialDescription = 'Click to edit description',
+  className,
+  editable = false,
+  onSave,  // ✅ Self-contained event handling
+  onEdit,
+  onDelete,
+  onDuplicate,
+  ...props
+}: ItemCardProps) {
+  // ✅ Perfect inline editing implementation
+  const [isEditing, setIsEditing] = React.useState(false)
+
+  const handleSave = () => {
+    const newTitle = titleRef.current?.textContent || ''
+    const newDescription = descriptionRef.current?.textContent || ''
+    onSave?.({ title: newTitle, description: newDescription })  // ✅ Optional chaining
+    setIsEditing(false)
+  }
+
   return (
-    <Card className="w-full">
+    <Card className={cn('w-full', className)} {...props}>
       <CardHeader>
-        <div className="grid grid-cols-[1fr,auto] gap-6 items-start">
-          <div className="flex flex-col gap-3">
-            <CardTitle>{post.title}</CardTitle>
-            <p className="text-muted-foreground">{post.excerpt}</p>
+        <div className="grid grid-cols-[1fr,auto] gap-6 items-start">  {/* ✅ Perfect layout */}
+          <div className="flex flex-col gap-3">  {/* ✅ Gap-based spacing */}
+            <CardTitle
+              contentEditable={isEditing}  // ✅ Inline editing
+              onKeyDown={handleKeyDown}
+              className="outline-none min-h-[1.75rem] leading-7"
+            >
+              {initialTitle}
+            </CardTitle>
+            <CardDescription
+              contentEditable={isEditing}
+              onKeyDown={handleKeyDown}
+              className="outline-none min-h-[1.25rem] leading-5"
+            >
+              {initialDescription}
+            </CardDescription>
           </div>
-          <Badge>{post.status}</Badge>
+          {/* ✅ Action buttons with proper spacing */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* Dropdown menu implementation... */}
+          </div>
         </div>
       </CardHeader>
-      {onEdit && (
-        <CardContent>
-          <div className="flex gap-1">
-            <Button onClick={() => onEdit(post.id)} size="sm">
-              Edit
-            </Button>
-          </div>
-        </CardContent>
-      )}
     </Card>
   )
 }
+```
+
+##### **✅ Navigation System: Proven Architecture**
+```tsx
+// src/components/layouts/Navigation.tsx - BATTLE-TESTED SIMPLICITY
+'use client'
+
+import { TopBar } from './TopBar'
+
+interface NavigationProps {
+  children: React.ReactNode
+  actions?: React.ReactNode
+}
+
+export function Navigation({ children, actions }: NavigationProps) {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <TopBar actions={actions} />
+      <main className="flex-1 pt-16">  {/* ✅ Perfect offset */}
+        <div className="w-full py-6 px-4 sm:px-6">  {/* ✅ Responsive padding */}
+          {children}
+        </div>
+      </main>
+    </div>
+  )
+}
+```
+
+##### **✅ Server Component Pattern: Error-Free Implementation**
+```tsx
+// src/app/claims/[claimId]/page.tsx - PERFECT SERVER COMPONENT
+import { ItemCard, ItemCardStack } from '@/components/custom/ItemCard'
+
+interface ClaimDetailsPageProps {
+  params: Promise<{
+    claimId: string  // ✅ Proper TypeScript typing
+  }>
+}
+
+export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
+  const { claimId } = await params  // ✅ Async params handling
+
+  return (
+    <div className="flex flex-col gap-6">  {/* ✅ Gap-based layout */}
+      <div className="flex flex-col gap-3">
+        <h1 className="text-3xl font-bold">{claimId}</h1>
+        <p className="text-xl text-muted-foreground">Acme Restoration Co.</p>
+      </div>
+
+      <ItemCardStack>
+        <ItemCard
+          title="Water Damaged Carpet"
+          description="Commercial carpet in main lobby - 500 sq ft"
+          editable={true}  {/* ✅ Only serializable props */}
+        />
+      </ItemCardStack>
+    </div>
+  )
+}
+```
 ```
 
 **Required Patterns:**
@@ -741,6 +843,74 @@ export async function generateMetadata({ params }) {
 - [ ] Database query optimization
 - [ ] Static generation where possible
 - [ ] Client bundle < 300KB
+
+### **🚨 Critical Error Prevention Patterns**
+
+**Based on real development experience - these errors WILL occur if not followed:**
+
+#### **Server/Client Component Boundary Violations**
+```tsx
+// ❌ FATAL ERROR - Event handlers passed to Client Components
+export default async function ServerPage({ params }) {
+  const handleSave = (data) => { ... }  // ❌ Function in Server Component
+
+  return (
+    <ClientComponent
+      onSave={handleSave}  // ❌ CAUSES: "Event handlers cannot be passed to Client Component props"
+    />
+  )
+}
+
+// ✅ CORRECT PATTERN - Client Component handles events internally
+export default async function ServerPage({ params }) {
+  return (
+    <ClientComponent
+      editable={true}  // ✅ Only serializable props
+    />
+  )
+}
+```
+
+#### **Async/Await in Client Components**
+```tsx
+// ❌ FATAL ERROR - async function with 'use client'
+'use client'
+export default async function ClientPage({ params }) {  // ❌ async + 'use client' = ERROR
+  // ❌ CAUSES: "async/await is not yet supported in Client Components"
+}
+
+// ✅ CORRECT PATTERN - Async only in Server Components
+export default async function ServerPage({ params }) {  // ✅ No 'use client', can be async
+  const { claimId } = await params
+  return <ClientComponent claimId={claimId} />
+}
+```
+
+#### **TypeScript Promise Parameters**
+```tsx
+// ✅ CORRECT PATTERN - Promise<{param: string}> for dynamic routes
+interface PageProps {
+  params: Promise<{
+    claimId: string  // ✅ Proper typing for Next.js 15+
+  }>
+}
+
+export default async function Page({ params }: PageProps) {
+  const { claimId } = await params  // ✅ Await the Promise
+  return <div>{claimId}</div>
+}
+```
+
+#### **Gap vs Margin/Space Utilities**
+```tsx
+// ❌ FORBIDDEN PATTERNS - These cause layout issues
+<div className="space-y-4">           // ❌ Never use space utilities
+<div className="mb-4 mt-2">           // ❌ Never use margin utilities
+
+// ✅ CORRECT PATTERN - Always use gap
+<div className="flex flex-col gap-4">  // ✅ Gap for vertical spacing
+<div className="grid gap-6">           // ✅ Gap for grid layouts
+```
 
 ### Component Development Checklist
 
