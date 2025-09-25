@@ -373,8 +373,6 @@ if (isDryRun) {
   console.log('🛑 Stopping all development servers...\n')
 }
 
-let serversFound = false
-
 interface ProcessInfo {
   pid: string
   port?: string
@@ -393,15 +391,20 @@ function getListeningProcesses(): ProcessInfo[] {
       const parts = line.split(/\s+/)
       if (parts.length < 9) continue
       
-      const processName = parts[0]
-      const pid = parts[1]
+      const processName = parts[0] || 'unknown'
+      const pid = parts[1] || '0'
       const portInfo = parts[8] // Format: *:3000 or 127.0.0.1:3000
-      const port = portInfo.split(':').pop()
+      const port = portInfo?.split(':').pop()
       
       // Get full command line
       try {
         const command = execSync(`ps -p ${pid} -o command=`, { encoding: 'utf-8' }).trim()
-        processes.push({ pid, port, command, processName })
+        processes.push({
+          pid,
+          port: port ?? undefined,
+          command,
+          processName
+        })
       } catch {
         // Process might have exited
       }
@@ -425,16 +428,16 @@ function getDevelopmentProcesses(): ProcessInfo[] {
       const parts = line.split(/\s+/)
       if (parts.length < 11) continue
       
-      const pid = parts[1]
-      const command = parts.slice(10).join(' ')
-      const processName = parts[10].split('/').pop() || parts[10]
+      const pid = parts[1] || '0'
+      const command = parts.slice(10).join(' ') || 'unknown'
+      const processName = parts[10]?.split('/').pop() || parts[10] || 'unknown'
       
       // Only include processes owned by current user
       const user = parts[0]
       const currentUser = process.env.USER || process.env.USERNAME
       if (user !== currentUser) continue
       
-      processes.push({ pid, command, processName })
+      processes.push({ pid, command, processName, port: undefined })
     }
     
     return processes
@@ -575,13 +578,11 @@ async function main() {
     if (isDryRun) {
       console.log(`   🔍 Would stop this process\n`)
       stoppedServers.push(server)
-      serversFound = true
     } else {
       // Attempt to stop the server
       if (killProcess(server)) {
         console.log(`   ✓ Successfully stopped\n`)
         stoppedServers.push(server)
-        serversFound = true
       } else {
         console.log(`   ❌ Failed to stop (process may have already exited)\n`)
         failedServers.push(server)
