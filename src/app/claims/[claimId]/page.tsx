@@ -1,4 +1,4 @@
-import { ItemCard, ItemCardStack } from '@/components/custom/ItemCard'
+import { DetailCard } from '@/components/custom/DetailCard'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 
@@ -14,12 +14,20 @@ interface ClaimDetailsPageProps {
 export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
   const { claimId } = await params
 
-  // Fetch claim data from database
+  // Fetch claim data from database with all needed relations
   const claim = await prisma.claim.findUnique({
     where: { id: claimId },
     include: {
-      items: true,
-      claimant: true,
+      items: {
+        orderBy: { createdAt: 'asc' }
+      },
+      claimant: {
+        select: {
+          id: true,
+          name: true,
+          email: true
+        }
+      }
     },
   })
 
@@ -27,25 +35,17 @@ export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps
     notFound()
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3">
-        <h1 className="text-3xl font-bold">{claim.title}</h1>
-        <p className="text-xl text-muted-foreground">
-          {claim.description}
-        </p>
-      </div>
+  // Convert Prisma Decimal to number for client component
+  const serializedClaim = {
+    ...claim,
+    amount: claim.amount ? Number(claim.amount) : null,
+  }
 
-      <ItemCardStack>
-        {claim.items.map((item) => (
-          <ItemCard
-            key={item.id}
-            title={item.title}
-            description={item.description}
-            editable={true}
-          />
-        ))}
-      </ItemCardStack>
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <DetailCard claim={serializedClaim} editable={true} />
+      </div>
     </div>
   )
 }

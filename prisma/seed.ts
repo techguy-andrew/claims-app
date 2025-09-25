@@ -25,6 +25,11 @@ async function main() {
       title: 'CLAIM-001',
       description: 'Acme Restoration Co.',
       status: 'PENDING',
+      claimNumber: 'INS-2024-001',
+      insuranceCompany: 'Acme Insurance / John Adjuster',
+      adjustor: 'John Smith',
+      clientPhone: '(555) 123-4567',
+      clientAddress: '123 Main Street, Suite 100, Anytown, ST 12345',
       claimantId: user.id,
       items: {
         create: [

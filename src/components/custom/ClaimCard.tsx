@@ -36,8 +36,8 @@ export function ClaimCard({
         <CardHeader>
           <div className="grid grid-cols-[1fr,auto] gap-6 items-start">
             <div className="flex flex-col gap-3">
-              <CardTitle>{claimNumber}</CardTitle>
-              <CardDescription>{clientName}</CardDescription>
+              <CardTitle className="min-h-[1.75rem] leading-7">{claimNumber}</CardTitle>
+              <CardDescription className="min-h-[1.25rem] leading-5">{clientName}</CardDescription>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">

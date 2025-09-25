@@ -30,13 +30,18 @@ model User {
 
 // Claims model for claims management
 model Claim {
-  id          String      @id @default(cuid())
-  title       String
-  description String?     @db.Text
-  amount      Decimal?
-  status      ClaimStatus @default(PENDING)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id                String      @id @default(cuid())
+  title             String
+  description       String?     @db.Text
+  amount            Decimal?
+  status            ClaimStatus @default(PENDING)
+  claimNumber       String      @unique @default(cuid())
+  insuranceCompany  String?
+  adjustor          String?
+  clientPhone       String?
+  clientAddress     String?     @db.Text
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
   // Relations
   claimant   User   @relation(fields: [claimantId], references: [id], onDelete: Cascade)
@@ -45,6 +50,7 @@ model Claim {
 
   @@index([claimantId])
   @@index([status, createdAt])
+  @@index([claimNumber])
 }
 
 // Items model for claim items
