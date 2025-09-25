@@ -46,16 +46,22 @@ export function ItemCard({
   const [isEditing, setIsEditing] = React.useState(false)
   const [tempTitle, setTempTitle] = React.useState(safeTitle)
   const [tempDescription, setTempDescription] = React.useState(safeDescription)
+  const [originalTitle, setOriginalTitle] = React.useState(safeTitle)
+  const [originalDescription, setOriginalDescription] = React.useState(safeDescription)
   const titleRef = React.useRef<HTMLDivElement>(null)
   const descriptionRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     setTempTitle(safeTitle)
     setTempDescription(safeDescription)
+    setOriginalTitle(safeTitle)
+    setOriginalDescription(safeDescription)
   }, [safeTitle, safeDescription])
 
   const handleEdit = () => {
     setIsEditing(true)
+    setOriginalTitle(titleRef.current?.textContent || safeTitle)
+    setOriginalDescription(descriptionRef.current?.textContent || safeDescription)
     onEdit?.()
   }
 
@@ -70,7 +76,19 @@ export function ItemCard({
     setIsEditing(false)
   }
 
+  const checkForChanges = () => {
+    const currentTitle = titleRef.current?.textContent || ''
+    const currentDescription = descriptionRef.current?.textContent || ''
+    return currentTitle !== originalTitle || currentDescription !== originalDescription
+  }
+
   const handleCancel = () => {
+    if (checkForChanges()) {
+      if (!window.confirm('You have unsaved changes. Are you sure you want to cancel? Your changes will be lost.')) {
+        return
+      }
+    }
+
     if (titleRef.current && descriptionRef.current) {
       titleRef.current.textContent = tempTitle
       descriptionRef.current.textContent = tempDescription

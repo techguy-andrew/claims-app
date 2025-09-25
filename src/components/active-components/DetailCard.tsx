@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
 } from './card'
 import {
   DropdownMenu,
@@ -74,6 +73,11 @@ export function DetailCard({
   const [tempClientName, setTempClientName] = React.useState(safeClientName)
   const [tempClientPhone, setTempClientPhone] = React.useState(safeClientPhone)
   const [tempClientAddress, setTempClientAddress] = React.useState(safeClientAddress)
+  const [originalClaimNumber, setOriginalClaimNumber] = React.useState(safeClaimNumber)
+  const [originalInsuranceCompany, setOriginalInsuranceCompany] = React.useState(safeInsuranceCompany)
+  const [originalClientName, setOriginalClientName] = React.useState(safeClientName)
+  const [originalClientPhone, setOriginalClientPhone] = React.useState(safeClientPhone)
+  const [originalClientAddress, setOriginalClientAddress] = React.useState(safeClientAddress)
 
   const claimNumberRef = React.useRef<HTMLDivElement>(null)
   const insuranceCompanyRef = React.useRef<HTMLDivElement>(null)
@@ -87,6 +91,11 @@ export function DetailCard({
     setTempClientName(safeClientName)
     setTempClientPhone(safeClientPhone)
     setTempClientAddress(safeClientAddress)
+    setOriginalClaimNumber(safeClaimNumber)
+    setOriginalInsuranceCompany(safeInsuranceCompany)
+    setOriginalClientName(safeClientName)
+    setOriginalClientPhone(safeClientPhone)
+    setOriginalClientAddress(safeClientAddress)
   }, [safeClaimNumber, safeInsuranceCompany, safeClientName, safeClientPhone, safeClientAddress])
 
 
@@ -314,6 +323,11 @@ export function DetailCard({
 
   const handleEdit = () => {
     setIsEditing(true)
+    setOriginalClaimNumber(claimNumberRef.current?.textContent || safeClaimNumber)
+    setOriginalInsuranceCompany(insuranceCompanyRef.current?.textContent || safeInsuranceCompany)
+    setOriginalClientName(clientNameRef.current?.textContent || safeClientName)
+    setOriginalClientPhone(clientPhoneRef.current?.textContent || safeClientPhone)
+    setOriginalClientAddress(clientAddressRef.current?.textContent || safeClientAddress)
   }
 
   const handleSave = () => {
@@ -344,7 +358,27 @@ export function DetailCard({
   }
 
 
+  const checkForChanges = () => {
+    const currentClaimNumber = claimNumberRef.current?.textContent || ''
+    const currentInsuranceCompany = insuranceCompanyRef.current?.textContent || ''
+    const currentClientName = clientNameRef.current?.textContent || ''
+    const currentClientPhone = clientPhoneRef.current?.textContent || ''
+    const currentClientAddress = clientAddressRef.current?.textContent || ''
+
+    return currentClaimNumber !== originalClaimNumber ||
+           currentInsuranceCompany !== originalInsuranceCompany ||
+           currentClientName !== originalClientName ||
+           currentClientPhone !== originalClientPhone ||
+           currentClientAddress !== originalClientAddress
+  }
+
   const handleCancel = () => {
+    if (checkForChanges()) {
+      if (!window.confirm('You have unsaved changes. Are you sure you want to cancel? Your changes will be lost.')) {
+        return
+      }
+    }
+
     if (claimNumberRef.current && insuranceCompanyRef.current && clientNameRef.current && clientPhoneRef.current && clientAddressRef.current) {
       claimNumberRef.current.textContent = tempClaimNumber
       insuranceCompanyRef.current.textContent = tempInsuranceCompany
@@ -388,8 +422,6 @@ export function DetailCard({
             )}
             onDoubleClick={() => editable && !isLoading && !isEditing && handleEdit()}
           >
-            <CardTitle className="text-xl sm:text-2xl">Claim Details</CardTitle>
-
             <div className="flex flex-col gap-3 sm:gap-4 w-full">
               <div className="flex flex-col gap-1 w-full">
                 <label className="text-xs sm:text-sm font-medium text-muted-foreground">Claim Number</label>
