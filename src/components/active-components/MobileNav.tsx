@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet'
+import { Button } from './button'
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from './sheet'
 import { Menu } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 

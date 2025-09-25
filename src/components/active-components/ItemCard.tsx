@@ -7,14 +7,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from './card'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
+} from './dropdown-menu'
+import { Button } from './button'
 import { MoreVertical, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -92,13 +92,13 @@ export function ItemCard({
   }
 
   return (
-    <Card className={cn('w-full', className)} {...props}>
-      <CardHeader>
+    <Card className={cn('w-full h-full', className)} {...props}>
+      <CardHeader className="p-4 sm:p-6">
         <div className={cn(
-          "grid grid-cols-[1fr,auto] gap-6 items-start",
+          "grid grid-cols-[1fr,auto] gap-4 sm:gap-6 items-start w-full",
         )}>
           <div className={cn(
-            "flex flex-col gap-3",
+            "flex flex-col gap-2 sm:gap-3 min-w-0 flex-1",
             editable && "cursor-pointer"
           )}
             onDoubleClick={() => editable && !isEditing && handleEdit()}
@@ -112,6 +112,8 @@ export function ItemCard({
                 "outline-none",
                 "min-h-[1.75rem]",
                 "leading-7",
+                "text-base sm:text-lg lg:text-xl",
+                "break-words w-full",
                 isEditing && "cursor-text"
               )}
             >
@@ -127,6 +129,8 @@ export function ItemCard({
                 "outline-none",
                 "min-h-[1.25rem]",
                 "leading-5",
+                "text-sm sm:text-base",
+                "break-words w-full",
                 isEditing && "cursor-text"
               )}
             >
@@ -141,21 +145,21 @@ export function ItemCard({
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                    className="h-10 w-10 sm:h-8 sm:w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
                     onClick={handleSave}
                     aria-label="Save changes"
                   >
-                    <Check className="h-4 w-4" />
+                    <Check className="h-5 w-5 sm:h-4 sm:w-4" />
                   </Button>
 
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="h-10 w-10 sm:h-8 sm:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
                     onClick={handleCancel}
                     aria-label="Cancel changes"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-5 w-5 sm:h-4 sm:w-4" />
                   </Button>
                 </>
               ) : (
@@ -164,10 +168,10 @@ export function ItemCard({
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8"
+                      className="h-10 w-10 sm:h-8 sm:w-8"
                       aria-label="More options"
                     >
-                      <MoreVertical className="h-4 w-4" />
+                      <MoreVertical className="h-5 w-5 sm:h-4 sm:w-4" />
                     </Button>
                   </DropdownMenuTrigger>
 
@@ -201,7 +205,7 @@ export function ItemCard({
       </CardHeader>
 
       {children && (
-        <CardContent>
+        <CardContent className="p-4 sm:p-6 pt-0 w-full">
           {children}
         </CardContent>
       )}

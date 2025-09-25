@@ -7,8 +7,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+} from './card'
+import { Badge } from './badge'
 import { cn } from '@/lib/utils'
 import { ChevronRight } from 'lucide-react'
 
@@ -28,16 +28,16 @@ export function ClaimCard({
   ...props
 }: ClaimCardProps) {
   return (
-    <Link href={href} className="w-full">
+    <Link href={href} className="w-full h-full">
       <Card className={cn(
-        'w-full cursor-pointer transition-colors hover:bg-accent',
+        'w-full h-full cursor-pointer transition-colors hover:bg-accent',
         className
       )} {...props}>
-        <CardHeader>
-          <div className="grid grid-cols-[1fr,auto] gap-6 items-start">
-            <div className="flex flex-col gap-3">
-              <CardTitle className="min-h-[1.75rem] leading-7">{claimNumber}</CardTitle>
-              <CardDescription className="min-h-[1.25rem] leading-5">{clientName}</CardDescription>
+        <CardHeader className="p-4 sm:p-6">
+          <div className="grid grid-cols-[1fr,auto] gap-4 sm:gap-6 items-start w-full">
+            <div className="flex flex-col gap-2 sm:gap-3 min-w-0 flex-1">
+              <CardTitle className="min-h-[1.75rem] leading-7 text-base sm:text-lg lg:text-xl break-words">{claimNumber}</CardTitle>
+              <CardDescription className="min-h-[1.25rem] leading-5 text-sm sm:text-base break-words">{clientName}</CardDescription>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
@@ -47,11 +47,11 @@ export function ClaimCard({
                   status === 'in-progress' ? 'secondary' :
                   status === 'cancelled' ? 'destructive' :
                   'outline'
-                }>
+                } className="text-xs sm:text-sm whitespace-nowrap">
                   {status}
                 </Badge>
               )}
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
             </div>
           </div>
         </CardHeader>

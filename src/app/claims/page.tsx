@@ -1,4 +1,4 @@
-import { ClaimCard, ClaimCardStack } from '@/components/custom/ClaimCard'
+import { ClaimCard, ClaimCardStack } from '@/components/active-components/ClaimCard'
 import { prisma } from '@/lib/prisma'
 
 // Force dynamic rendering - don't statically generate this page
@@ -16,17 +16,17 @@ export default async function ClaimsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <h1 className="text-3xl font-bold">Claims</h1>
-            <p className="text-muted-foreground">
+    <div className="min-h-screen w-full bg-background">
+      <div className="w-full px-4 py-6 sm:px-6 sm:py-8">
+        <div className="flex flex-col gap-4 sm:gap-6 w-full">
+          <div className="flex flex-col gap-3 w-full">
+            <h1 className="text-2xl sm:text-3xl font-bold">Claims</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage your claims here.
             </p>
           </div>
 
-          <ClaimCardStack>
+          <ClaimCardStack className="w-full">
             {claims.map((claim) => (
               <ClaimCard
                 key={claim.id}

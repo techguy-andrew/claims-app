@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
-import { Toaster } from '@/components/ui/toaster'
-import { Navigation } from '@/components/layouts/Navigation'
+import { Toaster } from '@/components/active-components/toaster'
+import { Navigation } from '@/components/active-components/Navigation'
 import './globals.css'
 
 const inter = Inter({
@@ -12,7 +12,6 @@ const inter = Inter({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
 }
 
 export const metadata: Metadata = {
@@ -26,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={`${inter.variable} font-sans antialiased h-full`}>
+    <html lang="en" suppressHydrationWarning className="h-full w-full">
+      <body className={`${inter.variable} font-sans antialiased h-full w-full`}>
         <Navigation>
           {children}
         </Navigation>

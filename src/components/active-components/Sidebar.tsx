@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useNavigation } from '@/lib/navigation'
-import { Button } from '@/components/ui/button'
+import { Button } from './button'
 
 interface SidebarProps {
   onLinkClick?: () => void

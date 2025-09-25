@@ -1,4 +1,4 @@
-import { DetailCard } from '@/components/custom/DetailCard'
+import { DetailCard } from '@/components/active-components/DetailCard'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 
@@ -42,9 +42,9 @@ export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <DetailCard claim={serializedClaim} editable={true} />
+    <div className="min-h-screen w-full bg-background">
+      <div className="w-full px-4 py-6 sm:px-6 sm:py-8">
+        <DetailCard claim={serializedClaim} editable={true} className="w-full h-full" />
       </div>
     </div>
   )
