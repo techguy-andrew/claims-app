@@ -33,7 +33,7 @@ model Claim {
   id                String      @id @default(cuid())
   title             String
   description       String?     @db.Text
-  amount            Decimal?
+  amount            Decimal?    @db.Decimal(65,30)
   status            ClaimStatus @default(PENDING)
   claimNumber       String      @unique @default(cuid())
   insuranceCompany  String?
