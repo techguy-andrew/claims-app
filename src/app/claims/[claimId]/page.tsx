@@ -1,4 +1,5 @@
 import { DetailCard } from '@/components/active-components/DetailCard'
+import { StatusSelector } from '@/components/custom/StatusSelector'
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -60,21 +61,30 @@ export default async function ClaimDetailsPage({ params, searchParams }: ClaimDe
     <div className="min-h-screen w-full bg-background">
       <div className="w-full px-4 py-6 sm:px-6 sm:py-8">
         <div className="flex flex-col gap-4 sm:gap-6 w-full">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/claims">Claims</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>
-                  {isNewClaim ? 'New Claim' : serializedClaim.claimNumber}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <div className="grid grid-cols-[1fr,auto] gap-6 items-center">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/claims">Claims</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>
+                    {isNewClaim ? 'New Claim' : serializedClaim.claimNumber}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            {!isNewClaim && (
+              <StatusSelector
+                claimId={serializedClaim.id}
+                currentStatus={serializedClaim.status}
+                editable={true}
+              />
+            )}
+          </div>
 
           <DetailCard claim={serializedClaim} editable={true} isNewClaim={isNewClaim} className="w-full h-full" />
         </div>

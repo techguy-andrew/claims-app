@@ -11,26 +11,30 @@ import {
 import { Badge } from './badge'
 import { cn } from '@/lib/utils'
 import { ChevronRight } from 'lucide-react'
+import { ClaimStatus } from '@prisma/client'
+import { getStatusConfig } from '@/lib/status-config'
 
 export interface ClaimCardProps extends React.HTMLAttributes<HTMLDivElement> {
   claimNumber: string
   clientName: string
-  status?: 'pending' | 'in-progress' | 'completed' | 'cancelled'
+  status: ClaimStatus
   href: string
 }
 
 export function ClaimCard({
   claimNumber,
   clientName,
-  status = 'pending',
+  status,
   href,
   className,
   ...props
 }: ClaimCardProps) {
+  const statusConfig = getStatusConfig(status)
+
   return (
     <Link href={href} className="w-full h-full">
       <Card className={cn(
-        'w-full h-full cursor-pointer transition-colors hover:bg-accent',
+        'w-full h-full cursor-pointer transition-all duration-200 hover:bg-accent hover:shadow-md',
         className
       )} {...props}>
         <CardHeader className="p-4 sm:p-6">
@@ -41,17 +45,13 @@ export function ClaimCard({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              {status && (
-                <Badge variant={
-                  status === 'completed' ? 'default' :
-                  status === 'in-progress' ? 'secondary' :
-                  status === 'cancelled' ? 'destructive' :
-                  'outline'
-                } className="text-xs sm:text-sm whitespace-nowrap">
-                  {status}
-                </Badge>
-              )}
-              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+              <Badge
+                variant={statusConfig.variant}
+                className={`${statusConfig.className} text-xs sm:text-sm whitespace-nowrap transition-all duration-200`}
+              >
+                {statusConfig.label}
+              </Badge>
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground transition-colors duration-200 group-hover:text-foreground" />
             </div>
           </div>
         </CardHeader>

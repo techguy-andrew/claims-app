@@ -45,16 +45,7 @@ export default async function ClaimsPage() {
                 key={claim.id}
                 claimNumber={claim.claimNumber}
                 clientName={claim.claimant.name || 'Unknown Client'}
-                status={(() => {
-                  switch (claim.status) {
-                    case 'PENDING': return 'pending'
-                    case 'UNDER_REVIEW': return 'in-progress'
-                    case 'APPROVED': return 'completed'
-                    case 'REJECTED': return 'cancelled'
-                    case 'CLOSED': return 'cancelled'
-                    default: return 'pending'
-                  }
-                })()}
+                status={claim.status}
                 href={`/claims/${claim.id}`}
               />
             ))}
