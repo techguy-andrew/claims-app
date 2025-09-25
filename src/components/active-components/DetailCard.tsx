@@ -42,12 +42,14 @@ interface ClaimData {
 export interface DetailCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   claim: ClaimData
   editable?: boolean
+  isNewClaim?: boolean
 }
 
 export function DetailCard({
   claim: initialClaim,
   className,
   editable = false,
+  isNewClaim = false,
   ...props
 }: DetailCardProps) {
   const [claim, setClaim] = React.useState<ClaimData>(initialClaim)
@@ -60,27 +62,31 @@ export function DetailCard({
   }, [initialClaim])
 
   // Safe defaults for the fields
-  const safeClaimNumber = claim.claimNumber || 'Click to edit claim number'
-  const safeInsuranceCompany = claim.insuranceCompany || 'Click to edit insurance company'
-  const safeClientName = claim.claimant.name || 'Click to edit client name'
-  const safeClientPhone = claim.clientPhone || 'Click to edit client phone'
-  const safeClientAddress = claim.clientAddress || 'Click to edit client address'
+  const safeClaimNumber = claim.claimNumber || (isNewClaim ? '' : 'Click to edit claim number')
+  const safeInsuranceCompany = claim.insuranceCompany || (isNewClaim ? '' : 'Click to edit insurance company')
+  const safeAdjustor = claim.adjustor || (isNewClaim ? '' : 'Click to edit adjustor')
+  const safeClientName = claim.claimant.name || (isNewClaim ? '' : 'Click to edit client name')
+  const safeClientPhone = claim.clientPhone || (isNewClaim ? '' : 'Click to edit client phone')
+  const safeClientAddress = claim.clientAddress || (isNewClaim ? '' : 'Click to edit client address')
 
   // Editing state following ItemCard pattern
-  const [isEditing, setIsEditing] = React.useState(false)
+  const [isEditing, setIsEditing] = React.useState(isNewClaim)
   const [tempClaimNumber, setTempClaimNumber] = React.useState(safeClaimNumber)
   const [tempInsuranceCompany, setTempInsuranceCompany] = React.useState(safeInsuranceCompany)
+  const [tempAdjustor, setTempAdjustor] = React.useState(safeAdjustor)
   const [tempClientName, setTempClientName] = React.useState(safeClientName)
   const [tempClientPhone, setTempClientPhone] = React.useState(safeClientPhone)
   const [tempClientAddress, setTempClientAddress] = React.useState(safeClientAddress)
   const [originalClaimNumber, setOriginalClaimNumber] = React.useState(safeClaimNumber)
   const [originalInsuranceCompany, setOriginalInsuranceCompany] = React.useState(safeInsuranceCompany)
+  const [originalAdjustor, setOriginalAdjustor] = React.useState(safeAdjustor)
   const [originalClientName, setOriginalClientName] = React.useState(safeClientName)
   const [originalClientPhone, setOriginalClientPhone] = React.useState(safeClientPhone)
   const [originalClientAddress, setOriginalClientAddress] = React.useState(safeClientAddress)
 
   const claimNumberRef = React.useRef<HTMLDivElement>(null)
   const insuranceCompanyRef = React.useRef<HTMLDivElement>(null)
+  const adjustorRef = React.useRef<HTMLDivElement>(null)
   const clientNameRef = React.useRef<HTMLDivElement>(null)
   const clientPhoneRef = React.useRef<HTMLDivElement>(null)
   const clientAddressRef = React.useRef<HTMLDivElement>(null)
@@ -88,15 +94,17 @@ export function DetailCard({
   React.useEffect(() => {
     setTempClaimNumber(safeClaimNumber)
     setTempInsuranceCompany(safeInsuranceCompany)
+    setTempAdjustor(safeAdjustor)
     setTempClientName(safeClientName)
     setTempClientPhone(safeClientPhone)
     setTempClientAddress(safeClientAddress)
     setOriginalClaimNumber(safeClaimNumber)
     setOriginalInsuranceCompany(safeInsuranceCompany)
+    setOriginalAdjustor(safeAdjustor)
     setOriginalClientName(safeClientName)
     setOriginalClientPhone(safeClientPhone)
     setOriginalClientAddress(safeClientAddress)
-  }, [safeClaimNumber, safeInsuranceCompany, safeClientName, safeClientPhone, safeClientAddress])
+  }, [safeClaimNumber, safeInsuranceCompany, safeAdjustor, safeClientName, safeClientPhone, safeClientAddress])
 
 
   // Handle client name update
@@ -136,6 +144,7 @@ export function DetailCard({
   const handleClaimSave = async (data: {
     claimNumber: string
     insuranceCompany: string
+    adjustor: string
     clientPhone: string
     clientAddress: string
   }) => {
@@ -325,15 +334,17 @@ export function DetailCard({
     setIsEditing(true)
     setOriginalClaimNumber(claimNumberRef.current?.textContent || safeClaimNumber)
     setOriginalInsuranceCompany(insuranceCompanyRef.current?.textContent || safeInsuranceCompany)
+    setOriginalAdjustor(adjustorRef.current?.textContent || safeAdjustor)
     setOriginalClientName(clientNameRef.current?.textContent || safeClientName)
     setOriginalClientPhone(clientPhoneRef.current?.textContent || safeClientPhone)
     setOriginalClientAddress(clientAddressRef.current?.textContent || safeClientAddress)
   }
 
   const handleSave = () => {
-    if (claimNumberRef.current && insuranceCompanyRef.current && clientNameRef.current && clientPhoneRef.current && clientAddressRef.current) {
+    if (claimNumberRef.current && insuranceCompanyRef.current && adjustorRef.current && clientNameRef.current && clientPhoneRef.current && clientAddressRef.current) {
       const newClaimNumber = claimNumberRef.current.textContent || ''
       const newInsuranceCompany = insuranceCompanyRef.current.textContent || ''
+      const newAdjustor = adjustorRef.current.textContent || ''
       const newClientName = clientNameRef.current.textContent || ''
       const newClientPhone = clientPhoneRef.current.textContent || ''
       const newClientAddress = clientAddressRef.current.textContent || ''
@@ -341,6 +352,7 @@ export function DetailCard({
       handleClaimSave({
         claimNumber: newClaimNumber,
         insuranceCompany: newInsuranceCompany,
+        adjustor: newAdjustor,
         clientPhone: newClientPhone,
         clientAddress: newClientAddress
       })
@@ -350,6 +362,7 @@ export function DetailCard({
 
       setTempClaimNumber(newClaimNumber)
       setTempInsuranceCompany(newInsuranceCompany)
+      setTempAdjustor(newAdjustor)
       setTempClientName(newClientName)
       setTempClientPhone(newClientPhone)
       setTempClientAddress(newClientAddress)
@@ -361,12 +374,14 @@ export function DetailCard({
   const checkForChanges = () => {
     const currentClaimNumber = claimNumberRef.current?.textContent || ''
     const currentInsuranceCompany = insuranceCompanyRef.current?.textContent || ''
+    const currentAdjustor = adjustorRef.current?.textContent || ''
     const currentClientName = clientNameRef.current?.textContent || ''
     const currentClientPhone = clientPhoneRef.current?.textContent || ''
     const currentClientAddress = clientAddressRef.current?.textContent || ''
 
     return currentClaimNumber !== originalClaimNumber ||
            currentInsuranceCompany !== originalInsuranceCompany ||
+           currentAdjustor !== originalAdjustor ||
            currentClientName !== originalClientName ||
            currentClientPhone !== originalClientPhone ||
            currentClientAddress !== originalClientAddress
@@ -379,9 +394,10 @@ export function DetailCard({
       }
     }
 
-    if (claimNumberRef.current && insuranceCompanyRef.current && clientNameRef.current && clientPhoneRef.current && clientAddressRef.current) {
+    if (claimNumberRef.current && insuranceCompanyRef.current && adjustorRef.current && clientNameRef.current && clientPhoneRef.current && clientAddressRef.current) {
       claimNumberRef.current.textContent = tempClaimNumber
       insuranceCompanyRef.current.textContent = tempInsuranceCompany
+      adjustorRef.current.textContent = tempAdjustor
       clientNameRef.current.textContent = tempClientName
       clientPhoneRef.current.textContent = tempClientPhone
       clientAddressRef.current.textContent = tempClientAddress
@@ -440,7 +456,7 @@ export function DetailCard({
               </div>
 
               <div className="flex flex-col gap-1 w-full">
-                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Insurance Company / Adjustor</label>
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Insurance Company</label>
                 <div
                   ref={insuranceCompanyRef}
                   contentEditable={isEditing}
@@ -452,6 +468,22 @@ export function DetailCard({
                   )}
                 >
                   {safeInsuranceCompany}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1 w-full">
+                <label className="text-xs sm:text-sm font-medium text-muted-foreground">Adjustor</label>
+                <div
+                  ref={adjustorRef}
+                  contentEditable={isEditing}
+                  suppressContentEditableWarning
+                  onKeyDown={handleKeyDown}
+                  className={cn(
+                    "outline-none min-h-[1.25rem] leading-5 font-semibold text-sm sm:text-base break-words w-full",
+                    isEditing && "cursor-text"
+                  )}
+                >
+                  {safeAdjustor}
                 </div>
               </div>
 

@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
-// Validation schema for user updates
+// Validation schema for user updates - allow empty names for new claims
 const updateUserSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().optional().default(''),
 })
 
 interface RouteParams {

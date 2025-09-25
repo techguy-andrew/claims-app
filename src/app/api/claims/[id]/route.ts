@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
-// Validation schema
+// Validation schema - allow empty fields for minimal claims
 const updateClaimSchema = z.object({
   claimNumber: z.string().min(1, 'Claim number is required'),
-  insuranceCompany: z.string().min(1, 'Insurance company is required'),
-  clientPhone: z.string().min(1, 'Client phone is required'),
-  clientAddress: z.string().min(1, 'Client address is required'),
+  insuranceCompany: z.string().optional().default(''),
+  adjustor: z.string().optional().default(''),
+  clientPhone: z.string().optional().default(''),
+  clientAddress: z.string().optional().default(''),
 })
 
 interface RouteParams {
@@ -69,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const { claimNumber, insuranceCompany, clientPhone, clientAddress } = validation.data
+    const { claimNumber, insuranceCompany, adjustor, clientPhone, clientAddress } = validation.data
 
     // Check if claim exists
     const existingClaim = await prisma.claim.findUnique({
@@ -89,6 +90,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       data: {
         claimNumber,
         insuranceCompany,
+        adjustor,
         clientPhone,
         clientAddress,
         updatedAt: new Date()

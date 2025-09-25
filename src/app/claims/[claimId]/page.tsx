@@ -18,10 +18,14 @@ interface ClaimDetailsPageProps {
   params: Promise<{
     claimId: string
   }>
+  searchParams: Promise<{
+    isNew?: string
+  }>
 }
 
-export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps) {
+export default async function ClaimDetailsPage({ params, searchParams }: ClaimDetailsPageProps) {
   const { claimId } = await params
+  const { isNew } = await searchParams
 
   // Fetch claim data from database with all needed relations
   const claim = await prisma.claim.findUnique({
@@ -50,6 +54,8 @@ export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps
     amount: claim.amount ? Number(claim.amount) : null,
   }
 
+  const isNewClaim = isNew === 'true'
+
   return (
     <div className="min-h-screen w-full bg-background">
       <div className="w-full px-4 py-6 sm:px-6 sm:py-8">
@@ -63,12 +69,14 @@ export default async function ClaimDetailsPage({ params }: ClaimDetailsPageProps
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{serializedClaim.claimNumber}</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {isNewClaim ? 'New Claim' : serializedClaim.claimNumber}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
 
-          <DetailCard claim={serializedClaim} editable={true} className="w-full h-full" />
+          <DetailCard claim={serializedClaim} editable={true} isNewClaim={isNewClaim} className="w-full h-full" />
         </div>
       </div>
     </div>
