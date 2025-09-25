@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
+import { showError } from '@/lib/toast-utils'
 
 export default function NewClaimPage() {
   const router = useRouter()
@@ -28,13 +28,7 @@ export default function NewClaimPage() {
         router.replace(`/claims/${newClaim.id}?isNew=true`)
       } catch (error) {
         console.error('Error creating new claim:', error)
-        toast.error(error instanceof Error ? error.message : 'Failed to create new claim', {
-          style: {
-            background: '#ef4444',
-            color: 'white',
-            border: 'none'
-          }
-        })
+        showError(error instanceof Error ? error.message : 'Failed to create new claim')
 
         // Redirect back to claims page on error
         router.replace('/claims')

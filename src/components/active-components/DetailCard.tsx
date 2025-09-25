@@ -16,7 +16,7 @@ import { Button } from './button'
 import { ItemCard, ItemCardStack } from './ItemCard'
 import { MoreVertical, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
+import { showSuccess, showError } from '@/lib/toast-utils'
 import { useRouter } from 'next/navigation'
 
 // Types following Prisma schema
@@ -132,13 +132,7 @@ export function DetailCard({
       }))
     } catch (error) {
       console.error('Error updating client name:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to update client name', {
-        style: {
-          background: '#ef4444',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showError(error instanceof Error ? error.message : 'Failed to update client name')
     }
   }
 
@@ -168,22 +162,10 @@ export function DetailCard({
       const updatedClaim = await response.json()
       setClaim(updatedClaim)
 
-      toast.success('Claim updated successfully', {
-        style: {
-          background: '#22c55e',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showSuccess('Claim updated successfully')
     } catch (error) {
       console.error('Error updating claim:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to update claim', {
-        style: {
-          background: '#ef4444',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showError(error instanceof Error ? error.message : 'Failed to update claim')
     } finally {
       setIsLoading(false)
     }
@@ -206,24 +188,12 @@ export function DetailCard({
         throw new Error(error.error || 'Failed to delete claim')
       }
 
-      toast.success('Claim deleted successfully', {
-        style: {
-          background: '#22c55e',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showSuccess('Claim deleted successfully')
 
       router.push('/claims')
     } catch (error) {
       console.error('Error deleting claim:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to delete claim', {
-        style: {
-          background: '#ef4444',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showError(error instanceof Error ? error.message : 'Failed to delete claim')
       setIsLoading(false)
     }
   }
@@ -253,13 +223,7 @@ export function DetailCard({
         )
       }))
 
-      toast.success('Item updated successfully', {
-        style: {
-          background: '#22c55e',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showSuccess('Item updated successfully')
     } catch (error) {
       console.error('Error updating item:', error)
 
@@ -270,13 +234,7 @@ export function DetailCard({
         errorMessage = error.message
       }
 
-      toast.error(errorMessage, {
-        style: {
-          background: '#ef4444',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showError(errorMessage)
     }
   }
 
@@ -301,22 +259,10 @@ export function DetailCard({
         items: prevClaim.items.filter(item => item.id !== itemId)
       }))
 
-      toast.success('Item deleted successfully', {
-        style: {
-          background: '#22c55e',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showSuccess('Item deleted successfully')
     } catch (error) {
       console.error('Error deleting item:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to delete item', {
-        style: {
-          background: '#ef4444',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showError(error instanceof Error ? error.message : 'Failed to delete item')
     }
   }
 
@@ -343,22 +289,10 @@ export function DetailCard({
         items: [...prevClaim.items, newItem]
       }))
 
-      toast.success('Item created successfully', {
-        style: {
-          background: '#22c55e',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showSuccess('Item created successfully')
     } catch (error) {
       console.error('Error creating item:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to create item', {
-        style: {
-          background: '#ef4444',
-          color: 'white',
-          border: 'none'
-        }
-      })
+      showError(error instanceof Error ? error.message : 'Failed to create item')
     }
   }
 
