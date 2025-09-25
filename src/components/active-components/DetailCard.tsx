@@ -15,7 +15,7 @@ import {
 } from './dropdown-menu'
 import { Button } from './button'
 import { ItemCard, ItemCardStack } from './ItemCard'
-import { MoreVertical, Check, X, Plus } from 'lucide-react'
+import { MoreVertical, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -473,27 +473,27 @@ export function DetailCard({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {isEditing ? (
               <>
                 <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-10 w-10 sm:h-8 sm:w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full px-3 py-1 h-8 text-xs font-medium text-green-600 border-green-200 hover:text-green-700 hover:bg-green-50 hover:border-green-300"
                   onClick={handleSave}
                   aria-label="Save changes"
                 >
-                  <Check className="h-5 w-5 sm:h-4 sm:w-4" />
+                  Save
                 </Button>
 
                 <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-10 w-10 sm:h-8 sm:w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full px-3 py-1 h-8 text-xs font-medium text-red-600 border-red-200 hover:text-red-700 hover:bg-red-50 hover:border-red-300"
                   onClick={handleCancel}
                   aria-label="Cancel changes"
                 >
-                  <X className="h-5 w-5 sm:h-4 sm:w-4" />
+                  Cancel
                 </Button>
               </>
             ) : (
