@@ -62,12 +62,12 @@ export function DetailCard({
   }, [initialClaim])
 
   // Safe defaults for the fields
-  const safeClaimNumber = claim.claimNumber || (isNewClaim ? '' : 'Click to edit claim number')
-  const safeInsuranceCompany = claim.insuranceCompany || (isNewClaim ? '' : 'Click to edit insurance company')
-  const safeAdjustor = claim.adjustor || (isNewClaim ? '' : 'Click to edit adjustor')
-  const safeClientName = claim.claimant.name || (isNewClaim ? '' : 'Click to edit client name')
-  const safeClientPhone = claim.clientPhone || (isNewClaim ? '' : 'Click to edit client phone')
-  const safeClientAddress = claim.clientAddress || (isNewClaim ? '' : 'Click to edit client address')
+  const safeClaimNumber = claim.claimNumber || ''
+  const safeInsuranceCompany = claim.insuranceCompany || ''
+  const safeAdjustor = claim.adjustor || ''
+  const safeClientName = claim.claimant.name || ''
+  const safeClientPhone = claim.clientPhone || ''
+  const safeClientAddress = claim.clientAddress || ''
 
   // Editing state following ItemCard pattern
   const [isEditing, setIsEditing] = React.useState(isNewClaim)
@@ -432,10 +432,7 @@ export function DetailCard({
       <CardHeader className="p-4 sm:p-6">
         <div className="grid grid-cols-[1fr,auto] gap-4 sm:gap-6 items-start w-full">
           <div
-            className={cn(
-              "flex flex-col gap-3 min-w-0 flex-1",
-              editable && !isLoading && "cursor-pointer"
-            )}
+            className="flex flex-col gap-3 min-w-0 flex-1"
             onDoubleClick={() => editable && !isLoading && !isEditing && handleEdit()}
           >
             <div className="flex flex-col gap-3 sm:gap-4 w-full">
@@ -448,6 +445,8 @@ export function DetailCard({
                   onKeyDown={handleKeyDown}
                   className={cn(
                     "outline-none min-h-[1.75rem] leading-7 font-semibold text-sm sm:text-base break-words w-full",
+                    "border-none bg-transparent p-0 m-0 resize-none",
+                    "focus:outline-none focus:ring-0 focus:border-transparent",
                     isEditing && "cursor-text"
                   )}
                 >
@@ -464,6 +463,8 @@ export function DetailCard({
                   onKeyDown={handleKeyDown}
                   className={cn(
                     "outline-none min-h-[1.25rem] leading-5 font-semibold text-sm sm:text-base break-words w-full",
+                    "border-none bg-transparent p-0 m-0 resize-none",
+                    "focus:outline-none focus:ring-0 focus:border-transparent",
                     isEditing && "cursor-text"
                   )}
                 >
@@ -480,6 +481,8 @@ export function DetailCard({
                   onKeyDown={handleKeyDown}
                   className={cn(
                     "outline-none min-h-[1.25rem] leading-5 font-semibold text-sm sm:text-base break-words w-full",
+                    "border-none bg-transparent p-0 m-0 resize-none",
+                    "focus:outline-none focus:ring-0 focus:border-transparent",
                     isEditing && "cursor-text"
                   )}
                 >
@@ -496,6 +499,8 @@ export function DetailCard({
                   onKeyDown={handleKeyDown}
                   className={cn(
                     "outline-none min-h-[1.25rem] leading-5 font-semibold text-sm sm:text-base break-words w-full",
+                    "border-none bg-transparent p-0 m-0 resize-none",
+                    "focus:outline-none focus:ring-0 focus:border-transparent",
                     isEditing && "cursor-text"
                   )}
                 >
@@ -512,6 +517,8 @@ export function DetailCard({
                   onKeyDown={handleKeyDown}
                   className={cn(
                     "outline-none min-h-[1.25rem] leading-5 font-semibold text-sm sm:text-base break-words w-full",
+                    "border-none bg-transparent p-0 m-0 resize-none",
+                    "focus:outline-none focus:ring-0 focus:border-transparent",
                     isEditing && "cursor-text"
                   )}
                 >
@@ -528,6 +535,8 @@ export function DetailCard({
                   onKeyDown={handleKeyDown}
                   className={cn(
                     "outline-none min-h-[1.25rem] leading-5 font-semibold text-sm sm:text-base break-words w-full",
+                    "border-none bg-transparent p-0 m-0 resize-none",
+                    "focus:outline-none focus:ring-0 focus:border-transparent",
                     isEditing && "cursor-text"
                   )}
                 >
@@ -597,7 +606,7 @@ export function DetailCard({
       <CardContent className="p-4 sm:p-6 pt-0 w-full">
         <div className="flex flex-col gap-4 sm:gap-6 w-full">
           <div className="flex items-center justify-between w-full">
-            <h3 className="text-base sm:text-lg font-medium">Claim Items</h3>
+            <label className="text-xs sm:text-sm font-medium text-muted-foreground">Claim Items</label>
             <Button
               variant="outline"
               size="sm"
